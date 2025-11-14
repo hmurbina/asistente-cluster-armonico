@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Asistente Armónico — X,A,B,C → D (PRZ, Confluencias)</title>
+<style>
+  :root{--bg:#0b1220;--panel:#121a2b;--text:#e8eefc;--muted:#8fa1c7;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444}
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
+  body{margin:0;background:var(--bg);color:var(--text)}
+  header{padding:16px 18px;border-bottom:1px solid #1b2946}
+  .container{max-width:1200px;margin:0 auto;padding:18px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .card{background:var(--panel);border:1px solid #1b2946;border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+  h1{margin:0;font-size:20px}
+  h2{margin:4px 0 10px;font-size:16px;color:var(--muted)}
+  label{display:block;margin:8px 0 6px;color:var(--muted)}
+  input[type="number"]{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3e6b;background:#0e1526;color:#e8eefc}
+  .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .btn{display:inline-block;margin-top:10px;background:#2040b3;border:1px solid #3052d4;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#0e1526;border:1px solid #233457;color:#cfe2ff;padding:6px 10px;border-radius:999px;margin:3px 6px 3px 0}
+  .ok{border-color:#295e40;color:var(--ok)} .warn{border-color:#6d5215;color:var(--warn)} .bad{border-color:#5b2323;color:var(--bad)}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border-bottom:1px solid #1b2946;padding:8px 6px;text-align:left;font-size:14px;vertical-align:top}
+  .small{font-size:12px;color:var(--muted)} .muted{color:var(--muted)} .flex{display:flex;flex-wrap:wrap}
+  .hint{font-size:12px;color:#9fb1da;margin-top:6px}
+  .flag{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid #2a3e6b;background:#0e1526;margin-left:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Asistente Armónico · PRZ y Confluencias desde X, A, B, C
+    <span id="trend" class="flag">—</span>
+  </h1>
+  <div class="small">
+    CD se proyecta en la <b>misma dirección que AB</b>. La dirección del setup es la <b>opuesta a CD</b> (reversa en D).
+    Para ventas se usa el <b>primer valor del cluster</b>; para compras, el <b>último valor del cluster</b>.
+    Se listan todos los niveles con <b>confluencias ≥ 2</b> y sus patrones.
+  </div>
+</header>
+
+<div class="container grid">
+  <section class="card">
+    <h2>1) Datos</h2>
+    <div class="row">
+      <div><label>X</label><input id="x" type="number" step="0.0001" placeholder="ej. 1.2345"></div>
+      <div><label>A</label><input id="a" type="number" step="0.0001"></div>
+    </div>
+    <div class="row">
+      <div><label>B</label><input id="b" type="number" step="0.0001"></div>
+      <div><label>C</label><input id="c" type="number" step="0.0001"></div>
+    </div>
+    <div class="row-3">
+      <div><label>Tolerancia (± relativo)</label><input id="tol" type="number" min="0" max="0.1" step="0.001" value="0.02"></div>
+      <div><label>Umbral (mejor PRZ)</label><input id="th" type="number" min="2" max="6" step="1" value="3"></div>
+      <div><label>&nbsp;</label><button class="btn" id="calc">Calcular</button></div>
+    </div>
+    <div class="hint">Incluye: Gartley, Bat, Butterfly, Crab, Deep Crab, Cypher, Nen Star, Shark, AB=CD (1.0 / 1.27 / 1.618) y proyecciones BC (1.27…3.618).</div>
+  </section>
+
+  <aside class="card">
+    <h2>Ratios medidos</h2>
+    <div id="ratios" class="flex small muted"></div>
+    <h2>Candidatos de patrón (score reglas)</h2>
+    <table>
+      <thead><tr><th>Patrón</th><th>Score</th><th>Estado</th></tr></thead>
+      <tbody id="candidates"></tbody>
+    </table>
+  </aside>
+</div>
+
+<div class="container">
+  <section class="card">
+    <h2>2) PRZ & Confluencias (ordenadas por fuerza)</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Precio D (cluster)</th><th>Conf.</th><th>Patrón(es)</th><th>Detalles</th></tr>
+      </thead>
+      <tbody id="levels"></tbody>
+    </table>
+    <div class="hint">Confluencias: D/XA≈fib, CD/BC≈(1.27…3.618), CD/AB≈(1.0/1.27/1.618), D/XC≈0.786 (Cypher), reglas B/C del patrón y pertenencia a PRZ.</div>
+  </section>
+
+  <section class="card">
+    <h2>3) Mejor nivel y entradas (confluencias ≥ 2)</h2>
+    <div id="exec" class="small" style="margin-bottom:8px;"></div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Entrada (D)</th><th>SL</th><th>TP1</th><th>TP2</th><th>Conf.</th><th>Patrón(es)</th><th>Notas</th></tr>
+      </thead>
+      <tbody id="entries"></tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const fmt = n => Number.isFinite(n) ? n.toFixed(5) : "-";
+  const near = (v,t,rel)=> Math.abs(v-t) <= rel*Math.max(t,1e-9);
+  const between = (v,lo,hi)=> v>=lo && v<=hi;
+
+  const FIB_XA = [0.382,0.5,0.618,0.707,0.786,0.886,1.0,1.13,1.27,1.414,1.618,2.0,2.24,2.618,3.618];
+  const FIB_BC = [1.27,1.618,2.0,2.24,2.618,3.618];
+  const FIB_AB = [1.0,1.27,1.618];
+
+  function dirCD_from_AB(a, b){ return b < a ? -1 : 1; } // -1 abajo, +1 arriba
+
+  function inRange(v,lo,hi,t){
+    const loE=lo*(1-t), hiE=hi*(1+t);
+    return [between(v,loE,hiE), between(v,loE,hiE)?1:0];
+  }
+
+  function rangeXA(a,dirCD,lo,hi,XA,label){
+    const to = ratio => dirCD < 0 ? a - ratio*XA : a + ratio*XA;
+    return [{D:to(lo),patternSrc:label},{D:to(hi),patternSrc:label}];
+  }
+  function rangeXC(ref,dirCD,lo,hi,XC,label){
+    const to = ratio => dirCD < 0 ? ref - ratio*XC : ref + ratio*XC;
+    return [{D:to(lo),patternSrc:label},{D:to(hi),patternSrc:label}];
+  }
+  function abcdCandidates(a,b,c,dirCD,AB){
+    const s = dirCD < 0 ? -1 : 1;
+    return [
+      {D: c + s*(1.0*AB),   patternSrc:"PRZ AB=CD 1.0×AB"},
+      {D: c + s*(1.272*AB), patternSrc:"PRZ AB=CD 1.272×AB"},
+      {D: c + s*(1.618*AB), patternSrc:"PRZ AB=CD 1.618×AB"}
+    ];
+  }
+
+  const PATTERNS = [
+    {
+      key:"Gartley",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,0.75,0.88,XA,"PRZ Gartley ~0.786×XA")
+    },
+    {
+      key:"Bat",
+      rules:R=>[ inRange(R.B_XA,.382,.5,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,0.78,0.99,XA,"PRZ Bat 0.886×XA")
+    },
+    {
+      key:"Butterfly",
+      rules:R=>[ inRange(R.B_XA,.75,.99,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.27,1.618,XA,"PRZ Butterfly 1.27–1.618×XA")
+    },
+    {
+      key:"Crab",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.60,1.64,XA,"PRZ Crab ≈1.618×XA")
+    },
+    {
+      key:"Deep Crab",
+      rules:R=>[ inRange(R.B_XA,.86,.91,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.60,1.64,XA,"PRZ Deep Crab B≈0.886; D≈1.618×XA")
+    },
+    {
+      key:"Cypher",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_XA_ext,1.13,1.414,R.tol) ],
+      przFromC:(c,dirCD,XC)=>rangeXC(c,dirCD,0.76,0.81,XC,"PRZ Cypher D≈0.786×XC")
+    },
+    {
+      key:"Nen Star",
+      rules:R=>[ inRange(R.B_XA,.382,.786,R.tol), inRange(R.C_AB_ext,1.13,1.414,R.tol) ],
+      prz:(a,dirCD,XA)=>[
+        ...rangeXA(a,dirCD,1.26,1.29,XA,"PRZ Nen Star 1.272×XA"),
+        ...rangeXA(a,dirCD,0.76,0.81,XA,"PRZ Nen Star alt 0.786×XA")
+      ]
+    },
+    {
+      key:"Shark",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB_ext,1.13,1.618,R.tol) ],
+      prz:(a,dirCD,XA)=>[
+        ...rangeXA(a,dirCD,0.86,0.91,XA,"PRZ Shark Tipo I 0.886×XA"),
+        ...rangeXA(a,dirCD,1.10,1.16,XA,"PRZ Shark Tipo II 1.13×XA")
+      ]
+    }
+  ];
+
+  function compute(){
+    const x=+$("x").value, a=+$("a").value, b=+$("b").value, c=+$("c").value;
+    const tol=+($("tol").value||0.02), th=+($("th").value||3);
+    if(!isFinite(x)||!isFinite(a)||!isFinite(b)||!isFinite(c)){ alert("Ingresa X, A, B y C"); return; }
+
+    const XA = Math.abs(x-a), AB = Math.abs(a-b), BC = Math.abs(b-c), XC = Math.abs(x-c);
+    const dirCD = dirCD_from_AB(a,b); // dirección de CD (= AB)
+
+    const R = {
+      tol,
+      B_XA: AB/XA,
+      C_AB: BC/AB,
+      C_AB_ext: BC/AB,
+      C_XA_ext: ((a>x? c>a : c<a) ? Math.abs(x-c)/XA : NaN)
+    };
+
+    $("ratios").innerHTML = `
+      <span class="pill"><b>B/XA</b> ${fmt(R.B_XA)}</span>
+      <span class="pill"><b>C/AB</b> ${fmt(R.C_AB)}</span>
+      <span class="pill"><b>C ext/XA</b> ${isFinite(R.C_XA_ext)?fmt(R.C_XA_ext):"—"}</span>
+      <span class="pill"><b>Dir. CD</b> ${dirCD<0?"↓ (hacia abajo)":"↑ (hacia arriba)"}</span>
+    `;
+
+    // Ranking por reglas sin D
+    const candBody=$("candidates"); candBody.innerHTML="";
+    const scored = PATTERNS.map(p=>{
+      const rs = p.rules(R); let ok=true, score=0;
+      rs.forEach(r=>{ ok=ok&&r[0]; score+= (r[1]||0); });
+      return {pattern:p.key, ok, score:rs.length?score/rs.length:0, prz:p.prz, przFromC:p.przFromC};
+    }).sort((a,b)=> (b.ok-a.ok) || (b.score-a.score));
+    scored.forEach(s=>{
+      const st = s.ok ? "ok" : (s.score>0.55 ? "warn":"bad");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${s.pattern}</td><td><div class="pill ${st}">${(s.score*100).toFixed(0)}%</div></td><td class="small">${s.ok?"En rango":"Parcial/Fuera"}</td>`;
+      candBody.appendChild(tr);
+    });
+
+    // Candidatos de D con etiqueta de patrón
+    let candidates=[];
+    scored.forEach(s=>{
+      if (s.prz)      s.prz(a,dirCD,XA,XC).forEach(it=> candidates.push({pattern:s.pattern, ...it}));
+      if (s.przFromC) s.przFromC(c,dirCD,XC).forEach(it=> candidates.push({pattern:s.pattern, ...it}));
+    });
+    abcdCandidates(a,b,c,dirCD,AB).forEach(it=> candidates.push({pattern:"AB=CD", ...it}));
+    FIB_BC.forEach(r=>{
+      const sign = dirCD < 0 ? -1 : 1;
+      candidates.push({pattern:"BC proj", D: c + sign*(r*BC), patternSrc:`PRZ BC ${r}×BC`});
+    });
+
+    // Agrupar candidatos cercanos (PRZ consolidada)
+    candidates.sort((m,n)=> m.D-n.D);
+    const groups=[]; // {D, minD, maxD, items:[...]}
+    for(const cand of candidates){
+      const last = groups[groups.length-1];
+      if(!last || Math.abs(cand.D - last.D) > tol*Math.max(Math.abs(cand.D),1e-6)){
+        groups.push({D:cand.D, minD:cand.D, maxD:cand.D, items:[cand]});
+      }else{
+        last.items.push(cand);
+        if(cand.D < last.minD) last.minD = cand.D;
+        if(cand.D > last.maxD) last.maxD = cand.D;
+      }
+    }
+
+    // Confluencias por grupo
+    const rows=[];
+    for(const g of groups){
+      const Dg = g.D; // centro de referencia del cluster (primer valor)
+      const XD=Math.abs(x-Dg), CD=Math.abs(c-Dg);
+      const feats=[];
+
+      const rXA = XD/XA; const hitXA = FIB_XA.find(f=> near(rXA,f,tol)); if(hitXA) feats.push(`D/XA≈${hitXA}`);
+      const rBC = CD/BC; const hitBC = FIB_BC.find(f=> near(rBC,f,tol)); if(hitBC) feats.push(`CD/BC≈${hitBC}`);
+      const rAB = CD/AB; const hitAB = FIB_AB.find(f=> near(rAB,f,tol)); if(hitAB) feats.push(`CD/AB≈${hitAB}`);
+      const rXC = XD/XC; if(isFinite(R.C_XA_ext) && near(rXC,0.786,tol)) feats.push(`D/XC≈0.786`);
+
+      const patSet=new Set();
+      g.items.forEach(it=>{
+        if(it.patternSrc) feats.push(it.patternSrc);
+        if(it.pattern && it.pattern!=="BC proj") patSet.add(it.pattern);
+        if(it.pattern==="AB=CD") patSet.add("AB=CD");
+      });
+      PATTERNS.forEach(p=>{
+        if(patSet.has(p.key)){
+          const ok = p.rules(R).every(r=> r[0]);
+          if(ok) feats.push(`${p.key}: B&C ok`);
+        }
+      });
+
+      rows.push({
+        D: Dg,               // punto de referencia (primer valor del cluster)
+        minD: g.minD,
+        maxD: g.maxD,
+        feats,
+        conf:feats.length,
+        pats:[...patSet]
+      });
+    }
+
+    // Orden: por confluencias y cercanía a C
+    rows.sort((a,b)=> (b.conf-a.conf) || (Math.abs(c-a.D)-Math.abs(c-b.D)));
+
+    // Render PRZ
+    const tbody=$("levels"); tbody.innerHTML="";
+    let best=null;
+    rows.forEach((r,i)=>{
+      if(!best && r.conf>=th) best=r;
+      const badge = r.conf>=th ? "ok" : (r.conf===th-1? "warn":"bad");
+      const tr=document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td>
+          <div class="pill ${badge}">${fmt(r.D)}</div>
+          <div class="small">Cluster: [${fmt(r.minD)} – ${fmt(r.maxD)}]</div>
+        </td>
+        <td><div class="pill ${badge}">${r.conf}</div></td>
+        <td class="small">${r.pats.length? r.pats.join(", ") : "—"}</td>
+        <td class="small">${r.feats.join(" · ")}</td>`;
+      tbody.appendChild(tr);
+    });
+    if(!best && rows.length) best = rows[0];
+
+    // Dirección del setup = opuesta a CD
+    const setupBearish = (dirCD > 0);
+    $("trend").textContent = setupBearish
+      ? "setup BAJISTA (vender en D: se usa el primer valor del cluster)"
+      : "setup ALCISTA (comprar en D: se usa el último valor del cluster)";
+
+    // Mejor nivel (banner) usando primer/último según tipo de setup
+    const exec=$("exec"); exec.innerHTML="";
+    if(best){
+      const entryD = setupBearish
+        ? (best.minD ?? best.D)  // ventas → primer valor
+        : (best.maxD ?? best.D); // compras → último valor
+
+      const sign = setupBearish ? -1 : 1;
+      const DC = Math.abs(c-entryD);
+      const TP1 = entryD + sign*0.382*DC;
+      const TP2 = entryD + sign*0.618*DC;
+      const SL  = entryD - sign*1.27*DC;
+      exec.innerHTML = `
+        <div>
+          <b>Mejor PRZ (cluster):</b> ref=${fmt(best.D)}
+          <span class="pill ok">${best.conf} confluencias</span>
+          <span class="pill">${best.pats.length? best.pats.join(", ") : "—"}</span>
+        </div>
+        <div class="small">
+          Cluster completo: [${fmt(best.minD)} – ${fmt(best.maxD)}]<br>
+          <b>Entrada sugerida (según setup):</b> ${fmt(entryD)} ·
+          SL=${fmt(SL)} · TP1=${fmt(TP1)} · TP2=${fmt(TP2)}
+        </div>
+      `;
+    }
+
+    // Entradas (todas con conf ≥ 2) usando primer/último del cluster
+    const entriesBody = $("entries"); entriesBody.innerHTML="";
+    const signAll = setupBearish ? -1 : 1;
+    const qualified = rows.filter(r=> r.conf>=2);
+    if(qualified.length===0){
+      const tr=document.createElement("tr");
+      tr.innerHTML = `<td colspan="8" class="small">
+        No hay niveles con ≥ 2 confluencias. Ajusta tolerancia o revisa los puntos.
+      </td>`;
+      entriesBody.appendChild(tr);
+    }else{
+      qualified.forEach((r,i)=>{
+        const entryD = setupBearish
+          ? (r.minD ?? r.D)   // ventas → primer valor del cluster
+          : (r.maxD ?? r.D);  // compras → último valor del cluster
+
+        const DC = Math.abs(c-entryD);
+        const TP1 = entryD + signAll*0.382*DC;
+        const TP2 = entryD + signAll*0.618*DC;
+        const SL  = entryD - signAll*1.27*DC;
+        const badge = r.conf>=3 ? "ok" : "warn";
+        const tr=document.createElement("tr");
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>
+            <div class="pill ${badge}">${fmt(entryD)}</div>
+            <div class="small">Cluster: [${fmt(r.minD)} – ${fmt(r.maxD)}]</div>
+          </td>
+          <td>${fmt(SL)}</td>
+          <td>${fmt(TP1)}</td>
+          <td>${fmt(TP2)}</td>
+          <td><div class="pill ${badge}">${r.conf}</div></td>
+          <td class="small">${r.pats.length? r.pats.join(", ") : "—"}</td>
+          <td class="small">${r.feats.join(" · ")}</td>`;
+        entriesBody.appendChild(tr);
+      });
+    }
+  }
+
+  $("calc").addEventListener("click", compute);
+  ["x","a","b","c","tol","th"].forEach(id=>
+    $(id).addEventListener("keydown",e=>{ if(e.key==="Enter") compute(); })
+  );
+})();
+</script>
+</body>
+</html>
