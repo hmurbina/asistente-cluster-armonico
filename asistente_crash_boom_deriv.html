@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🦀 Asistente Armónico — Crash & Boom (Solo Extremos)</title>
+<style>
+  :root{--bg:#0b1220;--panel:#121a2b;--text:#e8eefc;--muted:#8fa1c7;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--extreme:#ff6b6b;--highlight:#9333ea;--boom:#10b981;--crash:#ef4444}
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
+  body{margin:0;background:var(--bg);color:var(--text)}
+  header{padding:16px 18px;border-bottom:1px solid #1b2946}
+  .container{max-width:1400px;margin:0 auto;padding:18px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .card{background:var(--panel);border:1px solid #1b2946;border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+  h1{margin:0;font-size:20px}
+  h2{margin:4px 0 10px;font-size:16px;color:var(--muted)}
+  h3{margin:12px 0 8px;font-size:14px;color:var(--highlight)}
+  label{display:block;margin:8px 0 6px;color:var(--muted)}
+  input[type="number"],select{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3e6b;background:#0e1526;color:#e8eefc}
+  .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .btn{display:inline-block;margin-top:10px;background:#581c87;border:1px solid #9333ea;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:bold}
+  .btn:hover{background:#7c3aed}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#0e1526;border:1px solid #233457;color:#cfe2ff;padding:6px 10px;border-radius:999px;margin:3px 6px 3px 0}
+  .ok{border-color:#295e40;color:var(--ok)} .warn{border-color:#6d5215;color:var(--warn)} .bad{border-color:#5b2323;color:var(--bad)}
+  .extreme{border-color:#9333ea;color:var(--highlight);background:#1a0a2e;font-weight:bold}
+  .boom-mode{border-color:var(--boom);color:var(--boom);background:#0a2e1a}
+  .crash-mode{border-color:var(--crash);color:var(--crash);background:#2e0a0a}
+  .extreme-row{background:#1a0a2e !important}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border-bottom:1px solid #1b2946;padding:8px 6px;text-align:left;font-size:13px;vertical-align:top}
+  .small{font-size:12px;color:var(--muted)} .muted{color:var(--muted)} .flex{display:flex;flex-wrap:wrap}
+  .hint{font-size:12px;color:#9fb1da;margin-top:6px;padding:8px;background:#0a0f1a;border-radius:8px;border-left:3px solid var(--highlight)}
+  .flag{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid #2a3e6b;background:#0e1526;margin-left:8px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:12px}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-dot{width:12px;height:12px;border-radius:50%}
+  .extreme-highlight{animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(147,51,234,0.4)}50%{box-shadow:0 0 0 8px rgba(147,51,234,0)}}
+  .instrument-selector{display:flex;gap:8px;margin-bottom:12px}
+  .instrument-btn{padding:10px 16px;border-radius:10px;border:2px solid #2a3e6b;background:#0e1526;color:#cfe2ff;cursor:pointer;font-weight:bold;transition:all 0.2s}
+  .instrument-btn:hover{background:#1a2744}
+  .instrument-btn.active.boom{background:#0a2e1a;border-color:var(--boom);color:var(--boom)}
+  .instrument-btn.active.crash{background:#2e0a0a;border-color:var(--crash);color:var(--crash)}
+  .risk-box{background:#0a0f1a;border:1px solid #2a3e6b;border-radius:10px;padding:12px;margin-top:12px}
+  .risk-title{font-weight:bold;color:var(--highlight);margin-bottom:8px}
+  .risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .risk-item{background:#121a2b;padding:8px;border-radius:8px;text-align:center}
+  .risk-label{font-size:11px;color:var(--muted)}
+  .risk-value{font-size:16px;font-weight:bold}
+  .sl-value{color:var(--bad)}
+  .tp-value{color:var(--ok)}
+  .invalidation-box{background:#1a0a0a;border:1px solid var(--bad);border-radius:10px;padding:12px;margin-top:12px}
+  .strategy-box{background:#0a1a0a;border:1px solid var(--ok);border-radius:10px;padding:12px;margin-top:12px}
+  .spike-info{background:linear-gradient(135deg,#1a0a2e,#0a1a2e);border:1px solid #3a2a5e;border-radius:10px;padding:12px;margin:12px 0}
+  .spike-title{font-weight:bold;color:#c084fc;margin-bottom:6px}
+  .no-results{padding:20px;text-align:center;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<header>
+  <h1>🦀 Asistente Armónico — Crash & Boom
+    <span class="pill extreme" style="font-size:11px;margin-left:10px">SOLO EXTREMOS</span>
+    <span id="trend" class="flag">—</span>
+  </h1>
+  <div class="small">
+    Enfocado en <b>patrones extremos</b> (Crab, Deep Crab, Shark, Alt Bat, 2.24, 2.618, 3.618) — zonas de máximo agotamiento.
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--highlight)"></div>Patrón Extremo</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--boom)"></div>Boom (spike ↑)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--crash)"></div>Crash (spike ↓)</div>
+  </div>
+</header>
+
+<div class="container grid">
+  <section class="card">
+    <h2>1) Configuración Crash/Boom</h2>
+    
+    <div class="instrument-selector">
+      <button class="instrument-btn boom active" data-instrument="boom">📈 BOOM</button>
+      <button class="instrument-btn crash" data-instrument="crash">📉 CRASH</button>
+    </div>
+    
+    <div class="row">
+      <div>
+        <label>Índice</label>
+        <select id="index">
+          <option value="150">150 (cada ~150 ticks)</option>
+          <option value="300">300 (cada ~300 ticks)</option>
+          <option value="500" selected>500 (cada ~500 ticks)</option>
+          <option value="600">600 (cada ~600 ticks)</option>
+          <option value="900">900 (cada ~900 ticks)</option>
+          <option value="1000">1000 (cada ~1000 ticks)</option>
+        </select>
+      </div>
+      <div>
+        <label>Timeframe Detección</label>
+        <select id="tf">
+          <option value="M1">M1</option>
+          <option value="M5">M5</option>
+          <option value="M15" selected>M15</option>
+          <option value="H1">H1</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Puntos XABC</h3>
+    <div class="row">
+      <div><label>X</label><input id="x" type="number" step="0.01" placeholder="ej. 9850.50"></div>
+      <div><label>A</label><input id="a" type="number" step="0.01"></div>
+    </div>
+    <div class="row">
+      <div><label>B</label><input id="b" type="number" step="0.01"></div>
+      <div><label>C</label><input id="c" type="number" step="0.01"></div>
+    </div>
+    
+    <h3>Parámetros</h3>
+    <div class="row-3">
+      <div><label>Tolerancia Fib (±)</label><input id="tol" type="number" min="0.01" max="0.15" step="0.005" value="0.03"></div>
+      <div><label>Umbral PRZ</label><input id="th" type="number" min="1" max="6" step="1" value="2"></div>
+      <div><label>&nbsp;</label><button class="btn" id="calc">🔍 Calcular PRZ</button></div>
+    </div>
+    
+    <div class="spike-info">
+      <div class="spike-title">📊 Características del Spike</div>
+      <div id="spikeInfo" class="small">Selecciona un índice para ver información del spike.</div>
+    </div>
+    
+    <div class="hint">
+      <b>Estrategia:</b> PRZ en M15 → Bajar a M5 → PSAR flip → Entrar. TP1=38.2% (50%) → BE → TP2=61.8%.
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2>📊 Análisis de Estructura</h2>
+    <div id="ratios" class="flex small muted"></div>
+    
+    <h2>🎯 Patrones Extremos Detectados</h2>
+    <table>
+      <thead><tr><th>Patrón</th><th>Score</th><th>Estado</th></tr></thead>
+      <tbody id="candidates"></tbody>
+    </table>
+    
+    <div id="instrumentAdvice" class="risk-box" style="display:none;">
+      <div class="risk-title">💡 Consejo para <span id="adviceInstrument">BOOM/CRASH</span></div>
+      <div id="adviceText" class="small"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="container">
+  <section class="card">
+    <h2>2) PRZ & Confluencias — Niveles Extremos</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Precio D (PRZ)</th><th>Conf.</th><th>Patrón(es)</th><th>Ratios Clave</th></tr>
+      </thead>
+      <tbody id="levels"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3) 🎯 Entradas con Gestión de Riesgo</h2>
+    <div id="exec" class="small" style="margin-bottom:12px;"></div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Entrada (D)</th>
+          <th>SL</th>
+          <th>TP1 (38.2%)</th>
+          <th>TP2 (61.8%)</th>
+          <th>TP3 (78.6%)</th>
+          <th>R:R</th>
+          <th>Conf.</th>
+          <th>Patrón</th>
+        </tr>
+      </thead>
+      <tbody id="entries"></tbody>
+    </table>
+    
+    <div id="riskManagement" class="risk-box" style="display:none;">
+      <div class="risk-title">📐 Gestión de Riesgo</div>
+      <div id="riskDetails"></div>
+    </div>
+    
+    <div id="invalidationRules" class="invalidation-box" style="display:none;">
+      <div class="risk-title" style="color:var(--bad)">⚠️ Reglas de Invalidación</div>
+      <div id="invalidationText" class="small"></div>
+    </div>
+    
+    <div id="strategyReminder" class="strategy-box">
+      <div class="risk-title" style="color:var(--ok)">✅ Checklist de Entrada (M5)</div>
+      <div class="small">
+        <ol style="margin:8px 0;padding-left:20px;">
+          <li>Precio toca la PRZ</li>
+          <li>Bajar a M5 y esperar flip del PSAR</li>
+          <li>Confirmar con vela de rechazo</li>
+          <li>Entrar con SL en invalidación de PRZ</li>
+          <li>TP1 al 38.2% → tomar 50% → mover a BE</li>
+          <li>Dejar correr hasta TP2/TP3</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const fmt = n => Number.isFinite(n) ? n.toFixed(2) : "-";
+  const fmtPips = n => Number.isFinite(n) ? Math.abs(n).toFixed(1) : "-";
+  const between = (v,lo,hi)=> v>=lo && v<=hi;
+
+  let instrument = 'boom';
+
+  const SPIKE_DATA = {
+    '150': { avgSpike: 35, maxSpike: 60, description: 'Spikes frecuentes (~2.5 min), tamaño moderado' },
+    '300': { avgSpike: 45, maxSpike: 75, description: 'Spikes cada ~5 min, buen balance' },
+    '500': { avgSpike: 50, maxSpike: 90, description: 'Spikes cada ~8 min, tamaño considerable' },
+    '600': { avgSpike: 55, maxSpike: 100, description: 'Spikes cada ~10 min, movimientos fuertes' },
+    '900': { avgSpike: 60, maxSpike: 120, description: 'Spikes cada ~15 min, mayor tamaño' },
+    '1000': { avgSpike: 65, maxSpike: 140, description: 'Spikes cada ~17 min, máximo tamaño' }
+  };
+
+  function updateSpikeInfo() {
+    const idx = $("index").value;
+    const data = SPIKE_DATA[idx];
+    const instLabel = instrument === 'boom' ? 'BOOM' : 'CRASH';
+    const spikeDir = instrument === 'boom' ? '↑ alcista' : '↓ bajista';
+    
+    $("spikeInfo").innerHTML = `
+      <b>${instLabel} ${idx}:</b> ${data.description}<br>
+      <b>Spike promedio:</b> ~${data.avgSpike} pts (${spikeDir}) | <b>Máximo:</b> ~${data.maxSpike} pts
+    `;
+  }
+
+  function inRange(v,lo,hi,t){
+    const loE=lo*(1-t), hiE=hi*(1+t);
+    return [between(v,loE,hiE), between(v,loE,hiE)?1:0];
+  }
+
+  function rangeXA(a,dirCD,lo,hi,XA,label){
+    const to = ratio => dirCD < 0 ? a - ratio*XA : a + ratio*XA;
+    return [{D:to(lo),patternSrc:label},{D:to(hi),patternSrc:label}];
+  }
+
+  // SOLO PATRONES EXTREMOS
+  const PATTERNS = [
+    {
+      key:"Crab",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.58,1.66,XA,"★ Crab D≈1.618×XA")
+    },
+    {
+      key:"Deep Crab",
+      rules:R=>[ inRange(R.B_XA,.85,.91,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.58,1.66,XA,"★ Deep Crab D≈1.618×XA")
+    },
+    {
+      key:"Shark",
+      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB_ext,1.13,1.618,R.tol) ],
+      prz:(a,dirCD,XA)=>[
+        ...rangeXA(a,dirCD,0.85,0.91,XA,"★ Shark 0.886×XA"),
+        ...rangeXA(a,dirCD,1.10,1.16,XA,"★ Shark 1.13×XA")
+      ]
+    },
+    {
+      key:"Alt Bat",
+      rules:R=>[ inRange(R.B_XA,.35,.45,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.10,1.16,XA,"★ Alt Bat D≈1.13×XA")
+    },
+    {
+      key:"Ext 2.24",
+      rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,2.20,2.28,XA,"★★ 2.24×XA Agotamiento")
+    },
+    {
+      key:"Ext 2.618",
+      rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,2.58,2.66,XA,"★★ 2.618×XA Agotamiento")
+    },
+    {
+      key:"Ext 3.618",
+      rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,3.55,3.68,XA,"★★★ 3.618×XA Máx Agotamiento")
+    }
+  ];
+
+  function compute(){
+    const x=+$("x").value, a=+$("a").value, b=+$("b").value, c=+$("c").value;
+    const tol=+($("tol").value||0.03), th=+($("th").value||2);
+    const idx = $("index").value;
+    const spikeData = SPIKE_DATA[idx];
+    
+    if(!isFinite(x)||!isFinite(a)||!isFinite(b)||!isFinite(c)){ alert("Ingresa X, A, B y C"); return; }
+
+    const XA = Math.abs(x-a), AB = Math.abs(a-b), BC = Math.abs(b-c);
+    const dirCD = b < a ? -1 : 1;
+
+    const R = {
+      B_XA: AB/XA,
+      C_AB: BC/AB,
+      C_AB_ext: BC/AB,
+      tol
+    };
+
+    const setupBearish = (dirCD > 0);
+    let setupAdvice = '';
+    
+    if(instrument === 'boom') {
+      if(setupBearish) {
+        setupAdvice = '⚠️ Setup de VENTA. En BOOM los spikes son alcistas. Verifica si el precio llegará antes del spike.';
+      } else {
+        setupAdvice = '✅ Setup de COMPRA. Perfecto para BOOM - espera spike alcista desde la PRZ.';
+      }
+    } else {
+      if(!setupBearish) {
+        setupAdvice = '⚠️ Setup de COMPRA. En CRASH los spikes son bajistas. Verifica si el precio llegará antes del spike.';
+      } else {
+        setupAdvice = '✅ Setup de VENTA. Perfecto para CRASH - espera spike bajista desde la PRZ.';
+      }
+    }
+
+    $("ratios").innerHTML = `
+      <span class="pill"><b>B/XA</b> ${(R.B_XA*100).toFixed(1)}%</span>
+      <span class="pill"><b>C/AB</b> ${(R.C_AB*100).toFixed(1)}%</span>
+      <span class="pill"><b>XA</b> ${fmt(XA)} pts</span>
+      <span class="pill"><b>Dir CD</b> ${dirCD<0?"↓":"↑"}</span>
+    `;
+
+    // Evaluar patrones
+    const candBody=$("candidates"); candBody.innerHTML="";
+    const scored = PATTERNS.map(p=>{
+      const rs = p.rules(R); let ok=true, score=0;
+      rs.forEach(r=>{ ok=ok&&r[0]; score+= (r[1]||0); });
+      return {pattern:p.key, ok, score:rs.length?score/rs.length:0, prz:p.prz};
+    }).sort((a,b)=> (b.ok-a.ok) || (b.score-a.score));
+    
+    scored.forEach(s=>{
+      const st = s.ok ? "extreme" : (s.score>0.5 ? "warn":"bad");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${s.pattern}</td><td><div class="pill ${st}">${(s.score*100).toFixed(0)}%</div></td><td class="small">${s.ok?"✓ Válido":"Parcial"}</td>`;
+      if(s.ok) tr.classList.add('extreme-row');
+      candBody.appendChild(tr);
+    });
+
+    // Advice
+    $("instrumentAdvice").style.display = 'block';
+    $("adviceInstrument").textContent = instrument.toUpperCase() + ' ' + idx;
+    $("adviceText").innerHTML = setupAdvice;
+
+    // PRZ Levels
+    const levelsBody=$("levels"); levelsBody.innerHTML="";
+    const activePatterns = scored.filter(s=>s.ok);
+    
+    if(activePatterns.length === 0){
+      levelsBody.innerHTML = '<tr><td colspan="5" class="no-results">No hay patrones extremos válidos con la estructura actual. Ajusta tolerancia o verifica puntos XABC.</td></tr>';
+      $("entries").innerHTML = '<tr><td colspan="9" class="no-results">Sin niveles de entrada.</td></tr>';
+      $("trend").textContent = '—';
+      $("trend").className = 'flag';
+      return;
+    }
+
+    let rawD = [];
+    activePatterns.forEach(s=>{
+      if(s.prz) rawD.push(...s.prz(a,dirCD,XA));
+    });
+
+    // Agrupar por proximidad
+    rawD.sort((a,b)=>a.D-b.D);
+    const grouped=[];
+    rawD.forEach(pt=>{
+      const found = grouped.find(g=> Math.abs(g.D - pt.D) < 0.005*Math.abs(pt.D));
+      if(found){
+        found.count++;
+        found.pats.push(pt.patternSrc);
+        found.minD = Math.min(found.minD, pt.D);
+        found.maxD = Math.max(found.maxD, pt.D);
+      } else {
+        grouped.push({D:pt.D, count:1, pats:[pt.patternSrc], minD:pt.D, maxD:pt.D});
+      }
+    });
+
+    const rows = grouped.map(g=>({
+      D: g.D,
+      minD: g.minD,
+      maxD: g.maxD,
+      conf: g.count,
+      pats: [...new Set(g.pats)]
+    })).sort((a,b)=>b.conf-a.conf);
+
+    rows.forEach((r,i)=>{
+      const badge = r.conf>=3 ? "extreme" : (r.conf>=2 ? "ok" : "warn");
+      const tr = document.createElement("tr");
+      tr.classList.add('extreme-row');
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td><div class="pill ${badge}">${fmt(r.D)}</div><span class="small"> (${fmt(r.minD)} – ${fmt(r.maxD)})</span></td>
+        <td><div class="pill ${badge}">${r.conf}</div></td>
+        <td class="small">${r.pats.join("<br>")}</td>
+        <td class="small">PRZ extremo</td>`;
+      levelsBody.appendChild(tr);
+    });
+
+    // Trend indicator
+    $("trend").textContent = setupBearish ? "SELL" : "BUY";
+    $("trend").className = setupBearish ? "flag crash-mode" : "flag boom-mode";
+
+    // Best level
+    const best = rows[0];
+    if(best && best.conf >= th){
+      const entryD = setupBearish ? (best.minD ?? best.D) : (best.maxD ?? best.D);
+      const DC = Math.abs(c-entryD);
+      const przWidth = Math.abs(best.maxD - best.minD);
+      const slBuffer = spikeData.avgSpike * 1.5;
+      const slDistance = Math.max(przWidth + slBuffer, spikeData.avgSpike * 2);
+      const signAll = setupBearish ? -1 : 1;
+      
+      const TP1 = entryD + signAll*0.382*DC;
+      const TP2 = entryD + signAll*0.618*DC;
+      const SL  = entryD - signAll*slDistance;
+      
+      const riskPips = Math.abs(entryD - SL);
+      const reward1 = Math.abs(TP1 - entryD);
+      const reward2 = Math.abs(TP2 - entryD);
+      const rr1 = (reward1/riskPips).toFixed(1);
+      const rr2 = (reward2/riskPips).toFixed(1);
+      
+      $("exec").innerHTML = `
+        <div class="risk-title">🎯 Mejor Entrada: ${best.pats[0]} <span class="pill extreme">★ EXTREMO</span></div>
+        <div class="risk-grid">
+          <div class="risk-item">
+            <div class="risk-label">Entrada</div>
+            <div class="risk-value">${fmt(entryD)}</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Stop Loss</div>
+            <div class="risk-value sl-value">${fmt(SL)}</div>
+            <div class="risk-label">(${fmtPips(riskPips)} pts)</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">TP1 (38.2%)</div>
+            <div class="risk-value tp-value">${fmt(TP1)}</div>
+            <div class="risk-label">R:R ${rr1}</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">TP2 (61.8%)</div>
+            <div class="risk-value tp-value">${fmt(TP2)}</div>
+            <div class="risk-label">R:R ${rr2}</div>
+          </div>
+        </div>
+      `;
+      
+      $("invalidationRules").style.display = 'block';
+      $("invalidationText").innerHTML = `
+        <ul style="margin:8px 0;padding-left:20px;">
+          <li><b>Invalidación:</b> Cierre ${setupBearish?'arriba':'abajo'} de ${fmt(SL)}</li>
+          <li><b>Spike en contra:</b> Esperar nuevo patrón</li>
+          <li><b>Tiempo máximo:</b> ${idx==='150'?'5':idx==='300'?'10':'15'} min sin reacción</li>
+        </ul>
+      `;
+      
+      $("riskManagement").style.display = 'block';
+      $("riskDetails").innerHTML = `
+        <div class="risk-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="risk-item">
+            <div class="risk-label">PRZ Width</div>
+            <div class="risk-value">${fmtPips(przWidth)} pts</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Spike Prom.</div>
+            <div class="risk-value">${spikeData.avgSpike} pts</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Buffer SL</div>
+            <div class="risk-value">${fmtPips(slBuffer)} pts</div>
+          </div>
+        </div>
+        <div class="small" style="margin-top:10px;">
+          <b>Gestión:</b> TP1 → 50% posición → BE → TP2/TP3
+        </div>
+      `;
+    }
+
+    // Entries table
+    const entriesBody = $("entries"); entriesBody.innerHTML="";
+    const signAll = setupBearish ? -1 : 1;
+    const qualified = rows.filter(r=> r.conf>=th);
+    
+    if(qualified.length===0){
+      entriesBody.innerHTML = `<tr><td colspan="9" class="small">No hay niveles con ≥ ${th} confluencias.</td></tr>`;
+    }else{
+      qualified.forEach((r,i)=>{
+        const entryD = setupBearish ? (r.minD ?? r.D) : (r.maxD ?? r.D);
+        const DC = Math.abs(c-entryD);
+        const przWidth = Math.abs(r.maxD - r.minD);
+        const slBuffer = spikeData.avgSpike * 1.5;
+        const slDistance = Math.max(przWidth + slBuffer, spikeData.avgSpike * 2);
+        
+        const TP1 = entryD + signAll*0.382*DC;
+        const TP2 = entryD + signAll*0.618*DC;
+        const TP3 = entryD + signAll*0.786*DC;
+        const SL  = entryD - signAll*slDistance;
+        
+        const riskPips = Math.abs(entryD - SL);
+        const reward2 = Math.abs(TP2 - entryD);
+        const rr = (reward2/riskPips).toFixed(1);
+        
+        const badge = r.conf>=3 ? "extreme" : "ok";
+        const tr=document.createElement("tr");
+        tr.classList.add('extreme-row');
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td><div class="pill ${badge}">${fmt(entryD)}</div></td>
+          <td class="sl-value">${fmt(SL)}<br><span class="small">(${fmtPips(riskPips)} pts)</span></td>
+          <td class="tp-value">${fmt(TP1)}</td>
+          <td class="tp-value">${fmt(TP2)}</td>
+          <td class="tp-value">${fmt(TP3)}</td>
+          <td><span class="pill ${parseFloat(rr)>=1.5?'ok':'warn'}">${rr}:1</span></td>
+          <td><div class="pill ${badge}">${r.conf}</div></td>
+          <td class="small">${r.pats.join(", ")}</td>`;
+        entriesBody.appendChild(tr);
+      });
+    }
+  }
+
+  // Event listeners
+  $("calc").addEventListener("click", compute);
+  ["x","a","b","c","tol","th"].forEach(id=>
+    $(id).addEventListener("keydown",e=>{ if(e.key==="Enter") compute(); })
+  );
+  
+  $("index").addEventListener("change", updateSpikeInfo);
+
+  document.querySelectorAll('.instrument-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.instrument-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      instrument = this.dataset.instrument;
+      updateSpikeInfo();
+      if($("x").value && $("a").value && $("b").value && $("c").value) compute();
+    });
+  });
+
+  updateSpikeInfo();
+})();
+</script>
+</body>
+</html>

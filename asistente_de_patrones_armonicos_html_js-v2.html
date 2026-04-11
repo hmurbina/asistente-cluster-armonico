@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Asistente Armónico PRO — Crash & Boom + Forex</title>
+<style>
+  :root{--bg:#0b1220;--panel:#121a2b;--text:#e8eefc;--muted:#8fa1c7;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--boom:#10b981;--crash:#ef4444;--accent:#8b5cf6}
+  *{box-sizing:border-box;font-family:system-ui,Segoe UI,Inter,Roboto,Arial}
+  body{margin:0;background:var(--bg);color:var(--text)}
+  header{padding:16px 18px;border-bottom:1px solid #1b2946}
+  .container{max-width:1300px;margin:0 auto;padding:18px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid #1b2946;border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+  h1{margin:0;font-size:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h2{margin:4px 0 10px;font-size:15px;color:var(--muted)}
+  h3{margin:12px 0 8px;font-size:14px;color:var(--accent)}
+  label{display:block;margin:8px 0 6px;color:var(--muted);font-size:13px}
+  input[type="number"],select{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3e6b;background:#0e1526;color:#e8eefc;font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .btn{display:inline-block;margin-top:10px;background:#5b21b6;border:1px solid #7c3aed;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600}
+  .btn:hover{background:#7c3aed}
+  .btn-full{width:100%}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#0e1526;border:1px solid #233457;color:#cfe2ff;padding:6px 10px;border-radius:999px;margin:3px 6px 3px 0;font-size:13px}
+  .ok{border-color:#295e40;color:var(--ok)} 
+  .warn{border-color:#6d5215;color:var(--warn)} 
+  .bad{border-color:#5b2323;color:var(--bad)}
+  .boom{border-color:var(--boom);color:var(--boom);background:rgba(16,185,129,0.1)}
+  .crash{border-color:var(--crash);color:var(--crash);background:rgba(239,68,68,0.1)}
+  .accent{border-color:var(--accent);color:var(--accent);background:rgba(139,92,246,0.1)}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border-bottom:1px solid #1b2946;padding:8px 6px;text-align:left;font-size:13px;vertical-align:top}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase}
+  .small{font-size:12px;color:var(--muted)} 
+  .muted{color:var(--muted)} 
+  .flex{display:flex;flex-wrap:wrap}
+  .hint{font-size:12px;color:#9fb1da;margin-top:8px;padding:10px;background:#0a0f1a;border-radius:8px;border-left:3px solid var(--accent)}
+  .flag{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid #2a3e6b;background:#0e1526;margin-left:8px;font-size:12px}
+  .flag.buy{border-color:var(--boom);color:var(--boom);background:rgba(16,185,129,0.15)}
+  .flag.sell{border-color:var(--crash);color:var(--crash);background:rgba(239,68,68,0.15)}
+  .instrument-selector{display:flex;gap:8px;margin-bottom:14px}
+  .instrument-btn{flex:1;padding:12px;border-radius:10px;border:2px solid #2a3e6b;background:#0e1526;color:var(--muted);cursor:pointer;font-weight:600;font-size:13px;transition:all 0.2s}
+  .instrument-btn:hover{border-color:#3a4e7b}
+  .instrument-btn.active.boom-btn{background:rgba(16,185,129,0.1);border-color:var(--boom);color:var(--boom)}
+  .instrument-btn.active.crash-btn{background:rgba(239,68,68,0.1);border-color:var(--crash);color:var(--crash)}
+  .instrument-btn.active.forex-btn{background:rgba(139,92,246,0.1);border-color:var(--accent);color:var(--accent)}
+  .spike-box{background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(16,185,129,0.05));border:1px solid #2a3e6b;border-radius:10px;padding:12px;margin:12px 0}
+  .advice-box{padding:10px;border-radius:8px;margin-top:10px;font-size:12px}
+  .advice-box.warning{background:rgba(245,158,11,0.1);border:1px solid var(--warn);color:var(--warn)}
+  .advice-box.success{background:rgba(16,185,129,0.1);border:1px solid var(--ok);color:var(--ok)}
+  .section-title{font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #1b2946}
+  .pattern-valid{background:linear-gradient(90deg,rgba(34,197,94,0.08),transparent)}
+  .pattern-partial{background:linear-gradient(90deg,rgba(245,158,11,0.05),transparent)}
+</style>
+</head>
+<body>
+<header>
+  <h1>
+    🎯 Asistente Armónico PRO
+    <span id="trend" class="flag">—</span>
+  </h1>
+  <div class="small">
+    <b>11 patrones armónicos clásicos</b> · Soporte para <b>Boom/Crash</b> y <b>Forex</b> · 
+    PRZ con <b>todas las confluencias Fibonacci</b> · Entradas con gestión de riesgo adaptada a spikes
+  </div>
+</header>
+
+<div class="container grid">
+  <section class="card">
+    <h2>1) Configuración</h2>
+    
+    <div class="instrument-selector">
+      <button class="instrument-btn boom-btn" data-instrument="boom">📈 BOOM</button>
+      <button class="instrument-btn crash-btn" data-instrument="crash">📉 CRASH</button>
+      <button class="instrument-btn forex-btn active" data-instrument="forex">💱 FOREX</button>
+    </div>
+    
+    <div class="row" id="boomCrashConfig" style="display:none;">
+      <div>
+        <label>Índice Boom/Crash</label>
+        <select id="bcIndex">
+          <option value="150">150 (spike cada ~150 ticks)</option>
+          <option value="300">300 (spike cada ~300 ticks)</option>
+          <option value="500" selected>500 (spike cada ~500 ticks)</option>
+          <option value="600">600 (spike cada ~600 ticks)</option>
+          <option value="900">900 (spike cada ~900 ticks)</option>
+          <option value="1000">1000 (spike cada ~1000 ticks)</option>
+        </select>
+      </div>
+      <div>
+        <label>Timeframe</label>
+        <select id="tf">
+          <option value="M1">M1</option>
+          <option value="M5">M5</option>
+          <option value="M15" selected>M15</option>
+          <option value="H1">H1</option>
+        </select>
+      </div>
+    </div>
+    
+    <div id="spikeInfo" class="spike-box" style="display:none;">
+      <div class="small"><b>📊 Características del Spike:</b></div>
+      <div id="spikeDetails" class="small" style="margin-top:6px;"></div>
+    </div>
+    
+    <h3>📐 Puntos XABC</h3>
+    <div class="row">
+      <div><label>X (Inicio)</label><input id="x" type="number" step="0.00001" placeholder="ej. 1.2345"></div>
+      <div><label>A (Impulso)</label><input id="a" type="number" step="0.00001"></div>
+    </div>
+    <div class="row">
+      <div><label>B (Retroceso)</label><input id="b" type="number" step="0.00001"></div>
+      <div><label>C (Extensión)</label><input id="c" type="number" step="0.00001"></div>
+    </div>
+    
+    <h3>⚙️ Parámetros</h3>
+    <div class="row-3">
+      <div><label>Tolerancia (±)</label><input id="tol" type="number" min="0.01" max="0.1" step="0.005" value="0.02"></div>
+      <div><label>Umbral PRZ</label><input id="th" type="number" min="2" max="6" step="1" value="3"></div>
+      <div><label>&nbsp;</label><button class="btn btn-full" id="calc">🔍 Calcular</button></div>
+    </div>
+    
+    <div id="instrumentAdvice" class="advice-box" style="display:none;"></div>
+    
+    <div class="hint">
+      <b>Patrones clásicos:</b> Gartley, Bat, Butterfly, Crab, Deep Crab, Cypher, Shark, Nen Star, 
+      5-0, Three Drives + AB=CD (1.0/1.27/1.618/2.0/2.618) y proyecciones BC/XA/XC completas.
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2>📊 Ratios Medidos</h2>
+    <div id="ratios" class="flex small muted"></div>
+    
+    <div class="section-title">Candidatos de Patrón (score reglas)</div>
+    <table>
+      <thead><tr><th>Patrón</th><th>B/XA</th><th>C/AB</th><th>Score</th><th>PRZ D</th></tr></thead>
+      <tbody id="candidates"></tbody>
+    </table>
+  </aside>
+</div>
+
+<div class="container">
+  <section class="card">
+    <h2>2) PRZ & Confluencias (ordenadas por fuerza)</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Precio D (cluster)</th><th>Conf.</th><th>Patrón(es)</th><th>Confluencias Fibonacci</th></tr>
+      </thead>
+      <tbody id="levels"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3) Entradas con Gestión de Riesgo</h2>
+    <div id="exec" class="small" style="margin-bottom:12px;"></div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Entrada (D)</th><th>Cluster</th><th>SL</th><th>TP1 (38.2%)</th><th>TP2 (61.8%)</th><th>R:R</th><th>Conf.</th><th>Patrón(es)</th></tr>
+      </thead>
+      <tbody id="entries"></tbody>
+    </table>
+    
+    <div class="hint" style="margin-top:16px;">
+      <b>Estrategia Boom/Crash:</b> PRZ en M15 → Bajar a M5 → Esperar flip PSAR + vela de rechazo → Entrar.<br>
+      <b>Gestión:</b> TP1 = cerrar 50% → mover SL a BE → dejar correr hasta TP2/TP3.
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const fmt = n => Number.isFinite(n) ? n.toPrecision(6) : "—";
+  const fmtPct = n => Number.isFinite(n) ? (n*100).toFixed(1)+"%" : "—";
+  const near = (v,t,rel)=> Math.abs(v-t) <= rel*Math.max(t,1e-9);
+  const between = (v,lo,hi)=> v>=lo && v<=hi;
+
+  let instrument = 'forex';
+
+  // Datos de spikes para Boom/Crash
+  const SPIKE_DATA = {
+    '150': { avgSpike: 35, maxSpike: 60, freq: '~2.5 min', desc: 'Muy frecuente, spikes pequeños' },
+    '300': { avgSpike: 45, maxSpike: 75, freq: '~5 min', desc: 'Frecuente, balance bueno' },
+    '500': { avgSpike: 50, maxSpike: 90, freq: '~8 min', desc: 'Moderado, spikes considerables' },
+    '600': { avgSpike: 55, maxSpike: 100, freq: '~10 min', desc: 'Moderado, movimientos fuertes' },
+    '900': { avgSpike: 60, maxSpike: 120, freq: '~15 min', desc: 'Poco frecuente, spikes grandes' },
+    '1000': { avgSpike: 65, maxSpike: 140, freq: '~17 min', desc: 'Infrecuente, spikes muy grandes' }
+  };
+
+  // TODOS los ratios Fibonacci para confluencias
+  const FIB_XA = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886, 1.0, 1.272, 1.618, 2.0, 2.618, 3.618];
+  const FIB_BC = [1.0, 1.272, 1.618, 2.0, 2.618, 3.618];
+  const FIB_AB = [1.0, 1.272, 1.618, 2.0, 2.618];
+  const FIB_XC = [0.382, 0.5, 0.618, 0.786, 0.886];
+
+  function updateUI() {
+    const isBoomCrash = instrument !== 'forex';
+    $("boomCrashConfig").style.display = isBoomCrash ? 'grid' : 'none';
+    $("spikeInfo").style.display = isBoomCrash ? 'block' : 'none';
+    if (isBoomCrash) updateSpikeInfo();
+  }
+
+  function updateSpikeInfo() {
+    const idx = $("bcIndex").value;
+    const data = SPIKE_DATA[idx];
+    const dir = instrument === 'boom' ? '↑ ALCISTA' : '↓ BAJISTA';
+    const dirDesc = instrument === 'boom' 
+      ? 'El mercado BAJA gradualmente y hace SPIKES hacia ARRIBA' 
+      : 'El mercado SUBE gradualmente y hace SPIKES hacia ABAJO';
+    
+    $("spikeDetails").innerHTML = `
+      <b>${instrument.toUpperCase()} ${idx}:</b> Spike ${dir} cada ${data.freq}<br>
+      <b>Tamaño:</b> ~${data.avgSpike} pts promedio, máx ~${data.maxSpike} pts<br>
+      <b>Comportamiento:</b> ${dirDesc}
+    `;
+  }
+
+  function dirCD_from_AB(a, b) { return b < a ? -1 : 1; }
+
+  function inRange(v, lo, hi, t) {
+    const loE = lo * (1 - t), hiE = hi * (1 + t);
+    return [between(v, loE, hiE), between(v, loE, hiE) ? 1 : 0];
+  }
+
+  function rangeXA(a, dirCD, lo, hi, XA, label) {
+    const to = ratio => dirCD < 0 ? a - ratio * XA : a + ratio * XA;
+    return [{ D: to(lo), patternSrc: label }, { D: to(hi), patternSrc: label }];
+  }
+
+  function rangeXC(ref, dirCD, lo, hi, XC, label) {
+    const to = ratio => dirCD < 0 ? ref - ratio * XC : ref + ratio * XC;
+    return [{ D: to(lo), patternSrc: label }, { D: to(hi), patternSrc: label }];
+  }
+
+  function rangeBC(c, dirCD, lo, hi, BC, label) {
+    const to = ratio => dirCD < 0 ? c - ratio * BC : c + ratio * BC;
+    return [{ D: to(lo), patternSrc: label }, { D: to(hi), patternSrc: label }];
+  }
+
+  // PATRONES ARMÓNICOS CLÁSICOS
+  const PATTERNS = [
+    {
+      key: "Gartley",
+      rules: R => [inRange(R.B_XA, 0.618, 0.618, R.tol), inRange(R.C_AB, 0.382, 0.886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 0.786, 0.786, XA, "Gartley D=0.786×XA")
+    },
+    {
+      key: "Bat",
+      rules: R => [inRange(R.B_XA, 0.382, 0.50, R.tol), inRange(R.C_AB, 0.382, 0.886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 0.886, 0.886, XA, "Bat D=0.886×XA")
+    },
+    {
+      key: "Butterfly",
+      rules: R => [inRange(R.B_XA, 0.786, 0.786, R.tol), inRange(R.C_AB, 0.382, 0.886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.272, 1.618, XA, "Butterfly D=1.27-1.618×XA")
+    },
+    {
+      key: "Crab",
+      rules: R => [inRange(R.B_XA, 0.382, 0.618, R.tol), inRange(R.C_AB, 0.382, 0.886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.618, 1.618, XA, "Crab D=1.618×XA")
+    },
+    {
+      key: "Deep Crab",
+      rules: R => [inRange(R.B_XA, 0.886, 0.886, R.tol), inRange(R.C_AB, 0.382, 0.886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.618, 2.618, XA, "Deep Crab D=1.618-2.618×XA")
+    },
+    {
+      key: "Cypher",
+      rules: R => [inRange(R.B_XA, 0.382, 0.618, R.tol), inRange(R.C_XA_ext, 1.272, 1.618, R.tol)],
+      przFromC: (c, dirCD, XC) => rangeXC(c, dirCD, 0.786, 0.786, XC, "Cypher D=0.786×XC")
+    },
+    {
+      key: "Shark",
+      rules: R => [inRange(R.B_XA, 0.382, 0.618, R.tol), inRange(R.C_AB_ext, 1.0, 1.618, R.tol)],
+      prz: (a, dirCD, XA) => [
+        ...rangeXA(a, dirCD, 0.886, 0.886, XA, "Shark D=0.886×XA"),
+        ...rangeXA(a, dirCD, 1.0, 1.272, XA, "Shark D=1.0-1.272×XA")
+      ]
+    },
+    {
+      key: "Nen Star",
+      rules: R => [inRange(R.B_XA, 0.382, 0.618, R.tol), inRange(R.C_AB_ext, 1.272, 1.618, R.tol)],
+      prz: (a, dirCD, XA) => [
+        ...rangeXA(a, dirCD, 1.272, 1.272, XA, "Nen Star D=1.272×XA"),
+        ...rangeXA(a, dirCD, 0.786, 0.786, XA, "Nen Star alt D=0.786×XA")
+      ]
+    },
+    {
+      key: "5-0",
+      rules: R => [inRange(R.B_XA, 1.0, 1.618, R.tol), inRange(R.C_AB_ext, 1.618, 2.0, R.tol)],
+      przFromBC: (c, dirCD, BC) => rangeBC(c, dirCD, 0.50, 0.50, BC, "5-0 D=0.50×BC")
+    },
+    {
+      key: "Three Drives",
+      rules: R => [inRange(R.B_XA, 0.618, 0.786, R.tol), inRange(R.C_AB_ext, 1.272, 1.618, R.tol)],
+      prz: (a, dirCD, XA) => [
+        ...rangeXA(a, dirCD, 1.272, 1.272, XA, "3-Drives D=1.272×XA"),
+        ...rangeXA(a, dirCD, 1.618, 1.618, XA, "3-Drives D=1.618×XA")
+      ]
+    }
+  ];
+
+  function abcdCandidates(a, b, c, dirCD, AB) {
+    const s = dirCD < 0 ? -1 : 1;
+    return [
+      { D: c + s * (1.0 * AB), patternSrc: "AB=CD 1.0×AB" },
+      { D: c + s * (1.272 * AB), patternSrc: "AB=CD 1.272×AB" },
+      { D: c + s * (1.618 * AB), patternSrc: "AB=CD 1.618×AB" },
+      { D: c + s * (2.0 * AB), patternSrc: "AB=CD 2.0×AB" },
+      { D: c + s * (2.618 * AB), patternSrc: "AB=CD 2.618×AB" }
+    ];
+  }
+
+  function compute() {
+    const x = +$("x").value, a = +$("a").value, b = +$("b").value, c = +$("c").value;
+    const tol = +($("tol").value || 0.02), th = +($("th").value || 3);
+    
+    if (!isFinite(x) || !isFinite(a) || !isFinite(b) || !isFinite(c)) {
+      alert("Ingresa X, A, B y C");
+      return;
+    }
+
+    const XA = Math.abs(x - a), AB = Math.abs(a - b), BC = Math.abs(b - c), XC = Math.abs(x - c);
+    const dirCD = dirCD_from_AB(a, b);
+
+    const R = {
+      tol,
+      B_XA: AB / XA,
+      C_AB: BC / AB,
+      C_AB_ext: BC / AB,
+      C_XA_ext: ((a > x ? c > a : c < a) ? XC / XA : NaN)
+    };
+
+    // Spike data for Boom/Crash
+    const isBoomCrash = instrument !== 'forex';
+    const spikeData = isBoomCrash ? SPIKE_DATA[$("bcIndex").value] : null;
+
+    // Mostrar ratios
+    $("ratios").innerHTML = `
+      <span class="pill"><b>B/XA</b> ${fmtPct(R.B_XA)}</span>
+      <span class="pill"><b>C/AB</b> ${fmtPct(R.C_AB)}</span>
+      <span class="pill"><b>C ext/XA</b> ${isFinite(R.C_XA_ext) ? fmtPct(R.C_XA_ext) : "—"}</span>
+      <span class="pill"><b>Dir CD</b> ${dirCD < 0 ? "↓ abajo" : "↑ arriba"}</span>
+    `;
+
+    // Dirección del setup y advice
+    const setupBearish = (dirCD > 0);
+    let adviceHtml = '';
+    
+    if (isBoomCrash) {
+      if (instrument === 'boom') {
+        if (setupBearish) {
+          adviceHtml = `⚠️ <b>VENTA en BOOM:</b> Los spikes son ALCISTAS. El precio debe llegar a PRZ ANTES del spike. Riesgo: el spike puede invalidar tu entrada. Considera esperar confirmación extra.`;
+          $("instrumentAdvice").className = 'advice-box warning';
+        } else {
+          adviceHtml = `✅ <b>COMPRA en BOOM:</b> ¡Setup alineado! Los spikes son ALCISTAS. Espera que el precio llegue a PRZ y aprovecha el spike para impulso adicional.`;
+          $("instrumentAdvice").className = 'advice-box success';
+        }
+      } else {
+        if (!setupBearish) {
+          adviceHtml = `⚠️ <b>COMPRA en CRASH:</b> Los spikes son BAJISTAS. El precio debe llegar a PRZ ANTES del spike. Riesgo: el spike puede invalidar tu entrada.`;
+          $("instrumentAdvice").className = 'advice-box warning';
+        } else {
+          adviceHtml = `✅ <b>VENTA en CRASH:</b> ¡Setup alineado! Los spikes son BAJISTAS. Espera que el precio llegue a PRZ y aprovecha el spike.`;
+          $("instrumentAdvice").className = 'advice-box success';
+        }
+      }
+      $("instrumentAdvice").innerHTML = adviceHtml;
+      $("instrumentAdvice").style.display = 'block';
+    } else {
+      $("instrumentAdvice").style.display = 'none';
+    }
+
+    // Evaluar patrones
+    const candBody = $("candidates");
+    candBody.innerHTML = "";
+    
+    const scored = PATTERNS.map(p => {
+      const rs = p.rules(R);
+      let ok = true, score = 0;
+      rs.forEach(r => { ok = ok && r[0]; score += (r[1] || 0); });
+      
+      // Calcular PRZ aproximado para mostrar
+      let przApprox = null;
+      if (ok) {
+        let przPoints = [];
+        if (p.prz) przPoints.push(...p.prz(a, dirCD, XA, XC));
+        if (p.przFromC) przPoints.push(...p.przFromC(c, dirCD, XC));
+        if (p.przFromBC) przPoints.push(...p.przFromBC(c, dirCD, BC));
+        if (przPoints.length > 0) {
+          przApprox = przPoints.reduce((sum, pt) => sum + pt.D, 0) / przPoints.length;
+        }
+      }
+      
+      return { 
+        pattern: p.key, 
+        ok, 
+        score: rs.length ? score / rs.length : 0, 
+        prz: p.prz, 
+        przFromC: p.przFromC, 
+        przFromBC: p.przFromBC,
+        przApprox,
+        B_XA: R.B_XA,
+        C_AB: R.C_AB
+      };
+    }).sort((a, b) => (b.ok - a.ok) || (b.score - a.score));
+
+    scored.forEach(s => {
+      const st = s.ok ? "ok" : (s.score > 0.55 ? "warn" : "bad");
+      const tr = document.createElement("tr");
+      tr.className = s.ok ? 'pattern-valid' : (s.score > 0.55 ? 'pattern-partial' : '');
+      tr.innerHTML = `
+        <td>${s.pattern}</td>
+        <td class="small">${fmtPct(s.B_XA)}</td>
+        <td class="small">${fmtPct(s.C_AB)}</td>
+        <td><span class="pill ${st}">${(s.score * 100).toFixed(0)}%</span></td>
+        <td class="small">${s.ok && s.przApprox ? fmt(s.przApprox) : '—'}</td>
+      `;
+      candBody.appendChild(tr);
+    });
+
+    // Candidatos de D
+    let candidates = [];
+    
+    scored.forEach(s => {
+      if (s.prz) s.prz(a, dirCD, XA, XC).forEach(it => candidates.push({ pattern: s.pattern, ...it }));
+      if (s.przFromC) s.przFromC(c, dirCD, XC).forEach(it => candidates.push({ pattern: s.pattern, ...it }));
+      if (s.przFromBC) s.przFromBC(c, dirCD, BC).forEach(it => candidates.push({ pattern: s.pattern, ...it }));
+    });
+    
+    // AB=CD proyecciones
+    abcdCandidates(a, b, c, dirCD, AB).forEach(it => candidates.push({ pattern: "AB=CD", ...it }));
+    
+    // BC proyecciones
+    FIB_BC.forEach(r => {
+      const sign = dirCD < 0 ? -1 : 1;
+      candidates.push({ pattern: "BC proj", D: c + sign * (r * BC), patternSrc: `BC ${r}×BC` });
+    });
+
+    // XA extensiones adicionales
+    FIB_XA.filter(r => r > 1).forEach(r => {
+      const D = dirCD < 0 ? a - r * XA : a + r * XA;
+      candidates.push({ pattern: "XA ext", D, patternSrc: `XA ${r}×XA` });
+    });
+
+    // Agrupar candidatos cercanos
+    candidates.sort((m, n) => m.D - n.D);
+    const groups = [];
+    
+    for (const cand of candidates) {
+      const last = groups[groups.length - 1];
+      if (!last || Math.abs(cand.D - last.D) > tol * Math.max(Math.abs(cand.D), 1e-6)) {
+        groups.push({ D: cand.D, minD: cand.D, maxD: cand.D, items: [cand] });
+      } else {
+        last.items.push(cand);
+        if (cand.D < last.minD) last.minD = cand.D;
+        if (cand.D > last.maxD) last.maxD = cand.D;
+      }
+    }
+
+    // Confluencias por grupo
+    const rows = [];
+    for (const g of groups) {
+      const Dg = g.D;
+      const XD = Math.abs(x - Dg), CD = Math.abs(c - Dg);
+      const feats = [];
+
+      // Confluencias D/XA
+      const rXA = XD / XA;
+      const hitXA = FIB_XA.find(f => near(rXA, f, tol));
+      if (hitXA) feats.push(`D/XA≈${hitXA}`);
+
+      // Confluencias CD/BC
+      const rBC = CD / BC;
+      const hitBC = FIB_BC.find(f => near(rBC, f, tol));
+      if (hitBC) feats.push(`CD/BC≈${hitBC}`);
+
+      // Confluencias CD/AB
+      const rAB = CD / AB;
+      const hitAB = FIB_AB.find(f => near(rAB, f, tol));
+      if (hitAB) feats.push(`CD/AB≈${hitAB}`);
+
+      // Confluencias D/XC (Cypher)
+      const rXC = XD / XC;
+      const hitXC = FIB_XC.find(f => near(rXC, f, tol));
+      if (hitXC) feats.push(`D/XC≈${hitXC}`);
+
+      // Patrones y PRZ sources
+      const patSet = new Set();
+      g.items.forEach(it => {
+        if (it.patternSrc) feats.push(it.patternSrc);
+        if (it.pattern && !['BC proj', 'XA ext'].includes(it.pattern)) patSet.add(it.pattern);
+      });
+
+      // Validación de reglas de patrón
+      PATTERNS.forEach(p => {
+        if (patSet.has(p.key)) {
+          const ok = p.rules(R).every(r => r[0]);
+          if (ok) feats.push(`${p.key}: B&C ✓`);
+        }
+      });
+
+      rows.push({
+        D: Dg,
+        minD: g.minD,
+        maxD: g.maxD,
+        feats,
+        conf: feats.length,
+        pats: [...patSet]
+      });
+    }
+
+    // Ordenar por confluencias
+    rows.sort((a, b) => (b.conf - a.conf) || (Math.abs(c - a.D) - Math.abs(c - b.D)));
+
+    // Render PRZ
+    const tbody = $("levels");
+    tbody.innerHTML = "";
+    let best = null;
+
+    rows.forEach((r, i) => {
+      if (!best && r.conf >= th) best = r;
+      const badge = r.conf >= th ? "ok" : (r.conf === th - 1 ? "warn" : "bad");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td>
+          <div class="pill ${badge}">${fmt(r.D)}</div>
+          <div class="small">Cluster: [${fmt(r.minD)} – ${fmt(r.maxD)}]</div>
+        </td>
+        <td><div class="pill ${badge}">${r.conf}</div></td>
+        <td class="small">${r.pats.length ? r.pats.join(", ") : "—"}</td>
+        <td class="small">${r.feats.join(" · ")}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    if (!best && rows.length) best = rows[0];
+
+    // Trend indicator
+    $("trend").textContent = setupBearish ? "SELL ↓" : "BUY ↑";
+    $("trend").className = setupBearish ? "flag sell" : "flag buy";
+
+    // Mejor nivel
+    const exec = $("exec");
+    exec.innerHTML = "";
+    
+    if (best) {
+      const entryD = setupBearish ? (best.minD ?? best.D) : (best.maxD ?? best.D);
+      const sign = setupBearish ? -1 : 1;
+      const DC = Math.abs(c - entryD);
+      const TP1 = entryD + sign * 0.382 * DC;
+      const TP2 = entryD + sign * 0.618 * DC;
+      
+      // SL adaptado a Boom/Crash
+      let slMultiplier = 1.27;
+      if (isBoomCrash) {
+        const przWidth = Math.abs(best.maxD - best.minD);
+        const slBuffer = spikeData.avgSpike * 1.5;
+        slMultiplier = Math.max((przWidth + slBuffer) / DC, 1.5);
+      }
+      const SL = entryD - sign * slMultiplier * DC;
+      
+      const riskPips = Math.abs(entryD - SL);
+      const reward = Math.abs(TP2 - entryD);
+      const rr = (reward / riskPips).toFixed(1);
+      
+      exec.innerHTML = `
+        <div style="padding:12px;background:${setupBearish ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'};border:1px solid ${setupBearish ? 'var(--crash)' : 'var(--boom)'};border-radius:10px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+            <b>🎯 Mejor PRZ:</b>
+            <span class="pill ok">${best.conf} confluencias</span>
+            <span class="pill">${best.pats.length ? best.pats.join(", ") : "—"}</span>
+          </div>
+          <div class="small">
+            <b>Cluster:</b> [${fmt(best.minD)} – ${fmt(best.maxD)}]<br>
+            <b>Entrada sugerida:</b> ${fmt(entryD)} · 
+            <b>SL:</b> ${fmt(SL)} · 
+            <b>TP1:</b> ${fmt(TP1)} · 
+            <b>TP2:</b> ${fmt(TP2)} ·
+            <b>R:R:</b> ${rr}
+            ${isBoomCrash ? `<br><b>Nota:</b> SL ajustado para spike ~${spikeData.avgSpike} pts` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // Tabla de entradas
+    const entriesBody = $("entries");
+    entriesBody.innerHTML = "";
+    const signAll = setupBearish ? -1 : 1;
+    const qualified = rows.filter(r => r.conf >= 2);
+    
+    if (qualified.length === 0) {
+      entriesBody.innerHTML = `<tr><td colspan="9" class="small">No hay niveles con ≥ 2 confluencias. Ajusta tolerancia o revisa los puntos.</td></tr>`;
+    } else {
+      qualified.forEach((r, i) => {
+        const entryD = setupBearish ? (r.minD ?? r.D) : (r.maxD ?? r.D);
+        const DC = Math.abs(c - entryD);
+        const TP1 = entryD + signAll * 0.382 * DC;
+        const TP2 = entryD + signAll * 0.618 * DC;
+        
+        let slMultiplier = 1.27;
+        if (isBoomCrash) {
+          const przWidth = Math.abs(r.maxD - r.minD);
+          const slBuffer = spikeData.avgSpike * 1.5;
+          slMultiplier = Math.max((przWidth + slBuffer) / DC, 1.5);
+        }
+        const SL = entryD - signAll * slMultiplier * DC;
+        
+        const riskPips = Math.abs(entryD - SL);
+        const reward = Math.abs(TP2 - entryD);
+        const rr = (reward / riskPips).toFixed(1);
+        
+        const badge = r.conf >= th ? "ok" : "warn";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td><div class="pill ${badge}">${fmt(entryD)}</div></td>
+          <td class="small">[${fmt(r.minD)} – ${fmt(r.maxD)}]</td>
+          <td>${fmt(SL)}</td>
+          <td>${fmt(TP1)}</td>
+          <td>${fmt(TP2)}</td>
+          <td><span class="pill ${parseFloat(rr) >= 1.5 ? 'ok' : 'warn'}">${rr}:1</span></td>
+          <td><div class="pill ${badge}">${r.conf}</div></td>
+          <td class="small">${r.pats.length ? r.pats.join(", ") : "—"}</td>
+        `;
+        entriesBody.appendChild(tr);
+      });
+    }
+  }
+
+  // Event listeners
+  $("calc").addEventListener("click", compute);
+  ["x", "a", "b", "c", "tol", "th"].forEach(id =>
+    $(id).addEventListener("keydown", e => { if (e.key === "Enter") compute(); })
+  );
+
+  $("bcIndex").addEventListener("change", updateSpikeInfo);
+
+  document.querySelectorAll('.instrument-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.instrument-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      instrument = this.dataset.instrument;
+      updateUI();
+      if ($("x").value && $("a").value && $("b").value && $("c").value) compute();
+    });
+  });
+
+  updateUI();
+})();
+</script>
+</body>
+</html>

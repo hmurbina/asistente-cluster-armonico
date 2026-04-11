@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>📊 Asistente Armónico PRO — Forex & Mercados Reales</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+  
+  :root{
+    --bg:#03070d;
+    --panel:#0a1118;
+    --panel-alt:#0d161f;
+    --panel-border:#1a2a3a;
+    --text:#e8f0f8;
+    --muted:#6b8299;
+    --ok:#00c896;
+    --warn:#ffb020;
+    --bad:#ff4060;
+    --extreme:#9f7aea;
+    --highlight:#7c5ce0;
+    --buy:#00d4aa;
+    --sell:#ff5470;
+    --gold:#ffd700;
+    --news:#ff6b35;
+    --session-asia:#4ecdc4;
+    --session-london:#3498db;
+    --session-ny:#e74c3c;
+  }
+  
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Outfit',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%,rgba(124,92,224,0.06) 0%,transparent 50%),
+      radial-gradient(ellipse at 80% 100%,rgba(0,212,170,0.04) 0%,transparent 50%);
+  }
+  
+  header{
+    padding:18px 24px;
+    border-bottom:1px solid var(--panel-border);
+    background:linear-gradient(180deg,var(--panel) 0%,transparent 100%);
+  }
+  
+  .container{max-width:1600px;margin:0 auto;padding:20px}
+  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  
+  .card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  
+  h1{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  h2{margin:4px 0 12px;font-size:14px;color:var(--muted);font-weight:500}
+  h3{margin:14px 0 10px;font-size:12px;color:var(--highlight);font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
+  
+  label{display:block;margin:8px 0 5px;color:var(--muted);font-size:12px;font-weight:500}
+  
+  input[type="number"],input[type="text"],select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid var(--panel-border);
+    background:var(--bg);
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    transition:all 0.2s;
+  }
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--highlight);
+    box-shadow:0 0 0 2px rgba(124,92,224,0.2);
+  }
+  
+  .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:linear-gradient(135deg,#5b21b6,#7c3aed);
+    border:none;
+    color:#fff;
+    border-radius:8px;
+    padding:10px 16px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:13px;
+    transition:all 0.2s;
+    box-shadow:0 4px 12px rgba(124,92,224,0.3);
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(124,92,224,0.4)}
+  .btn-secondary{background:var(--panel-alt);border:1px solid var(--panel-border);box-shadow:none}
+  .btn-secondary:hover{background:var(--panel-border)}
+  
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:var(--bg);
+    border:1px solid var(--panel-border);
+    color:var(--text);
+    padding:5px 10px;
+    border-radius:999px;
+    margin:2px 4px 2px 0;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+  }
+  .ok{border-color:rgba(0,200,150,0.4);color:var(--ok);background:rgba(0,200,150,0.1)}
+  .warn{border-color:rgba(255,176,32,0.4);color:var(--warn);background:rgba(255,176,32,0.1)}
+  .bad{border-color:rgba(255,64,96,0.4);color:var(--bad);background:rgba(255,64,96,0.1)}
+  .extreme{border-color:rgba(159,122,234,0.5);color:var(--extreme);background:rgba(159,122,234,0.15);font-weight:600}
+  .gold{border-color:rgba(255,215,0,0.5);color:var(--gold);background:rgba(255,215,0,0.1)}
+  
+  .buy-mode{border-color:var(--buy);color:var(--buy);background:rgba(0,212,170,0.1)}
+  .sell-mode{border-color:var(--sell);color:var(--sell);background:rgba(255,84,112,0.1)}
+  .extreme-row{background:rgba(124,92,224,0.04)}
+  
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th{
+    border-bottom:2px solid var(--panel-border);
+    padding:8px 6px;
+    text-align:left;
+    font-size:11px;
+    font-weight:600;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  td{border-bottom:1px solid var(--panel-border);padding:10px 6px;font-size:12px;vertical-align:top}
+  
+  .small{font-size:11px;color:var(--muted)}
+  .muted{color:var(--muted)}
+  .flex{display:flex;flex-wrap:wrap;gap:4px}
+  
+  .hint{
+    font-size:11px;
+    color:var(--text);
+    margin-top:12px;
+    padding:12px;
+    background:linear-gradient(135deg,rgba(124,92,224,0.08),rgba(0,212,170,0.04));
+    border-radius:10px;
+    border-left:3px solid var(--highlight);
+  }
+  
+  .flag{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 12px;
+    border-radius:999px;
+    border:1px solid var(--panel-border);
+    background:var(--bg);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+  }
+  
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11px}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+  
+  /* Instrument Categories */
+  .category-selector{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .category-btn{
+    padding:8px 14px;
+    border-radius:8px;
+    border:1px solid var(--panel-border);
+    background:var(--bg);
+    color:var(--muted);
+    cursor:pointer;
+    font-weight:500;
+    font-size:12px;
+    transition:all 0.2s;
+  }
+  .category-btn:hover{background:var(--panel-alt)}
+  .category-btn.active{background:var(--highlight);border-color:var(--highlight);color:#fff}
+  
+  /* Session indicator */
+  .session-bar{
+    display:flex;
+    gap:8px;
+    padding:10px 14px;
+    background:var(--panel-alt);
+    border-radius:10px;
+    margin-bottom:14px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .session-item{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 10px;
+    border-radius:6px;
+    font-size:11px;
+    font-weight:500;
+  }
+  .session-item.active{background:rgba(255,255,255,0.1)}
+  .session-dot{width:8px;height:8px;border-radius:50%;opacity:0.4}
+  .session-dot.active{opacity:1;box-shadow:0 0 8px currentColor}
+  
+  /* News warning */
+  .news-warning{
+    background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(255,64,96,0.1));
+    border:1px solid rgba(255,107,53,0.3);
+    border-radius:10px;
+    padding:12px;
+    margin:12px 0;
+  }
+  .news-title{font-weight:600;color:var(--news);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  
+  /* Risk boxes */
+  .risk-box{
+    background:var(--bg);
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:14px;
+    margin-top:14px;
+  }
+  .risk-title{font-weight:600;color:var(--highlight);margin-bottom:8px;display:flex;align-items:center;gap:6px;font-size:13px}
+  .risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .risk-item{
+    background:var(--panel);
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    border:1px solid var(--panel-border);
+  }
+  .risk-label{font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px}
+  .risk-value{font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace}
+  .sl-value{color:var(--bad)}
+  .tp-value{color:var(--ok)}
+  
+  .invalidation-box{
+    background:rgba(255,64,96,0.05);
+    border:1px solid rgba(255,64,96,0.25);
+    border-radius:10px;
+    padding:14px;
+    margin-top:14px;
+  }
+  .strategy-box{
+    background:rgba(0,200,150,0.05);
+    border:1px solid rgba(0,200,150,0.25);
+    border-radius:10px;
+    padding:14px;
+    margin-top:14px;
+  }
+  
+  /* Volatility meter */
+  .volatility-meter{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    background:var(--panel-alt);
+    border-radius:8px;
+    margin-top:10px;
+  }
+  .vol-bar{
+    flex:1;
+    height:6px;
+    background:var(--panel-border);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .vol-fill{
+    height:100%;
+    border-radius:3px;
+    transition:width 0.3s;
+  }
+  .vol-low{background:var(--ok);width:30%}
+  .vol-med{background:var(--warn);width:60%}
+  .vol-high{background:var(--bad);width:90%}
+  
+  .no-results{padding:24px;text-align:center;color:var(--muted);font-style:italic}
+  
+  /* Instrument info panel */
+  .instrument-info{
+    background:linear-gradient(135deg,var(--panel-alt),var(--panel));
+    border:1px solid var(--panel-border);
+    border-radius:10px;
+    padding:14px;
+    margin:12px 0;
+  }
+  .instrument-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .instrument-name{font-size:16px;font-weight:700}
+  .instrument-type{font-size:11px;color:var(--muted);padding:4px 8px;background:var(--bg);border-radius:4px}
+  
+  /* ATR display */
+  .atr-box{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:10px;
+  }
+  .atr-item{
+    text-align:center;
+    padding:8px;
+    background:var(--bg);
+    border-radius:6px;
+  }
+  .atr-label{font-size:10px;color:var(--muted)}
+  .atr-value{font-size:14px;font-weight:600;font-family:'JetBrains Mono',monospace}
+  
+  @media (max-width:1200px){.grid{grid-template-columns:1fr}}
+  @media (max-width:768px){
+    .row,.row-3,.row-4{grid-template-columns:1fr}
+    .category-selector{flex-direction:column}
+    .session-bar{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>
+    📊 Asistente Armónico PRO
+    <span class="pill extreme" style="font-size:10px">MERCADOS REALES</span>
+    <span class="pill gold" style="font-size:10px">PATRONES EXTREMOS</span>
+    <span id="trend" class="flag">—</span>
+  </h1>
+  <div class="small" style="margin-top:6px">
+    Forex • Índices • Commodities • Criptos — Análisis con factores de mercado real: sesiones, volatilidad, noticias y spread.
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--extreme)"></div>Patrón Extremo</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--buy)"></div>Setup Alcista</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--sell)"></div>Setup Bajista</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--news)"></div>Alerta Noticias</div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Session Bar -->
+  <div class="session-bar">
+    <span class="small" style="color:var(--text);font-weight:600">📍 Sesiones:</span>
+    <div class="session-item" id="sessionAsia">
+      <div class="session-dot" style="background:var(--session-asia)"></div>
+      <span>Asia (00:00-09:00 UTC)</span>
+    </div>
+    <div class="session-item" id="sessionLondon">
+      <div class="session-dot" style="background:var(--session-london)"></div>
+      <span>Londres (07:00-16:00 UTC)</span>
+    </div>
+    <div class="session-item" id="sessionNY">
+      <div class="session-dot" style="background:var(--session-ny)"></div>
+      <span>Nueva York (12:00-21:00 UTC)</span>
+    </div>
+    <span id="currentTime" class="pill" style="margin-left:auto"></span>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1) Selección de Instrumento</h2>
+      
+      <div class="category-selector">
+        <button class="category-btn active" data-category="forex">💱 Forex Majors</button>
+        <button class="category-btn" data-category="forex-minor">💱 Forex Minors</button>
+        <button class="category-btn" data-category="indices">📈 Índices</button>
+        <button class="category-btn" data-category="commodities">🛢️ Commodities</button>
+        <button class="category-btn" data-category="crypto">₿ Crypto</button>
+        <button class="category-btn" data-category="custom">⚙️ Personalizado</button>
+      </div>
+      
+      <div class="row">
+        <div>
+          <label>Instrumento</label>
+          <select id="instrument">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+        <div>
+          <label>Timeframe</label>
+          <select id="tf">
+            <option value="M1">M1</option>
+            <option value="M5">M5</option>
+            <option value="M15" selected>M15</option>
+            <option value="M30">M30</option>
+            <option value="H1">H1</option>
+            <option value="H4">H4</option>
+            <option value="D1">D1</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Custom instrument inputs (hidden by default) -->
+      <div id="customInputs" style="display:none;">
+        <div class="row-3">
+          <div>
+            <label>Símbolo</label>
+            <input type="text" id="customSymbol" placeholder="ej. BTCUSD">
+          </div>
+          <div>
+            <label>Pip Value</label>
+            <input type="number" id="customPipValue" step="0.0001" value="0.0001">
+          </div>
+          <div>
+            <label>ATR Diario (aprox)</label>
+            <input type="number" id="customATR" step="1" value="100">
+          </div>
+        </div>
+      </div>
+      
+      <div class="instrument-info" id="instrumentInfo">
+        <div class="instrument-header">
+          <span class="instrument-name" id="instName">EUR/USD</span>
+          <span class="instrument-type" id="instType">Forex Major</span>
+        </div>
+        <div class="atr-box">
+          <div class="atr-item">
+            <div class="atr-label">ATR Diario</div>
+            <div class="atr-value" id="atrDaily">~80 pips</div>
+          </div>
+          <div class="atr-item">
+            <div class="atr-label">Spread Típico</div>
+            <div class="atr-value" id="spreadTypical">0.8-1.2 pips</div>
+          </div>
+          <div class="atr-item">
+            <div class="atr-label">Mejor Sesión</div>
+            <div class="atr-value" id="bestSession">Londres/NY</div>
+          </div>
+        </div>
+        <div class="volatility-meter">
+          <span class="small">Volatilidad:</span>
+          <div class="vol-bar"><div class="vol-fill vol-med" id="volFill"></div></div>
+          <span class="small" id="volLabel">Media</span>
+        </div>
+      </div>
+
+      <h3>Puntos XABC del Patrón</h3>
+      <div class="row">
+        <div><label>X (Inicio)</label><input id="x" type="number" step="0.00001" placeholder="ej. 1.08500"></div>
+        <div><label>A (Primer extremo)</label><input id="a" type="number" step="0.00001"></div>
+      </div>
+      <div class="row">
+        <div><label>B (Retroceso)</label><input id="b" type="number" step="0.00001"></div>
+        <div><label>C (Extensión)</label><input id="c" type="number" step="0.00001"></div>
+      </div>
+      
+      <h3>Parámetros de Análisis</h3>
+      <div class="row-4">
+        <div><label>Tolerancia Fib (±)</label><input id="tol" type="number" min="0.01" max="0.15" step="0.005" value="0.03"></div>
+        <div><label>Umbral PRZ</label><input id="th" type="number" min="1" max="6" step="1" value="2"></div>
+        <div><label>ATR Manual (pips)</label><input id="atrManual" type="number" step="1" placeholder="Auto"></div>
+        <div><label>&nbsp;</label><button class="btn" id="calc">🔍 Calcular PRZ</button></div>
+      </div>
+      
+      <div class="news-warning" id="newsWarning" style="display:none;">
+        <div class="news-title">⚠️ Alerta de Noticias</div>
+        <div id="newsText" class="small"></div>
+      </div>
+      
+      <div class="hint">
+        <b>🎯 Estrategia PRO:</b> Identificar PRZ → Verificar sesión activa → Confirmar con estructura de precio → 
+        SL basado en ATR → Entrar con confirmación → TP escalonado según volatilidad del instrumento.
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2>📊 Estructura del Patrón</h2>
+      <div id="ratios" class="flex small muted"></div>
+      
+      <h2>🎯 Patrones Extremos Válidos</h2>
+      <table>
+        <thead><tr><th>Patrón</th><th>Score</th><th>Estado</th></tr></thead>
+        <tbody id="candidates"></tbody>
+      </table>
+      
+      <div id="marketContext" class="risk-box" style="display:none;">
+        <div class="risk-title">🌍 Contexto de Mercado</div>
+        <div id="contextText" class="small"></div>
+      </div>
+      
+      <div id="riskAssessment" class="risk-box" style="display:none;">
+        <div class="risk-title">⚖️ Evaluación de Riesgo</div>
+        <div id="riskText" class="small"></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card">
+    <h2>2) PRZ & Confluencias — Zonas de Reversión Extrema</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Precio D (PRZ)</th><th>Conf.</th><th>Patrón(es)</th><th>Distancia</th><th>Contexto</th></tr>
+      </thead>
+      <tbody id="levels"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>3) 🎯 Plan de Trading con Gestión de Riesgo</h2>
+    <div id="exec" class="small" style="margin-bottom:12px;"></div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Entrada (D)</th>
+          <th>SL</th>
+          <th>TP1 (38.2%)</th>
+          <th>TP2 (61.8%)</th>
+          <th>TP3 (100%)</th>
+          <th>R:R</th>
+          <th>Pips Riesgo</th>
+          <th>Conf.</th>
+        </tr>
+      </thead>
+      <tbody id="entries"></tbody>
+    </table>
+    
+    <div id="riskManagement" class="risk-box" style="display:none;">
+      <div class="risk-title">📐 Gestión de Riesgo Detallada</div>
+      <div id="riskDetails"></div>
+    </div>
+    
+    <div id="invalidationRules" class="invalidation-box" style="display:none;">
+      <div class="risk-title" style="color:var(--bad)">⚠️ Reglas de Invalidación</div>
+      <div id="invalidationText" class="small"></div>
+    </div>
+    
+    <div id="strategyReminder" class="strategy-box">
+      <div class="risk-title" style="color:var(--ok)">✅ Checklist de Entrada Profesional</div>
+      <div class="small">
+        <ol style="margin:8px 0;padding-left:20px;line-height:1.9">
+          <li><b>Contexto:</b> Verificar tendencia en TF superior (H4/D1)</li>
+          <li><b>Sesión:</b> Operar en sesión con mayor volumen para el par</li>
+          <li><b>Noticias:</b> Evitar entradas 30 min antes/después de noticias de alto impacto</li>
+          <li><b>Precio en PRZ:</b> Esperar toque de la zona identificada</li>
+          <li><b>Confirmación:</b> Vela de rechazo, divergencia RSI, o patrón de velas</li>
+          <li><b>Entrada:</b> Con orden límite en PRZ o a mercado con confirmación</li>
+          <li><b>SL:</b> Más allá del extremo de PRZ + buffer ATR (1.5-2x ATR del TF)</li>
+          <li><b>TP1:</b> 38.2% retroceso → cerrar 40-50% posición → mover SL a BE</li>
+          <li><b>TP2:</b> 61.8% retroceso → cerrar 30% adicional</li>
+          <li><b>TP3:</b> 100% (punto C) → cerrar restante o trail stop</li>
+        </ol>
+      </div>
+    </div>
+    
+    <div class="risk-box" style="margin-top:14px;">
+      <div class="risk-title">📏 Calculadora de Posición</div>
+      <div class="row-4" style="margin-top:10px;">
+        <div>
+          <label>Capital de Cuenta</label>
+          <input type="number" id="accountSize" value="10000" step="100">
+        </div>
+        <div>
+          <label>Riesgo por Trade (%)</label>
+          <input type="number" id="riskPercent" value="1" step="0.1" min="0.1" max="5">
+        </div>
+        <div>
+          <label>Pips de Riesgo</label>
+          <input type="number" id="pipsRisk" step="0.1" readonly>
+        </div>
+        <div>
+          <label>Tamaño Lote Sugerido</label>
+          <input type="text" id="lotSize" readonly style="font-weight:bold;color:var(--ok)">
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const fmt = (n, decimals) => Number.isFinite(n) ? n.toFixed(decimals) : "-";
+  const between = (v, lo, hi) => v >= lo && v <= hi;
+
+  // Datos de instrumentos por categoría
+  const INSTRUMENTS = {
+    forex: [
+      { symbol: 'EURUSD', name: 'EUR/USD', pipValue: 0.0001, atrDaily: 75, spread: '0.8-1.2', session: 'Londres/NY', volatility: 'media', decimals: 5 },
+      { symbol: 'GBPUSD', name: 'GBP/USD', pipValue: 0.0001, atrDaily: 100, spread: '1.0-1.5', session: 'Londres', volatility: 'alta', decimals: 5 },
+      { symbol: 'USDJPY', name: 'USD/JPY', pipValue: 0.01, atrDaily: 80, spread: '0.8-1.2', session: 'Asia/NY', volatility: 'media', decimals: 3 },
+      { symbol: 'USDCHF', name: 'USD/CHF', pipValue: 0.0001, atrDaily: 65, spread: '1.2-1.8', session: 'Londres', volatility: 'baja', decimals: 5 },
+      { symbol: 'AUDUSD', name: 'AUD/USD', pipValue: 0.0001, atrDaily: 70, spread: '1.0-1.5', session: 'Asia/Londres', volatility: 'media', decimals: 5 },
+      { symbol: 'USDCAD', name: 'USD/CAD', pipValue: 0.0001, atrDaily: 75, spread: '1.2-1.8', session: 'NY', volatility: 'media', decimals: 5 },
+      { symbol: 'NZDUSD', name: 'NZD/USD', pipValue: 0.0001, atrDaily: 65, spread: '1.5-2.0', session: 'Asia', volatility: 'media', decimals: 5 },
+    ],
+    'forex-minor': [
+      { symbol: 'EURGBP', name: 'EUR/GBP', pipValue: 0.0001, atrDaily: 50, spread: '1.5-2.5', session: 'Londres', volatility: 'baja', decimals: 5 },
+      { symbol: 'EURJPY', name: 'EUR/JPY', pipValue: 0.01, atrDaily: 95, spread: '1.5-2.5', session: 'Londres/Asia', volatility: 'alta', decimals: 3 },
+      { symbol: 'GBPJPY', name: 'GBP/JPY', pipValue: 0.01, atrDaily: 140, spread: '2.0-3.5', session: 'Londres', volatility: 'muy alta', decimals: 3 },
+      { symbol: 'AUDJPY', name: 'AUD/JPY', pipValue: 0.01, atrDaily: 85, spread: '1.5-2.5', session: 'Asia', volatility: 'alta', decimals: 3 },
+      { symbol: 'EURAUD', name: 'EUR/AUD', pipValue: 0.0001, atrDaily: 110, spread: '2.0-3.5', session: 'Londres/Asia', volatility: 'alta', decimals: 5 },
+      { symbol: 'EURCHF', name: 'EUR/CHF', pipValue: 0.0001, atrDaily: 45, spread: '1.5-2.5', session: 'Londres', volatility: 'baja', decimals: 5 },
+      { symbol: 'GBPAUD', name: 'GBP/AUD', pipValue: 0.0001, atrDaily: 150, spread: '3.0-5.0', session: 'Londres', volatility: 'muy alta', decimals: 5 },
+      { symbol: 'CADJPY', name: 'CAD/JPY', pipValue: 0.01, atrDaily: 80, spread: '2.0-3.0', session: 'NY/Asia', volatility: 'media', decimals: 3 },
+    ],
+    indices: [
+      { symbol: 'US30', name: 'Dow Jones 30', pipValue: 1, atrDaily: 350, spread: '2-4', session: 'NY', volatility: 'alta', decimals: 0 },
+      { symbol: 'US500', name: 'S&P 500', pipValue: 0.1, atrDaily: 45, spread: '0.4-0.8', session: 'NY', volatility: 'media', decimals: 1 },
+      { symbol: 'NAS100', name: 'Nasdaq 100', pipValue: 0.1, atrDaily: 180, spread: '1-2', session: 'NY', volatility: 'alta', decimals: 1 },
+      { symbol: 'GER40', name: 'DAX 40', pipValue: 0.1, atrDaily: 180, spread: '1-2', session: 'Londres', volatility: 'alta', decimals: 1 },
+      { symbol: 'UK100', name: 'FTSE 100', pipValue: 0.1, atrDaily: 80, spread: '1-2', session: 'Londres', volatility: 'media', decimals: 1 },
+      { symbol: 'JPN225', name: 'Nikkei 225', pipValue: 1, atrDaily: 400, spread: '5-10', session: 'Asia', volatility: 'alta', decimals: 0 },
+      { symbol: 'AUS200', name: 'ASX 200', pipValue: 0.1, atrDaily: 70, spread: '2-4', session: 'Asia', volatility: 'media', decimals: 1 },
+    ],
+    commodities: [
+      { symbol: 'XAUUSD', name: 'Oro (Gold)', pipValue: 0.01, atrDaily: 25, spread: '0.2-0.4', session: 'Londres/NY', volatility: 'alta', decimals: 2 },
+      { symbol: 'XAGUSD', name: 'Plata (Silver)', pipValue: 0.001, atrDaily: 0.6, spread: '0.02-0.04', session: 'Londres/NY', volatility: 'muy alta', decimals: 3 },
+      { symbol: 'XTIUSD', name: 'Petróleo WTI', pipValue: 0.01, atrDaily: 2.5, spread: '0.03-0.06', session: 'NY', volatility: 'alta', decimals: 2 },
+      { symbol: 'XBRUSD', name: 'Petróleo Brent', pipValue: 0.01, atrDaily: 2.3, spread: '0.03-0.06', session: 'Londres', volatility: 'alta', decimals: 2 },
+      { symbol: 'XNGUSD', name: 'Gas Natural', pipValue: 0.001, atrDaily: 0.15, spread: '0.005-0.01', session: 'NY', volatility: 'muy alta', decimals: 3 },
+      { symbol: 'XCUUSD', name: 'Cobre', pipValue: 0.001, atrDaily: 0.08, spread: '0.005-0.01', session: 'Londres/NY', volatility: 'media', decimals: 4 },
+    ],
+    crypto: [
+      { symbol: 'BTCUSD', name: 'Bitcoin', pipValue: 1, atrDaily: 2500, spread: '10-30', session: '24/7', volatility: 'muy alta', decimals: 0 },
+      { symbol: 'ETHUSD', name: 'Ethereum', pipValue: 0.1, atrDaily: 150, spread: '1-3', session: '24/7', volatility: 'muy alta', decimals: 1 },
+      { symbol: 'XRPUSD', name: 'Ripple', pipValue: 0.0001, atrDaily: 0.05, spread: '0.001-0.003', session: '24/7', volatility: 'muy alta', decimals: 4 },
+      { symbol: 'LTCUSD', name: 'Litecoin', pipValue: 0.01, atrDaily: 8, spread: '0.1-0.3', session: '24/7', volatility: 'muy alta', decimals: 2 },
+      { symbol: 'SOLUSD', name: 'Solana', pipValue: 0.01, atrDaily: 12, spread: '0.1-0.3', session: '24/7', volatility: 'muy alta', decimals: 2 },
+    ],
+    custom: []
+  };
+
+  let currentCategory = 'forex';
+  let currentInstrument = INSTRUMENTS.forex[0];
+
+  // Actualizar sesiones activas
+  function updateSessions() {
+    const now = new Date();
+    const utcHour = now.getUTCHours();
+    
+    // Asia: 00:00-09:00 UTC
+    const asiaActive = utcHour >= 0 && utcHour < 9;
+    // London: 07:00-16:00 UTC
+    const londonActive = utcHour >= 7 && utcHour < 16;
+    // NY: 12:00-21:00 UTC
+    const nyActive = utcHour >= 12 && utcHour < 21;
+    
+    $("sessionAsia").classList.toggle('active', asiaActive);
+    $("sessionAsia").querySelector('.session-dot').classList.toggle('active', asiaActive);
+    
+    $("sessionLondon").classList.toggle('active', londonActive);
+    $("sessionLondon").querySelector('.session-dot').classList.toggle('active', londonActive);
+    
+    $("sessionNY").classList.toggle('active', nyActive);
+    $("sessionNY").querySelector('.session-dot').classList.toggle('active', nyActive);
+    
+    $("currentTime").textContent = `🕐 ${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} UTC`;
+    
+    return { asiaActive, londonActive, nyActive };
+  }
+
+  // Popular selector de instrumentos
+  function populateInstruments(category) {
+    const select = $("instrument");
+    select.innerHTML = '';
+    
+    if (category === 'custom') {
+      $("customInputs").style.display = 'block';
+      select.innerHTML = '<option value="custom">Instrumento Personalizado</option>';
+      return;
+    }
+    
+    $("customInputs").style.display = 'none';
+    
+    INSTRUMENTS[category].forEach((inst, i) => {
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `${inst.symbol} - ${inst.name}`;
+      select.appendChild(option);
+    });
+    
+    updateInstrumentInfo(0);
+  }
+
+  // Actualizar info del instrumento
+  function updateInstrumentInfo(index) {
+    if (currentCategory === 'custom') {
+      currentInstrument = {
+        symbol: $("customSymbol").value || 'CUSTOM',
+        name: 'Personalizado',
+        pipValue: parseFloat($("customPipValue").value) || 0.0001,
+        atrDaily: parseFloat($("customATR").value) || 100,
+        spread: 'Variable',
+        session: 'Variable',
+        volatility: 'variable',
+        decimals: 5
+      };
+    } else {
+      currentInstrument = INSTRUMENTS[currentCategory][index];
+    }
+    
+    $("instName").textContent = currentInstrument.name;
+    $("instType").textContent = getCategoryName(currentCategory);
+    $("atrDaily").textContent = currentInstrument.pipValue >= 1 ? 
+      `~${currentInstrument.atrDaily} pts` : 
+      `~${currentInstrument.atrDaily} pips`;
+    $("spreadTypical").textContent = `${currentInstrument.spread} pips`;
+    $("bestSession").textContent = currentInstrument.session;
+    
+    // Volatilidad
+    const volMap = { 'baja': 'vol-low', 'media': 'vol-med', 'alta': 'vol-high', 'muy alta': 'vol-high', 'variable': 'vol-med' };
+    $("volFill").className = `vol-fill ${volMap[currentInstrument.volatility] || 'vol-med'}`;
+    $("volLabel").textContent = currentInstrument.volatility.charAt(0).toUpperCase() + currentInstrument.volatility.slice(1);
+  }
+
+  function getCategoryName(cat) {
+    const names = {
+      'forex': 'Forex Major',
+      'forex-minor': 'Forex Minor/Cross',
+      'indices': 'Índice Bursátil',
+      'commodities': 'Commodity',
+      'crypto': 'Criptomoneda',
+      'custom': 'Personalizado'
+    };
+    return names[cat] || cat;
+  }
+
+  // Calcular pips entre dos precios
+  function calcPips(price1, price2) {
+    return Math.abs(price1 - price2) / currentInstrument.pipValue;
+  }
+
+  function inRange(v, lo, hi, t) {
+    const loE = lo * (1 - t), hiE = hi * (1 + t);
+    return [between(v, loE, hiE), between(v, loE, hiE) ? 1 : 0];
+  }
+
+  function rangeXA(a, dirCD, lo, hi, XA, label) {
+    const to = ratio => dirCD < 0 ? a - ratio * XA : a + ratio * XA;
+    return [{D: to(lo), patternSrc: label}, {D: to(hi), patternSrc: label}];
+  }
+
+  // PATRONES ARMÓNICOS EXTREMOS
+  const PATTERNS = [
+    {
+      key: "Crab",
+      rules: R => [inRange(R.B_XA, .382, .618, R.tol), inRange(R.C_AB, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.58, 1.66, XA, "★ Crab D≈1.618×XA")
+    },
+    {
+      key: "Deep Crab",
+      rules: R => [inRange(R.B_XA, .85, .91, R.tol), inRange(R.C_AB, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.58, 1.66, XA, "★ Deep Crab D≈1.618×XA")
+    },
+    {
+      key: "Shark",
+      rules: R => [inRange(R.B_XA, .382, .618, R.tol), inRange(R.C_AB_ext, 1.13, 1.618, R.tol)],
+      prz: (a, dirCD, XA) => [
+        ...rangeXA(a, dirCD, 0.85, 0.91, XA, "★ Shark 0.886×XA"),
+        ...rangeXA(a, dirCD, 1.10, 1.16, XA, "★ Shark 1.13×XA")
+      ]
+    },
+    {
+      key: "Alt Bat",
+      rules: R => [inRange(R.B_XA, .35, .45, R.tol), inRange(R.C_AB, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.10, 1.16, XA, "★ Alt Bat D≈1.13×XA")
+    },
+    {
+      key: "Butterfly",
+      rules: R => [inRange(R.B_XA, .76, .80, R.tol), inRange(R.C_AB, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 1.25, 1.28, XA, "★ Butterfly D≈1.27×XA")
+    },
+    {
+      key: "Cypher",
+      rules: R => [inRange(R.B_XA, .382, .618, R.tol), inRange(R.C_XA, 1.13, 1.414, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 0.76, 0.80, XA, "★ Cypher D≈0.786×XA")
+    },
+    {
+      key: "Ext 2.24",
+      rules: R => [inRange(R.B_XA, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 2.20, 2.28, XA, "★★ 2.24×XA Agotamiento")
+    },
+    {
+      key: "Ext 2.618",
+      rules: R => [inRange(R.B_XA, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 2.58, 2.66, XA, "★★ 2.618×XA Agotamiento Fuerte")
+    },
+    {
+      key: "Ext 3.618",
+      rules: R => [inRange(R.B_XA, .382, .886, R.tol)],
+      prz: (a, dirCD, XA) => rangeXA(a, dirCD, 3.55, 3.68, XA, "★★★ 3.618×XA Máx Agotamiento")
+    }
+  ];
+
+  function compute() {
+    const x = parseFloat($("x").value);
+    const a = parseFloat($("a").value);
+    const b = parseFloat($("b").value);
+    const c = parseFloat($("c").value);
+    const tol = parseFloat($("tol").value) || 0.03;
+    const th = parseInt($("th").value) || 2;
+    const tf = $("tf").value;
+    
+    if (!isFinite(x) || !isFinite(a) || !isFinite(b) || !isFinite(c)) {
+      alert("Ingresa los valores X, A, B y C");
+      return;
+    }
+
+    const decimals = currentInstrument.decimals;
+    const XA = Math.abs(x - a);
+    const AB = Math.abs(a - b);
+    const BC = Math.abs(b - c);
+    const dirCD = b < a ? -1 : 1;
+    
+    // Para Cypher necesitamos C_XA
+    const C_XA = Math.abs(c - x) / XA;
+
+    const R = {
+      B_XA: AB / XA,
+      C_AB: BC / AB,
+      C_AB_ext: BC / AB,
+      C_XA: C_XA,
+      tol
+    };
+
+    const setupBearish = (dirCD > 0);
+    const sessions = updateSessions();
+    
+    // ATR para cálculos
+    let atr = currentInstrument.atrDaily;
+    if ($("atrManual").value) {
+      atr = parseFloat($("atrManual").value);
+    }
+    
+    // Ajustar ATR según timeframe
+    const tfMultipliers = { 'M1': 0.05, 'M5': 0.1, 'M15': 0.2, 'M30': 0.3, 'H1': 0.5, 'H4': 0.8, 'D1': 1 };
+    const atrTF = atr * (tfMultipliers[tf] || 0.2);
+
+    // Mostrar ratios
+    $("ratios").innerHTML = `
+      <span class="pill"><b>B/XA</b> ${(R.B_XA * 100).toFixed(1)}%</span>
+      <span class="pill"><b>C/AB</b> ${(R.C_AB * 100).toFixed(1)}%</span>
+      <span class="pill"><b>XA</b> ${calcPips(x, a).toFixed(1)} pips</span>
+      <span class="pill"><b>Dir CD</b> ${dirCD < 0 ? "↓ Bajista" : "↑ Alcista"}</span>
+      <span class="pill"><b>ATR ${tf}</b> ~${atrTF.toFixed(1)} pips</span>
+    `;
+
+    // Evaluar patrones
+    const candBody = $("candidates");
+    candBody.innerHTML = "";
+    const scored = PATTERNS.map(p => {
+      const rs = p.rules(R);
+      let ok = true, score = 0;
+      rs.forEach(r => { ok = ok && r[0]; score += (r[1] || 0); });
+      return {pattern: p.key, ok, score: rs.length ? score / rs.length : 0, prz: p.prz};
+    }).sort((a, b) => (b.ok - a.ok) || (b.score - a.score));
+    
+    scored.forEach(s => {
+      const st = s.ok ? "extreme" : (s.score > 0.5 ? "warn" : "bad");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${s.pattern}</td>
+        <td><div class="pill ${st}">${(s.score * 100).toFixed(0)}%</div></td>
+        <td class="small">${s.ok ? "✓ Válido" : "Parcial"}</td>
+      `;
+      if (s.ok) tr.classList.add('extreme-row');
+      candBody.appendChild(tr);
+    });
+
+    // Contexto de mercado
+    $("marketContext").style.display = 'block';
+    let sessionAdvice = '';
+    const instSession = currentInstrument.session.toLowerCase();
+    
+    if (instSession.includes('asia') && sessions.asiaActive) sessionAdvice = '✅ Sesión Asia activa - óptimo para este par';
+    else if (instSession.includes('londres') && sessions.londonActive) sessionAdvice = '✅ Sesión Londres activa - óptimo para este par';
+    else if (instSession.includes('ny') && sessions.nyActive) sessionAdvice = '✅ Sesión NY activa - óptimo para este par';
+    else if (instSession.includes('24/7')) sessionAdvice = '✅ Mercado 24/7 - siempre activo';
+    else sessionAdvice = '⚠️ No es la sesión óptima para este instrumento';
+    
+    $("contextText").innerHTML = `
+      <div style="display:grid;gap:8px;">
+        <div><b>Instrumento:</b> ${currentInstrument.name} (${getCategoryName(currentCategory)})</div>
+        <div><b>Sesión:</b> ${sessionAdvice}</div>
+        <div><b>Volatilidad:</b> ${currentInstrument.volatility.toUpperCase()} — ATR diario ~${currentInstrument.atrDaily} pips</div>
+        <div><b>Setup:</b> ${setupBearish ? '🔴 VENTA (Bajista)' : '🟢 COMPRA (Alcista)'}</div>
+      </div>
+    `;
+
+    // Evaluación de riesgo
+    $("riskAssessment").style.display = 'block';
+    const volRisk = currentInstrument.volatility === 'muy alta' ? 'ALTO' : 
+                    currentInstrument.volatility === 'alta' ? 'MEDIO-ALTO' : 
+                    currentInstrument.volatility === 'media' ? 'MEDIO' : 'BAJO';
+    
+    $("riskText").innerHTML = `
+      <div style="display:grid;gap:6px;">
+        <div><b>Riesgo por Volatilidad:</b> <span class="pill ${volRisk.includes('ALTO') ? 'warn' : 'ok'}">${volRisk}</span></div>
+        <div><b>Spread típico:</b> ${currentInstrument.spread} pips — considerar en entrada</div>
+        <div><b>Recomendación SL:</b> ${(atrTF * 1.5).toFixed(1)} - ${(atrTF * 2).toFixed(1)} pips (1.5-2x ATR ${tf})</div>
+      </div>
+    `;
+
+    // PRZ Levels
+    const levelsBody = $("levels");
+    levelsBody.innerHTML = "";
+    const activePatterns = scored.filter(s => s.ok);
+    
+    if (activePatterns.length === 0) {
+      levelsBody.innerHTML = '<tr><td colspan="6" class="no-results">No hay patrones extremos válidos. Verifica los puntos XABC o ajusta la tolerancia.</td></tr>';
+      $("entries").innerHTML = '<tr><td colspan="9" class="no-results">Sin niveles de entrada.</td></tr>';
+      $("trend").textContent = '—';
+      $("trend").className = 'flag';
+      $("riskManagement").style.display = 'none';
+      $("invalidationRules").style.display = 'none';
+      return;
+    }
+
+    let rawD = [];
+    activePatterns.forEach(s => {
+      if (s.prz) rawD.push(...s.prz(a, dirCD, XA));
+    });
+
+    // Agrupar por proximidad
+    rawD.sort((aa, bb) => aa.D - bb.D);
+    const grouped = [];
+    rawD.forEach(pt => {
+      const found = grouped.find(g => Math.abs(g.D - pt.D) < 0.003 * Math.abs(pt.D));
+      if (found) {
+        found.count++;
+        found.pats.push(pt.patternSrc);
+        found.minD = Math.min(found.minD, pt.D);
+        found.maxD = Math.max(found.maxD, pt.D);
+      } else {
+        grouped.push({D: pt.D, count: 1, pats: [pt.patternSrc], minD: pt.D, maxD: pt.D});
+      }
+    });
+
+    const rows = grouped.map(g => ({
+      D: g.D,
+      minD: g.minD,
+      maxD: g.maxD,
+      conf: g.count,
+      pats: [...new Set(g.pats)]
+    })).sort((aa, bb) => bb.conf - aa.conf);
+
+    rows.forEach((r, i) => {
+      const badge = r.conf >= 3 ? "extreme" : (r.conf >= 2 ? "ok" : "warn");
+      const distPips = calcPips(c, r.D);
+      const tr = document.createElement("tr");
+      tr.classList.add('extreme-row');
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td><div class="pill ${badge}">${fmt(r.D, decimals)}</div><span class="small"> (${fmt(r.minD, decimals)} – ${fmt(r.maxD, decimals)})</span></td>
+        <td><div class="pill ${badge}">${r.conf}</div></td>
+        <td class="small">${r.pats.join("<br>")}</td>
+        <td class="small">${distPips.toFixed(1)} pips desde C</td>
+        <td class="small">PRZ Extremo</td>
+      `;
+      levelsBody.appendChild(tr);
+    });
+
+    // Trend indicator
+    $("trend").textContent = setupBearish ? "SELL" : "BUY";
+    $("trend").className = setupBearish ? "flag sell-mode" : "flag buy-mode";
+
+    // Best level
+    const best = rows[0];
+    if (best && best.conf >= th) {
+      const entryD = setupBearish ? best.minD : best.maxD;
+      const DC = Math.abs(c - entryD);
+      const przWidth = Math.abs(best.maxD - best.minD);
+      
+      // SL basado en ATR del timeframe
+      const slBuffer = atrTF * currentInstrument.pipValue * 1.5;
+      const przWidthPrice = przWidth;
+      const slDistance = Math.max(przWidthPrice + slBuffer, atrTF * currentInstrument.pipValue * 2);
+      const signAll = setupBearish ? -1 : 1;
+      
+      const TP1 = entryD + signAll * 0.382 * DC;
+      const TP2 = entryD + signAll * 0.618 * DC;
+      const TP3 = entryD + signAll * 1.0 * DC; // Punto C
+      const SL = entryD - signAll * slDistance;
+      
+      const riskPips = calcPips(entryD, SL);
+      const reward1Pips = calcPips(TP1, entryD);
+      const reward2Pips = calcPips(TP2, entryD);
+      const rr1 = (reward1Pips / riskPips).toFixed(1);
+      const rr2 = (reward2Pips / riskPips).toFixed(1);
+      
+      // Actualizar calculadora de posición
+      $("pipsRisk").value = riskPips.toFixed(1);
+      calculateLotSize();
+      
+      $("exec").innerHTML = `
+        <div class="risk-title">🎯 Mejor Setup: ${best.pats[0]} <span class="pill extreme">★ EXTREMO</span></div>
+        <div class="risk-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="risk-item">
+            <div class="risk-label">Entrada</div>
+            <div class="risk-value">${fmt(entryD, decimals)}</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Stop Loss</div>
+            <div class="risk-value sl-value">${fmt(SL, decimals)}</div>
+            <div class="risk-label">(${riskPips.toFixed(1)} pips)</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">TP1 (38.2%)</div>
+            <div class="risk-value tp-value">${fmt(TP1, decimals)}</div>
+            <div class="risk-label">R:R ${rr1}</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">TP2 (61.8%)</div>
+            <div class="risk-value tp-value">${fmt(TP2, decimals)}</div>
+            <div class="risk-label">R:R ${rr2}</div>
+          </div>
+        </div>
+      `;
+      
+      $("invalidationRules").style.display = 'block';
+      $("invalidationText").innerHTML = `
+        <ul style="margin:8px 0;padding-left:18px;line-height:1.8">
+          <li><b>Invalidación técnica:</b> Cierre de vela ${setupBearish ? 'arriba' : 'abajo'} de ${fmt(SL, decimals)}</li>
+          <li><b>Invalidación temporal:</b> Sin reacción en PRZ después de ${tf === 'M1' ? '5' : tf === 'M5' ? '15' : tf === 'M15' ? '30' : '60'} min</li>
+          <li><b>Noticias:</b> Evitar si hay evento de alto impacto en los próximos 30 min</li>
+          <li><b>Spread:</b> No entrar si spread > ${parseFloat(currentInstrument.spread.split('-')[1]) * 2} pips</li>
+        </ul>
+      `;
+      
+      $("riskManagement").style.display = 'block';
+      $("riskDetails").innerHTML = `
+        <div class="risk-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="risk-item">
+            <div class="risk-label">Ancho PRZ</div>
+            <div class="risk-value">${calcPips(best.minD, best.maxD).toFixed(1)} pips</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">ATR ${tf}</div>
+            <div class="risk-value">${atrTF.toFixed(1)} pips</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Buffer SL</div>
+            <div class="risk-value">${(atrTF * 1.5).toFixed(1)} pips</div>
+          </div>
+          <div class="risk-item">
+            <div class="risk-label">Spread Est.</div>
+            <div class="risk-value">${currentInstrument.spread} pips</div>
+          </div>
+        </div>
+        <div class="small" style="margin-top:12px;padding:10px;background:var(--panel);border-radius:8px;">
+          <b>Gestión escalonada:</b><br>
+          • TP1 (38.2%): Cerrar 40-50% → Mover SL a Break Even<br>
+          • TP2 (61.8%): Cerrar 30% adicional → Trail stop<br>
+          • TP3 (100%): Cerrar restante o dejar correr con trail
+        </div>
+      `;
+    }
+
+    // Entries table
+    const entriesBody = $("entries");
+    entriesBody.innerHTML = "";
+    const signAll = setupBearish ? -1 : 1;
+    const qualified = rows.filter(r => r.conf >= th);
+    
+    if (qualified.length === 0) {
+      entriesBody.innerHTML = `<tr><td colspan="9" class="small">No hay niveles con ≥ ${th} confluencias.</td></tr>`;
+    } else {
+      qualified.forEach((r, i) => {
+        const entryD = setupBearish ? r.minD : r.maxD;
+        const DC = Math.abs(c - entryD);
+        const przWidth = Math.abs(r.maxD - r.minD);
+        const slBuffer = atrTF * currentInstrument.pipValue * 1.5;
+        const slDistance = Math.max(przWidth + slBuffer, atrTF * currentInstrument.pipValue * 2);
+        
+        const TP1 = entryD + signAll * 0.382 * DC;
+        const TP2 = entryD + signAll * 0.618 * DC;
+        const TP3 = entryD + signAll * 1.0 * DC;
+        const SL = entryD - signAll * slDistance;
+        
+        const riskPips = calcPips(entryD, SL);
+        const reward2Pips = calcPips(TP2, entryD);
+        const rr = (reward2Pips / riskPips).toFixed(1);
+        
+        const badge = r.conf >= 3 ? "extreme" : "ok";
+        const tr = document.createElement("tr");
+        tr.classList.add('extreme-row');
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td><div class="pill ${badge}">${fmt(entryD, decimals)}</div></td>
+          <td class="sl-value">${fmt(SL, decimals)}</td>
+          <td class="tp-value">${fmt(TP1, decimals)}</td>
+          <td class="tp-value">${fmt(TP2, decimals)}</td>
+          <td class="tp-value">${fmt(TP3, decimals)}</td>
+          <td><span class="pill ${parseFloat(rr) >= 1.5 ? 'ok' : 'warn'}">${rr}:1</span></td>
+          <td>${riskPips.toFixed(1)}</td>
+          <td><div class="pill ${badge}">${r.conf}</div></td>
+        `;
+        entriesBody.appendChild(tr);
+      });
+    }
+  }
+
+  // Calculadora de tamaño de posición
+  function calculateLotSize() {
+    const account = parseFloat($("accountSize").value) || 10000;
+    const riskPct = parseFloat($("riskPercent").value) || 1;
+    const pipsRisk = parseFloat($("pipsRisk").value) || 0;
+    
+    if (pipsRisk <= 0) {
+      $("lotSize").value = '-';
+      return;
+    }
+    
+    const riskAmount = account * (riskPct / 100);
+    // Asumiendo valor pip estándar de $10 por lote estándar para la mayoría de pares
+    // Esto varía por par, pero es una aproximación útil
+    const pipValuePerLot = 10;
+    const lotSize = riskAmount / (pipsRisk * pipValuePerLot);
+    
+    $("lotSize").value = lotSize.toFixed(2) + ' lotes';
+  }
+
+  // Event listeners
+  $("calc").addEventListener("click", compute);
+  ["x", "a", "b", "c", "tol", "th", "atrManual"].forEach(id =>
+    $(id).addEventListener("keydown", e => { if (e.key === "Enter") compute(); })
+  );
+  
+  $("instrument").addEventListener("change", e => {
+    updateInstrumentInfo(parseInt(e.target.value));
+  });
+  
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentCategory = this.dataset.category;
+      populateInstruments(currentCategory);
+    });
+  });
+  
+  ["accountSize", "riskPercent", "pipsRisk"].forEach(id => {
+    $(id).addEventListener("input", calculateLotSize);
+  });
+  
+  ["customSymbol", "customPipValue", "customATR"].forEach(id => {
+    $(id).addEventListener("input", () => updateInstrumentInfo(0));
+  });
+
+  // Inicialización
+  populateInstruments('forex');
+  updateSessions();
+  setInterval(updateSessions, 60000); // Actualizar cada minuto
+})();
+</script>
+</body>
+</html>
