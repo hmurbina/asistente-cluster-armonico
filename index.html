@@ -27,6 +27,9 @@
   .boom-mode{border-color:var(--boom);color:var(--boom);background:#0a2e1a}
   .crash-mode{border-color:var(--crash);color:var(--crash);background:#2e0a0a}
   .extreme-row{background:#1a0a2e !important}
+  .exact-confluence{background:linear-gradient(90deg,#2a0a4e,#1a0a2e,#2a0a4e) !important;border-left:4px solid #fbbf24 !important;box-shadow:inset 0 0 12px rgba(251,191,36,0.15)}
+  .exact-badge{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-weight:bold;padding:3px 8px;border-radius:999px;font-size:11px;animation:exact-pulse 1.5s infinite}
+  @keyframes exact-pulse{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.6)}50%{box-shadow:0 0 0 6px rgba(251,191,36,0)}}
   table{width:100%;border-collapse:collapse;margin-top:8px}
   th,td{border-bottom:1px solid #1b2946;padding:8px 6px;text-align:left;font-size:13px;vertical-align:top}
   .small{font-size:12px;color:var(--muted)} .muted{color:var(--muted)} .flex{display:flex;flex-wrap:wrap}
@@ -54,19 +57,33 @@
   .strategy-box{background:#0a1a0a;border:1px solid var(--ok);border-radius:10px;padding:12px;margin-top:12px}
   .spike-info{background:linear-gradient(135deg,#1a0a2e,#0a1a2e);border:1px solid #3a2a5e;border-radius:10px;padding:12px;margin:12px 0}
   .spike-title{font-weight:bold;color:#c084fc;margin-bottom:6px}
+  .debt-section{background:linear-gradient(135deg,#1a2e0a,#0a2e1a);border:1px solid #2a5e3a;border-radius:10px;padding:10px;margin:12px 0}
+  .debt-title{font-weight:bold;color:#86efac;margin-bottom:4px;font-size:13px}
+  .debt-checks{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px}
+  .debt-check{display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 6px;border-radius:6px;background:rgba(0,0,0,0.2);font-size:11px;line-height:1.2}
+  .debt-check:hover{background:rgba(0,0,0,0.4)}
+  .debt-check input[type="checkbox"]{width:14px;height:14px;accent-color:#86efac;cursor:pointer;flex-shrink:0}
+  .debt-check b{font-size:11px}
+  .debt-check .small{display:none}
+  @media (max-width: 900px){
+    .debt-checks{grid-template-columns:repeat(3,1fr)}
+  }
+  .debt-tp-row{background:rgba(34,197,94,0.08) !important;border-left:4px solid #22c55e}
+  .debt-tp-badge{background:linear-gradient(135deg,#22c55e,#16a34a);color:#0a2e1a;font-weight:bold;padding:3px 8px;border-radius:999px;font-size:11px}
   .no-results{padding:20px;text-align:center;color:var(--muted);font-style:italic}
 </style>
 </head>
 <body>
 <header>
-  <h1>🦀 Asistente Armónico — Crash & Boom
+  <h1>🦀 Asistente Armónico — Mercados Universales
     <span class="pill extreme" style="font-size:11px;margin-left:10px">SOLO EXTREMOS</span>
     <span id="trend" class="flag">—</span>
   </h1>
   <div class="small">
-    Enfocado en <b>patrones extremos</b> (Crab, Deep Crab, Shark, Alt Bat, 2.24, 2.618, 3.618) — zonas de máximo agotamiento.
+    Solo proyecciones áureas puras: <b>1.618 · 2.618 · 3.618</b> en XA y BC. Confluencias exactas + niveles de deuda + plan escalonado híbrido. Compatible con Crash/Boom, Forex, Índices, Cripto.
   </div>
   <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Confluencia Exacta</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--highlight)"></div>Patrón Extremo</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--boom)"></div>Boom (spike ↑)</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--crash)"></div>Crash (spike ↓)</div>
@@ -75,33 +92,44 @@
 
 <div class="container grid">
   <section class="card">
-    <h2>1) Configuración Crash/Boom</h2>
-    
-    <div class="instrument-selector">
-      <button class="instrument-btn boom active" data-instrument="boom">📈 BOOM</button>
-      <button class="instrument-btn crash" data-instrument="crash">📉 CRASH</button>
-    </div>
-    
-    <div class="row">
-      <div>
-        <label>Índice</label>
-        <select id="index">
-          <option value="150">150 (cada ~150 ticks)</option>
-          <option value="300">300 (cada ~300 ticks)</option>
-          <option value="500" selected>500 (cada ~500 ticks)</option>
-          <option value="600">600 (cada ~600 ticks)</option>
-          <option value="900">900 (cada ~900 ticks)</option>
-          <option value="1000">1000 (cada ~1000 ticks)</option>
-        </select>
+    <h2>1) Configuración del Mercado</h2>
+
+    <label>Tipo de Mercado</label>
+    <select id="market">
+      <option value="crashboom" selected>Crash/Boom (Deriv)</option>
+      <option value="forex">Forex</option>
+      <option value="indices">Índices (US30, NAS100, SPX...)</option>
+      <option value="crypto">Cripto (BTC, ETH...)</option>
+      <option value="other">Otro / Personalizado</option>
+    </select>
+
+    <div id="crashBoomConfig" style="margin-top:12px;">
+      <div class="instrument-selector">
+        <button class="instrument-btn boom active" data-instrument="boom">📈 BOOM</button>
+        <button class="instrument-btn crash" data-instrument="crash">📉 CRASH</button>
       </div>
-      <div>
-        <label>Timeframe Detección</label>
-        <select id="tf">
-          <option value="M1">M1</option>
-          <option value="M5">M5</option>
-          <option value="M15" selected>M15</option>
-          <option value="H1">H1</option>
-        </select>
+
+      <div class="row">
+        <div>
+          <label>Índice</label>
+          <select id="index">
+            <option value="150">150 (cada ~150 ticks)</option>
+            <option value="300">300 (cada ~300 ticks)</option>
+            <option value="500" selected>500 (cada ~500 ticks)</option>
+            <option value="600">600 (cada ~600 ticks)</option>
+            <option value="900">900 (cada ~900 ticks)</option>
+            <option value="1000">1000 (cada ~1000 ticks)</option>
+          </select>
+        </div>
+        <div>
+          <label>Timeframe Detección</label>
+          <select id="tf">
+            <option value="M1">M1</option>
+            <option value="M5">M5</option>
+            <option value="M15" selected>M15</option>
+            <option value="H1">H1</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -115,18 +143,31 @@
       <div><label>C</label><input id="c" type="number" step="0.01"></div>
     </div>
     
-    <h3>Parámetros</h3>
     <div class="row-3">
-      <div><label>Tolerancia Fib (±)</label><input id="tol" type="number" min="0.01" max="0.15" step="0.005" value="0.03"></div>
-      <div><label>Umbral PRZ</label><input id="th" type="number" min="1" max="6" step="1" value="2"></div>
-      <div><label>&nbsp;</label><button class="btn" id="calc">🔍 Calcular PRZ</button></div>
+      <div></div>
+      <div><button class="btn" id="calc" style="width:100%;">🔍 Calcular PRZ</button></div>
+      <div></div>
     </div>
     
     <div class="spike-info">
       <div class="spike-title">📊 Características del Spike</div>
       <div id="spikeInfo" class="small">Selecciona un índice para ver información del spike.</div>
     </div>
-    
+
+    <div class="debt-section">
+      <div class="debt-title">💰 Niveles de Deuda del Mercado</div>
+      <div class="small muted" style="margin-bottom:6px;font-size:11px;">
+        Marca cada nivel que el precio <b>superó sin retroceder</b> (queda como deuda → TP probable). Medidos desde A en sentido contrario a XA.
+      </div>
+      <div class="debt-checks">
+        <label class="debt-check" title="TP en 78.6%"><input type="checkbox" id="debt786"> <b>78.6%</b></label>
+        <label class="debt-check" title="TP en 100% (origen X)"><input type="checkbox" id="debt100"> <b>100%</b></label>
+        <label class="debt-check" title="TP en 127.2%"><input type="checkbox" id="debt1272"> <b>127.2%</b></label>
+        <label class="debt-check" title="TP en 200%"><input type="checkbox" id="debt200"> <b>200%</b></label>
+        <label class="debt-check" title="TP en 261.8%"><input type="checkbox" id="debt2618"> <b>261.8%</b></label>
+      </div>
+    </div>
+
     <div class="hint">
       <b>Estrategia:</b> PRZ en M15 → Bajar a M5 → PSAR flip → Entrar. TP1=38.2% (50%) → BE → TP2=61.8%.
     </div>
@@ -154,67 +195,77 @@
     <h2>2) PRZ & Confluencias — Niveles Extremos</h2>
     <table>
       <thead>
-        <tr><th>#</th><th>Precio D (PRZ)</th><th>Conf.</th><th>Patrón(es)</th><th>Ratios Clave</th></tr>
+        <tr><th>#</th><th>Precio D (PRZ)</th><th>Conf. / Calidad</th><th>Patrón(es)</th><th>Características</th></tr>
       </thead>
       <tbody id="levels"></tbody>
     </table>
   </section>
 
   <section class="card">
-    <h2>3) 🎯 Entradas con Gestión de Riesgo</h2>
-    <div id="exec" class="small" style="margin-bottom:12px;"></div>
-    
+    <h2>2.5) 📊 Plan de Entradas Escalonadas (Híbrido: 2.618 / 3.618 / PRZ exacta)</h2>
+    <div class="small muted" style="margin-bottom:10px;">
+      Tres entradas progresivas: dos en ratios áureos fijos (2.618 y 3.618 ×XA) más una tercera adaptativa anclada en la mejor PRZ exacta detectada por el algoritmo. Si no hay confluencia exacta, el 3er nivel se desactiva automáticamente.
+    </div>
+    <table id="laddered">
+      <thead>
+        <tr>
+          <th>Nivel</th>
+          <th>Entrada</th>
+          <th>Zona operable</th>
+          <th>Capital sugerido</th>
+          <th>SL común</th>
+          <th>Patrón / Confluencia</th>
+        </tr>
+      </thead>
+      <tbody id="ladderedBody"></tbody>
+    </table>
+    <div id="ladderedSummary" class="hint" style="margin-top:10px;display:none;"></div>
+  </section>
+
+  <section class="card" id="debtSection" style="display:none;">
+    <h2>2.7) 💰 Take Profits por Deudas del Mercado</h2>
+    <div class="small muted" style="margin-bottom:10px;">
+      Niveles que el mercado debe retroceder a tocar. Cuanto más cerca esté un nivel del precio actual, mayor su probabilidad como TP a corto plazo. Los niveles se calculan como retrocesos del swing original X→A.
+    </div>
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Entrada (D)</th>
-          <th>SL</th>
-          <th>TP1 (38.2%)</th>
-          <th>TP2 (61.8%)</th>
-          <th>TP3 (78.6%)</th>
-          <th>R:R</th>
-          <th>Conf.</th>
-          <th>Patrón</th>
+          <th>Nivel</th>
+          <th>Precio TP</th>
+          <th>Distancia desde C</th>
+          <th>% del XA</th>
+          <th>Prioridad</th>
+          <th>Confluencia con PRZ</th>
         </tr>
       </thead>
-      <tbody id="entries"></tbody>
+      <tbody id="debtBody"></tbody>
     </table>
-    
-    <div id="riskManagement" class="risk-box" style="display:none;">
-      <div class="risk-title">📐 Gestión de Riesgo</div>
-      <div id="riskDetails"></div>
-    </div>
-    
-    <div id="invalidationRules" class="invalidation-box" style="display:none;">
-      <div class="risk-title" style="color:var(--bad)">⚠️ Reglas de Invalidación</div>
-      <div id="invalidationText" class="small"></div>
-    </div>
-    
-    <div id="strategyReminder" class="strategy-box">
-      <div class="risk-title" style="color:var(--ok)">✅ Checklist de Entrada (M5)</div>
-      <div class="small">
-        <ol style="margin:8px 0;padding-left:20px;">
-          <li>Precio toca la PRZ</li>
-          <li>Bajar a M5 y esperar flip del PSAR</li>
-          <li>Confirmar con vela de rechazo</li>
-          <li>Entrar con SL en invalidación de PRZ</li>
-          <li>TP1 al 38.2% → tomar 50% → mover a BE</li>
-          <li>Dejar correr hasta TP2/TP3</li>
-        </ol>
-      </div>
-    </div>
+    <div id="debtSummary" class="hint" style="margin-top:10px;"></div>
   </section>
 </div>
 
 <script>
 (function(){
   const $ = id => document.getElementById(id);
-  const fmt = n => Number.isFinite(n) ? n.toFixed(2) : "-";
-  const fmtPips = n => Number.isFinite(n) ? Math.abs(n).toFixed(1) : "-";
+  // Decimales por tipo de mercado (Forex normalmente 4-5; JPY 2-3; índices/cripto 2)
+  const MARKET_DECIMALS = {
+    'crashboom': 2,
+    'forex':     4,
+    'indices':   2,
+    'crypto':    2,
+    'other':     2
+  };
+  const getDecimals = () => MARKET_DECIMALS[market] ?? 2;
+  const fmt = n => Number.isFinite(n) ? n.toFixed(getDecimals()) : "-";
+  const fmtPips = n => {
+    if(!Number.isFinite(n)) return "-";
+    // En Forex, las distancias de precio son pequeñas — usar decimales del mercado
+    return (getDecimals() >= 4) ? Math.abs(n).toFixed(getDecimals()) : Math.abs(n).toFixed(1);
+  };
   const between = (v,lo,hi)=> v>=lo && v<=hi;
 
   let instrument = 'boom';
+  let market = 'crashboom';
 
   const SPIKE_DATA = {
     '150': { avgSpike: 35, maxSpike: 60, description: 'Spikes frecuentes (~2.5 min), tamaño moderado' },
@@ -225,16 +276,64 @@
     '1000': { avgSpike: 65, maxSpike: 140, description: 'Spikes cada ~17 min, máximo tamaño' }
   };
 
+  // Para mercados sin spike fijo, calculamos volatilidad como % de XA
+  // (regla heurística: el "ruido aceptable" en una PRZ suele ser ~8% del swing original)
+  const MARKET_VOL_FACTOR = {
+    'forex':   { factor: 0.05, label: 'Forex',         description: 'Volatilidad calculada como 5% del rango XA' },
+    'indices': { factor: 0.06, label: 'Índices',       description: 'Volatilidad calculada como 6% del rango XA' },
+    'crypto':  { factor: 0.10, label: 'Cripto',        description: 'Volatilidad calculada como 10% del rango XA (alta)' },
+    'other':   { factor: 0.08, label: 'Personalizado', description: 'Volatilidad calculada como 8% del rango XA' }
+  };
+
+  // Función única que retorna el "spike efectivo" para SLs y zonas operables,
+  // independientemente del mercado seleccionado
+  function getEffectiveVolatility(XA) {
+    if(market === 'crashboom') {
+      const idx = $("index").value;
+      return SPIKE_DATA[idx];
+    }
+    const cfg = MARKET_VOL_FACTOR[market];
+    const avgSpike = (XA || 1000) * cfg.factor;
+    return {
+      avgSpike,
+      maxSpike: avgSpike * 1.8,
+      description: cfg.description
+    };
+  }
+
   function updateSpikeInfo() {
-    const idx = $("index").value;
-    const data = SPIKE_DATA[idx];
-    const instLabel = instrument === 'boom' ? 'BOOM' : 'CRASH';
-    const spikeDir = instrument === 'boom' ? '↑ alcista' : '↓ bajista';
-    
-    $("spikeInfo").innerHTML = `
-      <b>${instLabel} ${idx}:</b> ${data.description}<br>
-      <b>Spike promedio:</b> ~${data.avgSpike} pts (${spikeDir}) | <b>Máximo:</b> ~${data.maxSpike} pts
-    `;
+    if(market === 'crashboom') {
+      const idx = $("index").value;
+      const data = SPIKE_DATA[idx];
+      const instLabel = instrument === 'boom' ? 'BOOM' : 'CRASH';
+      const spikeDir = instrument === 'boom' ? '↑ alcista' : '↓ bajista';
+      $("spikeInfo").innerHTML = `
+        <b>${instLabel} ${idx}:</b> ${data.description}<br>
+        <b>Spike promedio:</b> ~${data.avgSpike} pts (${spikeDir}) | <b>Máximo:</b> ~${data.maxSpike} pts
+      `;
+    } else {
+      const cfg = MARKET_VOL_FACTOR[market];
+      // Si ya tenemos XA, calcular ejemplo concreto
+      const x = +$("x").value, a = +$("a").value;
+      const xa = (isFinite(x) && isFinite(a)) ? Math.abs(x-a) : null;
+      const exampleVol = xa ? ` Con tu XA (${fmt(xa)}), volatilidad estimada: ~${fmt(xa*cfg.factor)} pts` : '';
+      $("spikeInfo").innerHTML = `
+        <b>${cfg.label}:</b> ${cfg.description}.${exampleVol}<br>
+        <span class="small muted">Los SLs y zonas operables se ajustan a la volatilidad del swing analizado.</span>
+      `;
+    }
+  }
+
+  function updateMarketUI() {
+    $("crashBoomConfig").style.display = (market === 'crashboom') ? 'block' : 'none';
+    // Ajustar precisión de inputs de precio según el mercado
+    const dec = getDecimals();
+    const step = (dec >= 4) ? '0.0001' : '0.01';
+    ['x','a','b','c'].forEach(id => {
+      const el = $(id);
+      if(el) el.step = step;
+    });
+    updateSpikeInfo();
   }
 
   function inRange(v,lo,hi,t){
@@ -244,61 +343,82 @@
 
   function rangeXA(a,dirCD,lo,hi,XA,label){
     const to = ratio => dirCD < 0 ? a - ratio*XA : a + ratio*XA;
-    return [{D:to(lo),patternSrc:label},{D:to(hi),patternSrc:label}];
+    const midRatio = (lo+hi)/2;
+    return [
+      {D:to(lo),patternSrc:label,ratio:lo,midRatio},
+      {D:to(hi),patternSrc:label,ratio:hi,midRatio}
+    ];
   }
 
-  // SOLO PATRONES EXTREMOS
+  function rangeBC(c,dirCD,lo,hi,BC,label){
+    const to = ratio => dirCD < 0 ? c - ratio*BC : c + ratio*BC;
+    const midRatio = (lo+hi)/2;
+    return [
+      {D:to(lo),patternSrc:label,ratio:lo,midRatio},
+      {D:to(hi),patternSrc:label,ratio:hi,midRatio}
+    ];
+  }
+
+  // SOLO PATRONES EXTREMOS — proyecciones puras a ratios áureos (1.618, 2.618, 3.618)
+  // tier: 1=★ (1.618), 2=★★ (2.618), 3=★★★ (3.618 — máximo agotamiento)
+  // system: 'XA' (proyección desde A) | 'BC' (proyección desde C) — clave para confluencia cruzada
+  // Rangos estrechos (±1%) para evitar zonas amplias y favorecer precisión
   const PATTERNS = [
+    // ===== PROYECCIONES XA (desde A, magnitud XA) =====
     {
-      key:"Crab",
+      key:"Crab", tier:1, system:'XA', classic:true,
       rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.58,1.66,XA,"★ Crab D≈1.618×XA")
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.602,1.634,XA,"★ Crab D≈1.618×XA")
     },
     {
-      key:"Deep Crab",
+      key:"Deep Crab", tier:1, system:'XA', classic:true,
       rules:R=>[ inRange(R.B_XA,.85,.91,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.58,1.66,XA,"★ Deep Crab D≈1.618×XA")
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.602,1.634,XA,"★ Deep Crab D≈1.618×XA")
     },
     {
-      key:"Shark",
-      rules:R=>[ inRange(R.B_XA,.382,.618,R.tol), inRange(R.C_AB_ext,1.13,1.618,R.tol) ],
-      prz:(a,dirCD,XA)=>[
-        ...rangeXA(a,dirCD,0.85,0.91,XA,"★ Shark 0.886×XA"),
-        ...rangeXA(a,dirCD,1.10,1.16,XA,"★ Shark 1.13×XA")
-      ]
+      key:"Butterfly", tier:1, system:'XA', classic:true,
+      rules:R=>[ inRange(R.B_XA,.75,.82,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.602,1.634,XA,"★ Butterfly D≈1.618×XA")
     },
     {
-      key:"Alt Bat",
-      rules:R=>[ inRange(R.B_XA,.35,.45,R.tol), inRange(R.C_AB,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,1.10,1.16,XA,"★ Alt Bat D≈1.13×XA")
-    },
-    {
-      key:"Ext 2.24",
+      key:"Ext 2.618 XA", tier:2, system:'XA', classic:false,
       rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,2.20,2.28,XA,"★★ 2.24×XA Agotamiento")
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,2.592,2.644,XA,"★★ 2.618×XA Agotamiento fuerte")
     },
     {
-      key:"Ext 2.618",
+      key:"Ext 3.618 XA", tier:3, system:'XA', classic:false,
       rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,2.58,2.66,XA,"★★ 2.618×XA Agotamiento")
+      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,3.582,3.654,XA,"★★★ 3.618×XA Máx Agotamiento")
+    },
+    // ===== PROYECCIONES BC (desde C, magnitud BC) =====
+    {
+      key:"BC 1.618", tier:1, system:'BC', classic:false,
+      rules:R=>[ inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA,c,BC)=>rangeBC(c,dirCD,1.602,1.634,BC,"★ CD/BC≈1.618 · PRZ BC 1.618×BC")
     },
     {
-      key:"Ext 3.618",
-      rules:R=>[ inRange(R.B_XA,.382,.886,R.tol) ],
-      prz:(a,dirCD,XA)=>rangeXA(a,dirCD,3.55,3.68,XA,"★★★ 3.618×XA Máx Agotamiento")
+      key:"BC 2.618", tier:2, system:'BC', classic:false,
+      rules:R=>[ inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA,c,BC)=>rangeBC(c,dirCD,2.592,2.644,BC,"★★ CD/BC≈2.618 · PRZ BC 2.618×BC")
+    },
+    {
+      key:"BC 3.618", tier:3, system:'BC', classic:false,
+      rules:R=>[ inRange(R.C_AB,.382,.886,R.tol) ],
+      prz:(a,dirCD,XA,c,BC)=>rangeBC(c,dirCD,3.582,3.654,BC,"★★★ CD/BC≈3.618 · PRZ BC 3.618×BC")
     }
   ];
 
   function compute(){
     const x=+$("x").value, a=+$("a").value, b=+$("b").value, c=+$("c").value;
-    const tol=+($("tol").value||0.03), th=+($("th").value||2);
+    // Constantes internas (antes inputs en UI, eliminados por no influir visiblemente)
+    const tol = 0.03;  // tolerancia ±3% para validar ratios Fib en reglas de patrones
     const idx = $("index").value;
-    const spikeData = SPIKE_DATA[idx];
-    
+
     if(!isFinite(x)||!isFinite(a)||!isFinite(b)||!isFinite(c)){ alert("Ingresa X, A, B y C"); return; }
 
     const XA = Math.abs(x-a), AB = Math.abs(a-b), BC = Math.abs(b-c);
     const dirCD = b < a ? -1 : 1;
+    const spikeData = getEffectiveVolatility(XA);  // volatilidad universal (crashboom usa tabla fija; otros, % de XA)
 
     const R = {
       B_XA: AB/XA,
@@ -336,7 +456,8 @@
     const scored = PATTERNS.map(p=>{
       const rs = p.rules(R); let ok=true, score=0;
       rs.forEach(r=>{ ok=ok&&r[0]; score+= (r[1]||0); });
-      return {pattern:p.key, ok, score:rs.length?score/rs.length:0, prz:p.prz};
+      return {pattern:p.key, ok, score:rs.length?score/rs.length:0, prz:p.prz,
+              tier:p.tier, system:p.system, classic:p.classic};
     }).sort((a,b)=> (b.ok-a.ok) || (b.score-a.score));
     
     scored.forEach(s=>{
@@ -357,8 +478,9 @@
     const activePatterns = scored.filter(s=>s.ok);
     
     if(activePatterns.length === 0){
-      levelsBody.innerHTML = '<tr><td colspan="5" class="no-results">No hay patrones extremos válidos con la estructura actual. Ajusta tolerancia o verifica puntos XABC.</td></tr>';
-      $("entries").innerHTML = '<tr><td colspan="9" class="no-results">Sin niveles de entrada.</td></tr>';
+      levelsBody.innerHTML = '<tr><td colspan="5" class="no-results">No hay patrones extremos válidos con la estructura actual. Verifica los puntos XABC.</td></tr>';
+      $("ladderedBody").innerHTML = '<tr><td colspan="6" class="no-results">Sin estructura XABC válida para calcular plan escalonado.</td></tr>';
+      $("ladderedSummary").style.display = 'none';
       $("trend").textContent = '—';
       $("trend").className = 'flag';
       return;
@@ -366,10 +488,19 @@
 
     let rawD = [];
     activePatterns.forEach(s=>{
-      if(s.prz) rawD.push(...s.prz(a,dirCD,XA));
+      if(s.prz){
+        const pts = s.prz(a,dirCD,XA,c,BC);
+        pts.forEach(p=>{
+          p.tier = s.tier || 1;
+          p.system = s.system || 'XA';
+          p.classic = !!s.classic;
+          p.patternKey = s.pattern;
+        });
+        rawD.push(...pts);
+      }
     });
 
-    // Agrupar por proximidad
+    // Agrupar por proximidad — ahora con metadata enriquecida
     rawD.sort((a,b)=>a.D-b.D);
     const grouped=[];
     rawD.forEach(pt=>{
@@ -377,31 +508,181 @@
       if(found){
         found.count++;
         found.pats.push(pt.patternSrc);
+        found.tiers.push(pt.tier);
+        found.systems.add(pt.system);
+        found.classics.push(pt.classic);
+        found.allPoints.push({D:pt.D, src:pt.patternSrc, tier:pt.tier, system:pt.system, ratio:pt.midRatio});
         found.minD = Math.min(found.minD, pt.D);
         found.maxD = Math.max(found.maxD, pt.D);
       } else {
-        grouped.push({D:pt.D, count:1, pats:[pt.patternSrc], minD:pt.D, maxD:pt.D});
+        grouped.push({
+          D:pt.D, count:1, pats:[pt.patternSrc],
+          tiers:[pt.tier], systems:new Set([pt.system]),
+          classics:[pt.classic],
+          allPoints:[{D:pt.D, src:pt.patternSrc, tier:pt.tier, system:pt.system, ratio:pt.midRatio}],
+          minD:pt.D, maxD:pt.D
+        });
       }
     });
 
-    const rows = grouped.map(g=>({
-      D: g.D,
-      minD: g.minD,
-      maxD: g.maxD,
-      conf: g.count,
-      pats: [...new Set(g.pats)]
-    })).sort((a,b)=>b.conf-a.conf);
+    // ========== DETECCIÓN DE CONFLUENCIAS EXACTAS ==========
+    // Una confluencia es "exacta" cuando ≥2 proyecciones de DIFERENTES patrones
+    // caen dentro de un radio ≤ 0.15% del precio. Esto identifica los puntos
+    // donde el solapamiento es estadísticamente significativo, no casual.
+    //
+    // IMPORTANTE: cada patrón genera 2 puntos (low/high del rango ±1%).
+    // Para que la confluencia sea REAL, los miembros deben venir de patrones
+    // DISTINTOS — si no, solo estaríamos midiendo el ancho del propio rango.
+    const EXACT_TOLERANCE = 0.0015;  // 0.15% del precio
+    grouped.forEach(g=>{
+      const sorted = [...g.allPoints].sort((a,b)=>a.D-b.D);
+      let maxExactCount = 1;
+      let exactCenter = g.D;
+      let exactMembers = [sorted[0]];
+      for(let i=0; i<sorted.length; i++){
+        const subset = [sorted[i]];
+        for(let j=i+1; j<sorted.length; j++){
+          if(Math.abs(sorted[j].D-sorted[i].D) <= EXACT_TOLERANCE*Math.abs(sorted[i].D)) {
+            subset.push(sorted[j]);
+          } else break;
+        }
+        // Filtrar: solo cuenta como confluencia si los miembros vienen de patrones distintos
+        // Deduplicamos por la combinación (src + ratio), que es la identidad única del patrón
+        const uniquePatterns = new Map();
+        subset.forEach(p => {
+          const key = p.src + '|' + p.ratio.toFixed(3);
+          if(!uniquePatterns.has(key)) uniquePatterns.set(key, p);
+        });
+        const uniqueMembers = [...uniquePatterns.values()];
+        if(uniqueMembers.length > maxExactCount){
+          maxExactCount = uniqueMembers.length;
+          exactCenter = uniqueMembers.reduce((s,v)=>s+v.D,0) / uniqueMembers.length;
+          exactMembers = uniqueMembers;
+        }
+      }
+      g.exactCount = maxExactCount;
+      g.exactCenter = exactCenter;
+      g.exactMembers = exactMembers;
+      g.isExact = maxExactCount >= 2;  // ahora exige ≥2 patrones DISTINTOS
+    });
+
+    // ========== SCORING PONDERADO DE CALIDAD DE PRZ ==========
+    // Objetivo: priorizar zonas con MÁXIMO AGOTAMIENTO REAL, no solo "muchos hits".
+    //
+    // Componentes del score:
+    //   1. weightSum: suma de pesos por tier (★=1, ★★=2, ★★★=4) → captura "intensidad"
+    //   2. crossBonus: +50% si confluyen sistemas XA + BC en la misma zona (señal estadísticamente fuerte)
+    //   3. classicBonus: +20% por cada patrón clásico cerrado (Crab/Butterfly/etc) presente
+    //   4. tightnessBonus: zonas estrechas valen más; PRZ ancho castiga (dispersión = menos precisión)
+    //   5. maxTierBoost: el tier máximo presente añade un suelo (un ★★★ siempre vale)
+    //   6. exactBonus: +40% si hay confluencia exacta (≥2 puntos dentro del 0.15%)
+    const TIER_WEIGHT = {1:1, 2:2, 3:4};
+    const rows = grouped.map(g=>{
+      const weightSum = g.tiers.reduce((s,t)=> s + (TIER_WEIGHT[t]||1), 0);
+      const maxTier = Math.max(...g.tiers);
+      const hasXA = g.systems.has('XA');
+      const hasBC = g.systems.has('BC');
+      const classicCount = g.classics.filter(Boolean).length;
+      const przWidth = Math.abs(g.maxD - g.minD);
+      const tightness = przWidth > 0 ? Math.max(0.5, 1 - (przWidth / Math.abs(g.D)) * 50) : 1;
+
+      let quality = weightSum;
+      quality += TIER_WEIGHT[maxTier] || 0;            // suelo por mejor tier presente
+      if(hasXA && hasBC) quality *= 1.5;               // confluencia cruzada XA+BC
+      quality *= (1 + 0.20 * classicCount);            // patrones clásicos cerrados
+      quality *= tightness;                            // zona precisa
+      if(g.isExact) quality *= 1.4;                    // confluencia exacta
+
+      return {
+        D: g.isExact ? g.exactCenter : g.D,            // usar centro exacto si aplica
+        minD: g.minD, maxD: g.maxD,
+        conf: g.count,
+        pats: [...new Set(g.pats)],
+        quality: +quality.toFixed(2),
+        maxTier, hasXA, hasBC, classicCount,
+        przWidth: +przWidth.toFixed(2),
+        isExact: g.isExact,
+        exactCount: g.exactCount,
+        exactCenter: g.exactCenter,
+        exactMembers: g.exactMembers || []           // proyecciones específicas de la exacta
+      };
+    }).sort((a,b)=> b.quality - a.quality);  // ← ORDEN POR CALIDAD, no por count
 
     rows.forEach((r,i)=>{
-      const badge = r.conf>=3 ? "extreme" : (r.conf>=2 ? "ok" : "warn");
+      // Badge según ranking por calidad: top 1 con quality alto = extremo
+      const isTop = i===0;
+      const badge = (isTop && r.quality>=6) ? "extreme" : (r.conf>=2 ? "ok" : "warn");
+
+      // Tags de calidad
+      const tags = [];
+      if(r.isExact) tags.push(`<span class="exact-badge">🎯 EXACTO ${r.exactCount}×</span>`);
+      if(r.hasXA && r.hasBC) tags.push('<span class="pill extreme" style="font-size:10px;padding:2px 6px;">XA+BC</span>');
+      if(r.maxTier===3) tags.push('<span class="pill extreme" style="font-size:10px;padding:2px 6px;">★★★ 3.618</span>');
+      else if(r.maxTier===2) tags.push('<span class="pill ok" style="font-size:10px;padding:2px 6px;">★★ 2.618</span>');
+      else tags.push('<span class="pill" style="font-size:10px;padding:2px 6px;">★ 1.618</span>');
+      if(r.classicCount>0) tags.push(`<span class="pill ok" style="font-size:10px;padding:2px 6px;">${r.classicCount} clásico${r.classicCount>1?'s':''}</span>`);
+      if(isTop) tags.unshift('<span class="pill extreme" style="font-size:10px;padding:2px 6px;">🏆 BEST</span>');
+
       const tr = document.createElement("tr");
-      tr.classList.add('extreme-row');
+      if(r.isExact) tr.classList.add('exact-confluence');
+      else if(isTop || r.quality>=6) tr.classList.add('extreme-row');
+
+      // Para confluencias exactas: mostrar punto exacto + zona operable
+      // La zona operable mínima es ±25% del spike promedio del instrumento (margen realista para orden limit)
+      let priceDisplay;
+      if(r.isExact){
+        const operableMargin = spikeData.avgSpike * 0.25;  // zona donde es realista entrar
+        const zoneMin = Math.min(r.minD, r.exactCenter - operableMargin);
+        const zoneMax = Math.max(r.maxD, r.exactCenter + operableMargin);
+        priceDisplay = `
+          <div class="pill ${badge}" style="font-weight:bold;font-size:14px;">${fmt(r.exactCenter)}</div>
+          <span class="small" style="color:#fbbf24;font-weight:bold;"> ★ punto exacto</span>
+          <div class="small" style="margin-top:3px;">
+            Zona operable: <b>${fmt(zoneMin)} – ${fmt(zoneMax)}</b>
+            ${r.przWidth > 0 ? `<br>PRZ teórica: ${fmt(r.minD)} – ${fmt(r.maxD)}` : ''}
+          </div>`;
+      } else {
+        priceDisplay = `
+          <div class="pill ${badge}">${fmt(r.D)}</div>
+          <div class="small" style="margin-top:3px;">Zona: <b>${fmt(r.minD)} – ${fmt(r.maxD)}</b></div>`;
+      }
+
+      // Desglose explícito de las proyecciones que forman la confluencia exacta
+      let exactBreakdown = '';
+      if(r.isExact && r.exactMembers && r.exactMembers.length){
+        // Extraer el nombre limpio del patrón (sin estrellas ni decoración)
+        const cleanName = src => src.replace(/^★+\s*/, '').replace(/\s*D≈.*$/,'').replace(/\s*·.*$/,'').replace(/\s*Agotamiento.*$/,'').replace(/\s*\(.*$/,'').trim();
+        const members = r.exactMembers.map(m=>
+          `<div style="font-size:11px;padding:2px 0;display:flex;justify-content:space-between;gap:8px;">
+            <span><span style="color:#fbbf24;font-weight:bold;">${cleanName(m.src)}</span>
+              <span class="muted"> (${m.system} ${m.ratio.toFixed(3)})</span></span>
+            <span style="font-family:monospace;">${fmt(m.D)}</span>
+          </div>`
+        ).join('');
+        exactBreakdown = `<div style="margin-top:6px;padding:6px;background:rgba(251,191,36,0.08);border-left:2px solid #fbbf24;border-radius:4px;">
+          <div style="font-size:10px;color:#fbbf24;font-weight:bold;margin-bottom:3px;">🎯 ${r.exactCount} PROYECCIONES SUPERPUESTAS:</div>
+          ${members}
+        </div>`;
+      }
+
       tr.innerHTML = `
         <td>${i+1}</td>
-        <td><div class="pill ${badge}">${fmt(r.D)}</div><span class="small"> (${fmt(r.minD)} – ${fmt(r.maxD)})</span></td>
-        <td><div class="pill ${badge}">${r.conf}</div></td>
+        <td>
+          ${priceDisplay}
+          <div style="margin-top:4px;">${tags.join(' ')}</div>
+          ${exactBreakdown}
+        </td>
+        <td>
+          <div class="pill ${badge}">${r.conf}</div>
+          <div class="small" style="margin-top:3px;color:var(--highlight);font-weight:bold;">Q: ${r.quality}</div>
+        </td>
         <td class="small">${r.pats.join("<br>")}</td>
-        <td class="small">PRZ extremo</td>`;
+        <td class="small">
+          ${r.isExact ? `<b style="color:#fbbf24;">🎯 ${r.exactCount} proyecciones superpuestas</b><br>` : ''}
+          ${r.hasXA && r.hasBC ? '<b>Confluencia XA+BC</b><br>' : ''}
+          ${r.maxTier===3 ? '<b>Máx agotamiento (3.618)</b>' : r.maxTier===2 ? 'Agotamiento fuerte (2.618)' : 'PRZ estándar (1.618)'}
+          <br>Ancho: ${fmtPips(r.przWidth)} pts
+        </td>`;
       levelsBody.appendChild(tr);
     });
 
@@ -409,127 +690,316 @@
     $("trend").textContent = setupBearish ? "SELL" : "BUY";
     $("trend").className = setupBearish ? "flag crash-mode" : "flag boom-mode";
 
-    // Best level
-    const best = rows[0];
-    if(best && best.conf >= th){
-      const entryD = setupBearish ? (best.minD ?? best.D) : (best.maxD ?? best.D);
-      const DC = Math.abs(c-entryD);
-      const przWidth = Math.abs(best.maxD - best.minD);
-      const slBuffer = spikeData.avgSpike * 1.5;
-      const slDistance = Math.max(przWidth + slBuffer, spikeData.avgSpike * 2);
-      const signAll = setupBearish ? -1 : 1;
-      
-      const TP1 = entryD + signAll*0.382*DC;
-      const TP2 = entryD + signAll*0.618*DC;
-      const SL  = entryD - signAll*slDistance;
-      
-      const riskPips = Math.abs(entryD - SL);
-      const reward1 = Math.abs(TP1 - entryD);
-      const reward2 = Math.abs(TP2 - entryD);
-      const rr1 = (reward1/riskPips).toFixed(1);
-      const rr2 = (reward2/riskPips).toFixed(1);
-      
-      $("exec").innerHTML = `
-        <div class="risk-title">🎯 Mejor Entrada: ${best.pats[0]} <span class="pill extreme">★ EXTREMO</span></div>
-        <div class="risk-grid">
-          <div class="risk-item">
-            <div class="risk-label">Entrada</div>
-            <div class="risk-value">${fmt(entryD)}</div>
-          </div>
-          <div class="risk-item">
-            <div class="risk-label">Stop Loss</div>
-            <div class="risk-value sl-value">${fmt(SL)}</div>
-            <div class="risk-label">(${fmtPips(riskPips)} pts)</div>
-          </div>
-          <div class="risk-item">
-            <div class="risk-label">TP1 (38.2%)</div>
-            <div class="risk-value tp-value">${fmt(TP1)}</div>
-            <div class="risk-label">R:R ${rr1}</div>
-          </div>
-          <div class="risk-item">
-            <div class="risk-label">TP2 (61.8%)</div>
-            <div class="risk-value tp-value">${fmt(TP2)}</div>
-            <div class="risk-label">R:R ${rr2}</div>
-          </div>
-        </div>
-      `;
-      
-      $("invalidationRules").style.display = 'block';
-      $("invalidationText").innerHTML = `
-        <ul style="margin:8px 0;padding-left:20px;">
-          <li><b>Invalidación:</b> Cierre ${setupBearish?'arriba':'abajo'} de ${fmt(SL)}</li>
-          <li><b>Spike en contra:</b> Esperar nuevo patrón</li>
-          <li><b>Tiempo máximo:</b> ${idx==='150'?'5':idx==='300'?'10':'15'} min sin reacción</li>
-        </ul>
-      `;
-      
-      $("riskManagement").style.display = 'block';
-      $("riskDetails").innerHTML = `
-        <div class="risk-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="risk-item">
-            <div class="risk-label">PRZ Width</div>
-            <div class="risk-value">${fmtPips(przWidth)} pts</div>
-          </div>
-          <div class="risk-item">
-            <div class="risk-label">Spike Prom.</div>
-            <div class="risk-value">${spikeData.avgSpike} pts</div>
-          </div>
-          <div class="risk-item">
-            <div class="risk-label">Buffer SL</div>
-            <div class="risk-value">${fmtPips(slBuffer)} pts</div>
-          </div>
-        </div>
-        <div class="small" style="margin-top:10px;">
-          <b>Gestión:</b> TP1 → 50% posición → BE → TP2/TP3
-        </div>
-      `;
+    // ========== PLAN DE ENTRADAS ESCALONADAS (HÍBRIDO) ==========
+    // 3 entradas:
+    //   1. 2.618×XA — referencia áurea fija (entrada estándar de agotamiento)
+    //   2. 3.618×XA — referencia áurea fija (máximo agotamiento)
+    //   3. Mejor PRZ exacta detectada — adaptativa: el sistema elige la zona
+    //      con confluencia exacta de mayor Q-Score. Si no hay exactas, este
+    //      tercer nivel queda inactivo (sin entrada teórica forzada).
+    //
+    // Capital sugerido: 30% / 35% / 35%. Las dos fijas son predecibles; la
+    // tercera concentra capital en la zona estadísticamente más precisa.
+    const ladderedBody = $("ladderedBody");
+    const ladderedSummary = $("ladderedSummary");
+    ladderedBody.innerHTML = '';
+    ladderedSummary.style.display = 'none';
+
+    // Helper: buscar PRZ detectada cerca de un precio target
+    const findNearestRow = (target) => {
+      for(const r of rows){
+        const center = r.isExact ? r.exactCenter : r.D;
+        if(Math.abs(center - target) < 0.005*Math.abs(target)) return r;
+      }
+      return null;
+    };
+
+    // Niveles 1 y 2: fijos en ratios áureos puros (solo XA)
+    const fixedLevels = [
+      {label:'2.618 ×XA', targetRatio:2.618, tier:2, capital:30, color:'#fbbf24', type:'fixed'},
+      {label:'3.618 ×XA', targetRatio:3.618, tier:3, capital:35, color:'#a855f7', type:'fixed'}
+    ];
+
+    const ladderRows = fixedLevels.map(L => {
+      const priceXA = dirCD < 0 ? a - L.targetRatio*XA : a + L.targetRatio*XA;
+      const matchXA = findNearestRow(priceXA);
+      const recommendedPrice = matchXA && matchXA.isExact ? matchXA.exactCenter
+                             : matchXA ? matchXA.D
+                             : priceXA;
+      return {
+        ...L,
+        priceXA, priceBC:null, matchXA, matchBC:null,
+        sameRow:false, recommendedPrice,
+        sortKey: priceXA  // para reordenar visualmente
+      };
+    });
+
+    // Nivel 3: mejor PRZ EXACTA detectada por el sistema
+    // rows ya está ordenado por quality desc, así que buscamos la primera con isExact
+    const bestExact = rows.find(r => r.isExact);
+    if(bestExact){
+      ladderRows.push({
+        label:'Mejor PRZ exacta',
+        targetRatio:null,
+        tier: bestExact.maxTier || 2,
+        capital:35,
+        color:'#22c55e',
+        type:'adaptive',
+        priceXA: bestExact.exactCenter,
+        priceBC: null,
+        matchXA: bestExact,
+        matchBC: null,
+        sameRow: bestExact.hasXA && bestExact.hasBC,
+        recommendedPrice: bestExact.exactCenter,
+        bestExactRef: bestExact,
+        sortKey: bestExact.exactCenter
+      });
+    } else {
+      // No hay exacta — añadir placeholder informativo
+      ladderRows.push({
+        label:'Mejor PRZ exacta',
+        targetRatio:null,
+        tier:0,
+        capital:0,
+        color:'#64748b',
+        type:'inactive',
+        priceXA: null, priceBC: null,
+        matchXA: null, matchBC: null,
+        sameRow:false,
+        recommendedPrice: null,
+        sortKey: Infinity
+      });
     }
 
-    // Entries table
-    const entriesBody = $("entries"); entriesBody.innerHTML="";
-    const signAll = setupBearish ? -1 : 1;
-    const qualified = rows.filter(r=> r.conf>=th);
-    
-    if(qualified.length===0){
-      entriesBody.innerHTML = `<tr><td colspan="9" class="small">No hay niveles con ≥ ${th} confluencias.</td></tr>`;
-    }else{
-      qualified.forEach((r,i)=>{
-        const entryD = setupBearish ? (r.minD ?? r.D) : (r.maxD ?? r.D);
-        const DC = Math.abs(c-entryD);
-        const przWidth = Math.abs(r.maxD - r.minD);
-        const slBuffer = spikeData.avgSpike * 1.5;
-        const slDistance = Math.max(przWidth + slBuffer, spikeData.avgSpike * 2);
-        
-        const TP1 = entryD + signAll*0.382*DC;
-        const TP2 = entryD + signAll*0.618*DC;
-        const TP3 = entryD + signAll*0.786*DC;
-        const SL  = entryD - signAll*slDistance;
-        
-        const riskPips = Math.abs(entryD - SL);
-        const reward2 = Math.abs(TP2 - entryD);
-        const rr = (reward2/riskPips).toFixed(1);
-        
-        const badge = r.conf>=3 ? "extreme" : "ok";
-        const tr=document.createElement("tr");
-        tr.classList.add('extreme-row');
+    // Ordenar entradas en el orden físico que las tocaría el precio (más cerca de C → más lejos)
+    // Para CD bajista (precio cayendo), el primer nivel tocado es el de mayor precio (más cerca de C que está arriba)
+    // Para CD alcista, el primero es el de menor precio
+    // Pero queremos que el usuario vea el orden temporal natural, así que ordenamos por |distancia a C|
+    const cPrice = c;
+    ladderRows.forEach(L => { if(L.sortKey !== Infinity) L.distFromC = Math.abs(L.sortKey - cPrice); else L.distFromC = Infinity; });
+    ladderRows.sort((a,b) => a.distFromC - b.distFromC);
+
+    // SL común: detrás del nivel ACTIVO más extremo (mayor distancia desde C)
+    const activeRows = ladderRows.filter(L => L.type !== 'inactive');
+    const slBufferL = spikeData.avgSpike * 1.5;
+    let slCommon;
+    if(activeRows.length > 0){
+      const deepest = activeRows[activeRows.length - 1];  // el más lejano de C
+      slCommon = dirCD < 0
+        ? deepest.recommendedPrice - slBufferL
+        : deepest.recommendedPrice + slBufferL;
+    } else {
+      slCommon = c;  // fallback
+    }
+
+    ladderRows.forEach((L, i) => {
+      if(L.type === 'inactive'){
+        const tr = document.createElement('tr');
+        tr.style.opacity = '0.5';
         tr.innerHTML = `
-          <td>${i+1}</td>
-          <td><div class="pill ${badge}">${fmt(entryD)}</div></td>
-          <td class="sl-value">${fmt(SL)}<br><span class="small">(${fmtPips(riskPips)} pts)</span></td>
-          <td class="tp-value">${fmt(TP1)}</td>
-          <td class="tp-value">${fmt(TP2)}</td>
-          <td class="tp-value">${fmt(TP3)}</td>
-          <td><span class="pill ${parseFloat(rr)>=1.5?'ok':'warn'}">${rr}:1</span></td>
-          <td><div class="pill ${badge}">${r.conf}</div></td>
-          <td class="small">${r.pats.join(", ")}</td>`;
-        entriesBody.appendChild(tr);
+          <td style="border-left:4px solid ${L.color};">
+            <b>${L.label}</b><br>
+            <span class="small muted">no activada</span>
+          </td>
+          <td colspan="5" class="small muted" style="text-align:center;font-style:italic;">
+            ⚠ No se detectó ninguna confluencia EXACTA en el análisis actual.<br>
+            Este nivel adaptativo permanece inactivo. Considera operar solo con las 2 entradas fijas (capital ajustado a 45% / 55%).
+          </td>`;
+        ladderedBody.appendChild(tr);
+        return;
+      }
+
+      const matched = L.matchXA;
+      const isExactMatch = matched && matched.isExact;
+      const isAdaptive = L.type === 'adaptive';
+
+      const matchBadge = isAdaptive
+        ? `<span class="exact-badge" style="font-size:9px;">🎯 EXACTA Q:${matched.quality}</span>`
+        : isExactMatch
+        ? '<span class="exact-badge" style="font-size:9px;">🎯 + EXACTA</span>'
+        : matched
+        ? '<span class="pill ok" style="font-size:9px;padding:2px 5px;">✓ detectada</span>'
+        : '<span class="pill warn" style="font-size:9px;padding:2px 5px;">⚠ solo teórica</span>';
+
+      const operableMargin = spikeData.avgSpike * 0.25;
+      const zoneCenter = L.recommendedPrice;
+      const zoneMin = isExactMatch && matched ? Math.min(matched.minD, zoneCenter - operableMargin) : zoneCenter - operableMargin;
+      const zoneMax = isExactMatch && matched ? Math.max(matched.maxD, zoneCenter + operableMargin) : zoneCenter + operableMargin;
+
+      const tr = document.createElement('tr');
+      if(isAdaptive || isExactMatch) tr.classList.add('exact-confluence');
+      else if(matched) tr.classList.add('extreme-row');
+
+      // Etiqueta de orden temporal (1er/2do/3er según posición desde C)
+      const order = i + 1;
+      const orderLabel = ['1er','2do','3er'][i] || `${order}º`;
+
+      tr.innerHTML = `
+        <td style="border-left:4px solid ${L.color};">
+          <b>${orderLabel} en tocar</b><br>
+          <span style="font-weight:bold;">${L.label}</span><br>
+          <span class="small muted">${'★'.repeat(L.tier)} ${isAdaptive ? 'adaptativa' : 'agotamiento'}</span>
+        </td>
+        <td>
+          <div class="pill ${matched?'extreme':'warn'}" style="font-weight:bold;">${fmt(zoneCenter)}</div>
+          <div style="margin-top:3px;">${matchBadge}</div>
+        </td>
+        <td class="small">
+          ${fmt(zoneMin)} – ${fmt(zoneMax)}
+          ${L.priceXA && !isAdaptive ? `<br><span class="muted">XA puro: ${fmt(L.priceXA)}</span>` : ''}
+          ${isAdaptive ? `<br><span class="muted">${matched.pats.slice(0,2).join(' + ')}</span>` : ''}
+        </td>
+        <td>
+          <div style="font-size:18px;font-weight:bold;color:${L.color};">${L.capital}%</div>
+          <span class="small muted">del capital</span>
+        </td>
+        <td class="sl-value">
+          ${fmt(slCommon)}
+          <br><span class="small">(común)</span>
+        </td>
+        <td class="small">
+          ${isAdaptive
+            ? `<b style="color:#22c55e;">Zona de máxima precisión</b><br><span class="muted">Q-Score: ${matched.quality} | ${matched.exactCount} proyecciones superpuestas</span>`
+            : matched
+            ? matched.pats.slice(0,2).join('<br>')
+            : '<span class="muted">No detectada — entrada teórica pura</span>'}
+        </td>`;
+      ladderedBody.appendChild(tr);
+    });
+
+    const firstActive = ladderRows.find(L => L.type !== 'inactive');
+    const totalRisk = firstActive ? Math.abs(firstActive.recommendedPrice - slCommon) : 0;
+    const detectedCount = ladderRows.filter(L => L.type !== 'inactive' && L.matchXA).length;
+    const hasAdaptive = ladderRows.some(L => L.type === 'adaptive');
+    const capitalSummary = hasAdaptive ? '30% / 35% / 35%' : '45% / 55% (sin 3er nivel)';
+
+    ladderedSummary.style.display = 'block';
+    ladderedSummary.innerHTML = `
+      <b>📋 Plan de ejecución (híbrido):</b><br>
+      • <b>Niveles activos:</b> ${activeRows.length} de 3 ${hasAdaptive ? '(incluye 3er nivel adaptativo en PRZ exacta)' : '(sin PRZ exacta detectada — 3er nivel inactivo)'}<br>
+      • <b>${detectedCount} de ${activeRows.length}</b> niveles confirmados estructuralmente por el sistema<br>
+      • <b>SL único en ${fmt(slCommon)}</b> protege todas las entradas activas<br>
+      • <b>Capital distribuido:</b> ${capitalSummary}<br>
+      • <b>Lógica:</b> 2.618 y 3.618 son referencias áureas fijas (predecibles para órdenes límite). El 3er nivel se ancla en la mejor PRZ exacta detectada — donde XA y BC se superponen — convirtiéndose en una entrada de "máxima precisión" calculada por el algoritmo.<br>
+      • <b>Distancia máxima al SL:</b> ${fmtPips(totalRisk)} pts desde la primera entrada
+    `;
+
+    // ========== CÁLCULO DE NIVELES DE DEUDA ==========
+    // Premisa del usuario: cada nivel que el precio superó SIN RETROCEDER a tocarlo
+    // queda como "deuda" — el mercado volverá a buscarlo. Es un TP probable.
+    //
+    // Fórmula correcta (verificada con ejemplo del usuario):
+    //   nivel = A − dirAX × ratio × XA
+    //
+    // Esto mide los niveles DESDE A en sentido contrario al swing X→A.
+    // Para XA alcista (a > x, dirAX=+1):
+    //   78.6%  → A - 0.786·XA  (cae por debajo de A, dentro del swing)
+    //   100%   → A - 1·XA = X  (regreso exacto al origen)
+    //   127.2% → A - 1.272·XA  (cae por debajo de X)
+    //   200%   → A - 2·XA
+    //   261.8% → A - 2.618·XA  (extremo)
+    //
+    // Para XA bajista (dirAX=-1) los niveles se reflejan en espejo (suben en lugar de bajar).
+    const dirAX = a > x ? 1 : -1;
+
+    // Cada checkbox marca DIRECTAMENTE su propio nivel como deuda activa
+    const DEBT_LEVELS = [
+      { id: 'debt786',  ratio: 0.786, label: '78.6%'  },
+      { id: 'debt100',  ratio: 1.000, label: '100%'   },
+      { id: 'debt1272', ratio: 1.272, label: '127.2%' },
+      { id: 'debt200',  ratio: 2.000, label: '200%'   },
+      { id: 'debt2618', ratio: 2.618, label: '261.8%' }
+    ];
+
+    const activeDebts = [];
+    DEBT_LEVELS.forEach(L => {
+      if($(L.id) && $(L.id).checked){
+        const price = a - dirAX * L.ratio * XA;
+        activeDebts.push({
+          ratio: L.ratio,
+          label: L.label,
+          reason: `Superó ${L.label} sin retroceder`,
+          price,
+          distance: Math.abs(price - c),
+          relativeDirection: (price > c) ? 'arriba' : 'abajo'
+        });
+      }
+    });
+
+    // Mostrar/ocultar sección de deudas
+    const debtSection = $("debtSection");
+    const debtBody = $("debtBody");
+    const debtSummary = $("debtSummary");
+
+    if(activeDebts.length === 0){
+      debtSection.style.display = 'none';
+    } else {
+      debtSection.style.display = 'block';
+      debtBody.innerHTML = '';
+
+      // Ordenar por distancia ascendente (los más cercanos a C son más probables a corto plazo)
+      activeDebts.sort((a,b)=> a.distance - b.distance);
+
+      activeDebts.forEach((d, idx) => {
+        // Prioridad: el más cercano es PRIORIDAD ALTA, los siguientes MEDIA y BAJA
+        const priority = idx === 0 ? 'ALTA' : idx === 1 ? 'MEDIA' : 'BAJA';
+        const priorityColor = idx === 0 ? '#22c55e' : idx === 1 ? '#fbbf24' : '#94a3b8';
+
+        // ¿Confluencia con alguna PRZ detectada?
+        let confluence = null;
+        for(const r of rows){
+          const center = r.isExact ? r.exactCenter : r.D;
+          if(Math.abs(center - d.price) < 0.005*Math.abs(d.price)){
+            confluence = r;
+            break;
+          }
+        }
+
+        const confCell = confluence
+          ? `<span class="debt-tp-badge">💎 TP + PRZ</span><br><span class="small">${confluence.pats[0]}</span>`
+          : '<span class="small muted">TP independiente</span>';
+
+        const tr = document.createElement('tr');
+        tr.classList.add('debt-tp-row');
+        tr.innerHTML = `
+          <td>
+            <b>${d.label}</b>
+            <br><span class="small muted">${d.reason}</span>
+          </td>
+          <td>
+            <div class="pill" style="font-weight:bold;border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,0.1);">${fmt(d.price)}</div>
+            <br><span class="small muted">${d.relativeDirection} del precio actual</span>
+          </td>
+          <td class="small">${fmtPips(d.distance)} pts</td>
+          <td class="small">${(d.ratio*100).toFixed(1)}%</td>
+          <td>
+            <span style="color:${priorityColor};font-weight:bold;">${priority}</span>
+          </td>
+          <td>${confCell}</td>`;
+        debtBody.appendChild(tr);
       });
+
+      const confluences = activeDebts.filter(d => {
+        for(const r of rows){
+          const center = r.isExact ? r.exactCenter : r.D;
+          if(Math.abs(center - d.price) < 0.005*Math.abs(d.price)) return true;
+        }
+        return false;
+      }).length;
+
+      debtSummary.innerHTML = `
+        <b>📋 Plan de Take Profits:</b><br>
+        • <b>${activeDebts.length} deuda${activeDebts.length>1?'s':''} activa${activeDebts.length>1?'s':''}</b> según las superaciones marcadas<br>
+        • <b>TP más cercano:</b> ${activeDebts[0].label} en ${fmt(activeDebts[0].price)} (${fmtPips(activeDebts[0].distance)} pts desde C) — prioridad ALTA<br>
+        ${confluences>0 ? `• <b>💎 ${confluences} confluencia${confluences>1?'s':''} con PRZ detectada</b> — niveles ideales donde tomar ganancia<br>` : ''}
+        • <b>Lógica:</b> escalona los TPs en este orden — primero el más cercano (mayor probabilidad de ser tocado pronto), luego los demás. Si hay confluencia con PRZ, marca ese nivel como TP principal porque combina el imán técnico (deuda) con el imán estructural (proyección armónica).
+      `;
     }
   }
 
   // Event listeners
   $("calc").addEventListener("click", compute);
-  ["x","a","b","c","tol","th"].forEach(id=>
+  ["x","a","b","c"].forEach(id=>
     $(id).addEventListener("keydown",e=>{ if(e.key==="Enter") compute(); })
   );
   
@@ -545,7 +1015,21 @@
     });
   });
 
-  updateSpikeInfo();
+  // Selector de mercado: muestra/oculta config Crash/Boom y recalcula
+  $("market").addEventListener('change', function() {
+    market = this.value;
+    updateMarketUI();
+    if($("x").value && $("a").value && $("b").value && $("c").value) compute();
+  });
+
+  // Checkboxes de deuda: recalcular en cada cambio (siempre que haya XABC)
+  ['debt786','debt100','debt1272','debt200','debt2618'].forEach(id => {
+    $(id).addEventListener('change', () => {
+      if($("x").value && $("a").value && $("b").value && $("c").value) compute();
+    });
+  });
+
+  updateMarketUI();
 })();
 </script>
 </body>
