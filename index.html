@@ -16,7 +16,10 @@
   h2{margin:4px 0 10px;font-size:16px;color:var(--muted)}
   h3{margin:12px 0 8px;font-size:14px;color:var(--highlight)}
   label{display:block;margin:8px 0 6px;color:var(--muted)}
-  input[type="number"],select{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3e6b;background:#0e1526;color:#e8eefc}
+  input[type="number"],input[type="text"],input[type="datetime-local"],input[type="date"],select{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3e6b;background:#0e1526;color:#e8eefc}
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.6)}
+  .tf-cluster-row{background:rgba(29,158,117,0.12) !important;border-left:4px solid #1d9e75}
+  .tf-badge{background:linear-gradient(135deg,#1d9e75,#0f6e56);color:#e1f5ee;font-weight:bold;padding:3px 8px;border-radius:999px;font-size:11px}
   .row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .btn{display:inline-block;margin-top:10px;background:#581c87;border:1px solid #9333ea;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:bold}
@@ -244,6 +247,77 @@
   </section>
 </div>
 
+<div class="container">
+  <section class="card">
+    <h2>5) 🔗 Confluencia Multi-Patrón — N patrones</h2>
+    <div class="small muted" style="margin-bottom:10px;">
+      Agrega varios patrones (de cualquier timeframe) con sus puntos XABC. El motor proyecta los niveles <b>1.618 · 2.618 · 3.618</b> (de XA y de BC) de cada patrón y busca dónde se <b>apilan</b>. Cuantos más patrones coincidan en un mismo precio, más fuerte y exacta la zona de reacción.
+    </div>
+    <div class="row-3">
+      <div><label>Etiqueta</label><input id="mpLabel" type="text" placeholder="ej. H4-1"></div>
+      <div><label>Timeframe</label>
+        <select id="mpTf"><option>H4</option><option>H1</option><option selected>M15</option><option>M5</option><option>M1</option></select>
+      </div>
+      <div><label>Tolerancia confluencia (pts)</label><input id="mpTol" type="number" step="0.5" value="5"></div>
+    </div>
+    <div class="row">
+      <div><label>X</label><input id="mpX" type="number" step="any" placeholder="precio X"></div>
+      <div><label>A</label><input id="mpA" type="number" step="any" placeholder="precio A"></div>
+    </div>
+    <div class="row">
+      <div><label>B</label><input id="mpB" type="number" step="any" placeholder="precio B"></div>
+      <div><label>C</label><input id="mpC" type="number" step="any" placeholder="precio C"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn" id="mpAdd" style="flex:1;min-width:150px;">➕ Agregar patrón</button>
+      <button class="btn" id="mpExport" style="background:#0a2e1a;border-color:#10b981;color:#10b981;">⬇ Exportar (CSV)</button>
+      <button class="btn" id="mpImport" style="background:#0a1a2e;border-color:#3b82f6;color:#60a5fa;">⬆ Importar (CSV)</button>
+      <button class="btn" id="mpClear" style="background:#5b2323;border-color:#ef4444;">🗑 Borrar todo</button>
+      <input type="file" id="mpFile" accept=".csv,text/csv" style="display:none;">
+    </div>
+
+    <h3>Patrones cargados (<span id="mpCount">0</span>)</h3>
+    <div id="mpList" class="flex"></div>
+
+    <h3>Zonas de confluencia</h3>
+    <table>
+      <thead><tr><th>Zona de precio</th><th>Confluyen</th><th>Dir</th><th>Entrada</th><th>SL</th><th>TP1 / TP2 / TP3</th><th>Fuerza</th></tr></thead>
+      <tbody id="mpBody"></tbody>
+    </table>
+    <div id="mpSummary" class="hint" style="margin-top:10px;display:none;"></div>
+  </section>
+
+  <section class="card" id="timeSection" style="grid-column:1 / -1;">
+    <h2>6) ⏱️ Proyección de Tiempo (Fibonacci) — ¿en qué vela completa D?</h2>
+    <div class="small muted" style="margin-bottom:10px;">
+      El precio te dice <b>a qué nivel</b> reacciona (PRZ de precio, arriba). Esto te dice <b>en qué vela</b>. Ingresa el <b>número de vela</b> de cada pivote (usa el índice de tu plataforma, o numera tú mismo desde cualquier vela como 0: solo importa la diferencia). El motor proyecta la duración del tramo CD por ratios áureos (<b>desde AB, BC y XA</b>) más las Time Zones desde X, y agrupa los candidatos en una <b>ventana de velas</b>. El conteo es por intervalos: <b>τ = vela(fin) − vela(inicio)</b> (la vela de inicio es 0; se cuenta al llegar a cada vela siguiente). Trabajar en velas elimina zonas horarias y huecos de fin de semana.
+    </div>
+    <div class="row">
+      <div><label>Vela de X (índice)</label><input id="tfX" type="number" step="1" placeholder="ej. 0"></div>
+      <div><label>Vela de A (índice)</label><input id="tfA" type="number" step="1" placeholder="ej. 6"></div>
+    </div>
+    <div class="row">
+      <div><label>Vela de B (índice)</label><input id="tfB" type="number" step="1" placeholder="ej. 12"></div>
+      <div><label>Vela de C (índice)</label><input id="tfC" type="number" step="1" placeholder="ej. 16"></div>
+    </div>
+    <div class="row">
+      <div><label>Tolerancia cluster (velas · 0 = auto)</label><input id="tfTol" type="number" step="1" min="0" value="0"></div>
+      <div><label>Vela actual (opcional · para «faltan N»)</label><input id="tfNow" type="number" step="1" placeholder="índice de la vela en curso"></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn" id="tfCalc" style="flex:1;min-width:150px;background:#0a2e1a;border-color:#1d9e75;color:#5dcaa5;">⏱️ Calcular ventana de velas</button>
+      <button class="btn" id="tfClear" style="background:#5b2323;border-color:#ef4444;">🗑 Limpiar</button>
+    </div>
+    <div id="tfPills" class="flex" style="margin-top:10px;"></div>
+    <h3>Proyecciones de la vela D</h3>
+    <table>
+      <thead><tr><th>Familia</th><th>Fórmula</th><th>k</th><th>τCD (velas)</th><th>Vela de D</th><th>Faltan</th><th>En ventana</th></tr></thead>
+      <tbody id="tfBody"><tr><td colspan="7" class="no-results">Ingresa los 4 índices de vela y pulsa «Calcular».</td></tr></tbody>
+    </table>
+    <div id="tfSummary" class="hint" style="margin-top:10px;display:none;"></div>
+  </section>
+</div>
+
 <script>
 (function(){
   const $ = id => document.getElementById(id);
@@ -407,6 +481,113 @@
       prz:(a,dirCD,XA,c,BC)=>rangeBC(c,dirCD,3.582,3.654,BC,"★★★ CD/BC≈3.618 · PRZ BC 3.618×BC")
     }
   ];
+
+  // Detección reutilizable para la Sección 5 (MISMOS patrones y validación que la Sección 2)
+  window.__detectLevels = function(x, a, b, c){
+    if(![x,a,b,c].every(Number.isFinite)) return [];
+    const XA = Math.abs(x-a), AB = Math.abs(a-b), BC = Math.abs(b-c);
+    if(XA === 0 || AB === 0) return [];
+    const dirCD = b < a ? -1 : 1;
+    const R = { B_XA: AB/XA, C_AB: BC/AB, tol: 0.03 };
+    const out = [];
+    PATTERNS.forEach(p => {
+      if(!p.rules(R).every(r => r[0])) return;
+      const pts = p.prz(a, dirCD, XA, c, BC);
+      const lo = Math.min(pts[0].D, pts[1].D), hi = Math.max(pts[0].D, pts[1].D);
+      out.push({ price:(lo+hi)/2, lo, hi, ratio: pts[0].midRatio, system: p.system, tier: p.tier, patternKey: p.key, dir: dirCD, cRef: c, scale: XA });
+    });
+    return out;
+  };
+
+  // Entradas UNIFICADAS / mejores — REPLICA EXACTA del plan escalonado de la Sección 2.5:
+  // mismo scoring de calidad, misma entrada (recommendedPrice) y misma zona operable (±avgSpike·0.25).
+  window.__bestEntries = function(x, a, b, c){
+    if(![x,a,b,c].every(Number.isFinite)) return [];
+    const XA = Math.abs(x-a), AB = Math.abs(a-b), BC = Math.abs(b-c);
+    if(XA === 0 || AB === 0) return [];
+    const dirCD = b < a ? -1 : 1;
+    const R = { B_XA: AB/XA, C_AB: BC/AB, tol: 0.03 };
+
+    // rawD con metadata completa (igual que compute)
+    const rawD = [];
+    PATTERNS.forEach(p => {
+      if(!p.rules(R).every(r => r[0])) return;
+      const pts = p.prz(a, dirCD, XA, c, BC);
+      pts.forEach(pt => { pt.tier = p.tier; pt.system = p.system; pt.classic = !!p.classic; pt.patternKey = p.key; });
+      rawD.push(...pts);
+    });
+    if(!rawD.length) return [];
+
+    // agrupar por proximidad (0.5%) con metadata
+    rawD.sort((m,n) => m.D - n.D);
+    const grouped = [];
+    rawD.forEach(pt => {
+      const f = grouped.find(g => Math.abs(g.D - pt.D) < 0.005*Math.abs(pt.D));
+      if(f){
+        f.count++; f.pats.push(pt.patternSrc); f.tiers.push(pt.tier); f.systems.add(pt.system); f.classics.push(pt.classic);
+        f.allPoints.push({D:pt.D, src:pt.patternSrc, tier:pt.tier, system:pt.system, ratio:pt.midRatio});
+        f.minD = Math.min(f.minD, pt.D); f.maxD = Math.max(f.maxD, pt.D);
+      } else grouped.push({ D:pt.D, count:1, pats:[pt.patternSrc], tiers:[pt.tier], systems:new Set([pt.system]), classics:[pt.classic],
+        allPoints:[{D:pt.D, src:pt.patternSrc, tier:pt.tier, system:pt.system, ratio:pt.midRatio}], minD:pt.D, maxD:pt.D });
+    });
+
+    // confluencia exacta (≥2 patrones distintos dentro de 0.15%)
+    const ET = 0.0015;
+    grouped.forEach(g => {
+      const s = [...g.allPoints].sort((m,n) => m.D - n.D); let mx = 1, ctr = g.D;
+      for(let i=0;i<s.length;i++){
+        const sub = [s[i]];
+        for(let j=i+1;j<s.length;j++){ if(Math.abs(s[j].D - s[i].D) <= ET*Math.abs(s[i].D)) sub.push(s[j]); else break; }
+        const uniq = new Map(); sub.forEach(p => { const k = p.src + '|' + p.ratio.toFixed(3); if(!uniq.has(k)) uniq.set(k, p); });
+        const u = [...uniq.values()]; if(u.length > mx){ mx = u.length; ctr = u.reduce((q,v) => q + v.D, 0) / u.length; }
+      }
+      g.exactCount = mx; g.exactCenter = ctr; g.isExact = mx >= 2;
+    });
+
+    // scoring de calidad (idéntico a compute) → rows ordenado por calidad desc
+    const TIER_WEIGHT = {1:1, 2:2, 3:4};
+    const rows = grouped.map(g => {
+      const weightSum = g.tiers.reduce((s,t) => s + (TIER_WEIGHT[t]||1), 0);
+      const maxTier = Math.max(...g.tiers);
+      const hasXA = g.systems.has('XA'), hasBC = g.systems.has('BC');
+      const classicCount = g.classics.filter(Boolean).length;
+      const przWidth = Math.abs(g.maxD - g.minD);
+      const tightness = przWidth > 0 ? Math.max(0.5, 1 - (przWidth / Math.abs(g.D)) * 50) : 1;
+      let quality = weightSum;
+      quality += TIER_WEIGHT[maxTier] || 0;
+      if(hasXA && hasBC) quality *= 1.5;
+      quality *= (1 + 0.20 * classicCount);
+      quality *= tightness;
+      if(g.isExact) quality *= 1.4;
+      return { D: g.isExact ? g.exactCenter : g.D, minD: g.minD, maxD: g.maxD, quality: +quality.toFixed(2),
+               maxTier, hasXA, hasBC, isExact: g.isExact, exactCount: g.exactCount, exactCenter: g.exactCenter };
+    }).sort((m,n) => n.quality - m.quality);
+
+    // Zona = RANGO CRUDO del patrón (±1% del ratio áureo): escala con el XA de cada patrón
+    // y es independiente del instrumento. Ideal para confluencia multi-timeframe.
+    const findNear = target => { for(const r of rows){ const center = r.isExact ? r.exactCenter : r.D; if(Math.abs(center - target) < 0.005*Math.abs(target)) return r; } return null; };
+    const bandOf = r => {
+      const lo = (r === 2.618) ? 2.592 : 3.582, hi = (r === 2.618) ? 2.644 : 3.654;
+      const e1 = dirCD < 0 ? a - lo*XA : a + lo*XA, e2 = dirCD < 0 ? a - hi*XA : a + hi*XA;
+      return { lo: Math.min(e1,e2), hi: Math.max(e1,e2) };
+    };
+
+    const out = [];
+    // niveles fijos 2.618 y 3.618 ×XA (entrada = recommendedPrice del scoring, igual que la 2.5)
+    [2.618, 3.618].forEach(r => {
+      const priceXA = dirCD < 0 ? a - r*XA : a + r*XA;
+      const m = findNear(priceXA);
+      const center = m ? (m.isExact ? m.exactCenter : m.D) : priceXA;
+      const z = m ? { lo: m.minD, hi: m.maxD } : bandOf(r);   // rango crudo de la PRZ
+      out.push({ price: center, lo: z.lo, hi: z.hi, ratio: r, system:'XA', dir: dirCD, cRef: c, scale: XA, exact: !!(m && m.isExact) });
+    });
+    // mejor PRZ exacta (la de mayor calidad) — rango crudo de la confluencia
+    const bestExact = rows.find(r => r.isExact);
+    if(bestExact){
+      out.push({ price: bestExact.exactCenter, lo: bestExact.minD, hi: bestExact.maxD, ratio: null, system:'EXACT', dir: dirCD, cRef: c, scale: XA, exact: true });
+    }
+    return out;
+  };
 
   function compute(){
     const x=+$("x").value, a=+$("a").value, b=+$("b").value, c=+$("c").value;
@@ -631,9 +812,10 @@
       // La zona operable mínima es ±25% del spike promedio del instrumento (margen realista para orden limit)
       let priceDisplay;
       if(r.isExact){
-        const operableMargin = spikeData.avgSpike * 0.25;  // zona donde es realista entrar
-        const zoneMin = Math.min(r.minD, r.exactCenter - operableMargin);
-        const zoneMax = Math.max(r.maxD, r.exactCenter + operableMargin);
+        // Zona operable = RANGO CRUDO de la confluencia (±1% del ratio áureo, escala con XA, sin instrumento)
+        const rawMargin = XA * 0.015;  // expansión mínima solo si la banda fuese de ancho ~0
+        const zoneMin = r.przWidth > 0 ? r.minD : (r.exactCenter - rawMargin);
+        const zoneMax = r.przWidth > 0 ? r.maxD : (r.exactCenter + rawMargin);
         priceDisplay = `
           <div class="pill ${badge}" style="font-weight:bold;font-size:14px;">${fmt(r.exactCenter)}</div>
           <span class="small" style="color:#fbbf24;font-weight:bold;"> ★ punto exacto</span>
@@ -781,7 +963,8 @@
 
     // SL común: detrás del nivel ACTIVO más extremo (mayor distancia desde C)
     const activeRows = ladderRows.filter(L => L.type !== 'inactive');
-    const slBufferL = spikeData.avgSpike * 1.5;
+    // SL común crudo: fracción del swing XA del propio patrón (independiente del instrumento)
+    const slBufferL = XA * 0.05;
     let slCommon;
     if(activeRows.length > 0){
       const deepest = activeRows[activeRows.length - 1];  // el más lejano de C
@@ -821,10 +1004,23 @@
         ? '<span class="pill ok" style="font-size:9px;padding:2px 5px;">✓ detectada</span>'
         : '<span class="pill warn" style="font-size:9px;padding:2px 5px;">⚠ solo teórica</span>';
 
-      const operableMargin = spikeData.avgSpike * 0.25;
+      // Zona operable = RANGO CRUDO del patrón (±1% del ratio áureo), escala con XA, sin instrumento
+      const GOLDEN_BAND = { '1.618':[1.602,1.634], '2.618':[2.592,2.644], '3.618':[3.582,3.654] };
       const zoneCenter = L.recommendedPrice;
-      const zoneMin = isExactMatch && matched ? Math.min(matched.minD, zoneCenter - operableMargin) : zoneCenter - operableMargin;
-      const zoneMax = isExactMatch && matched ? Math.max(matched.maxD, zoneCenter + operableMargin) : zoneCenter + operableMargin;
+      let zoneMin, zoneMax;
+      if(matched && matched.minD !== matched.maxD){
+        // rango crudo de la PRZ detectada (confluencia o banda ±1% del patrón)
+        zoneMin = matched.minD; zoneMax = matched.maxD;
+      } else if(L.targetRatio && GOLDEN_BAND[String(L.targetRatio)]){
+        // nivel teórico puro: banda áurea cruda proyectada desde A con magnitud XA
+        const [blo, bhi] = GOLDEN_BAND[String(L.targetRatio)];
+        const e1 = dirCD < 0 ? a - blo*XA : a + blo*XA;
+        const e2 = dirCD < 0 ? a - bhi*XA : a + bhi*XA;
+        zoneMin = Math.min(e1, e2); zoneMax = Math.max(e1, e2);
+      } else {
+        const rawMargin = XA * 0.015;
+        zoneMin = zoneCenter - rawMargin; zoneMax = zoneCenter + rawMargin;
+      }
 
       const tr = document.createElement('tr');
       if(isAdaptive || isExactMatch) tr.classList.add('exact-confluence');
@@ -1030,6 +1226,419 @@
   });
 
   updateMarketUI();
+})();
+</script>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const STORE = 'mp_patterns_v1';
+  const RATIOS = [1.618, 2.618, 3.618];
+  let patterns = [];
+  let lastRows = [];
+  try { const s = localStorage.getItem(STORE); if(s) patterns = JSON.parse(s) || []; } catch(e){ patterns = []; }
+  function persist(){ try { localStorage.setItem(STORE, JSON.stringify(patterns)); } catch(e){} }
+
+  function decOf(v){ const s = String(v); const i = s.indexOf('.'); return i < 0 ? 0 : Math.min(6, s.length - i - 1); }
+  function globalDec(){ let d = 2; patterns.forEach(p => [p.x,p.a,p.b,p.c].forEach(v => { d = Math.max(d, decOf(v)); })); return Math.min(d, 5); }
+  const fmt = n => Number.isFinite(n) ? n.toFixed(globalDec()) : '-';
+  const escHtml = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  function levelsFor(p){
+    const dl = (typeof window.__bestEntries === 'function') ? window.__bestEntries(p.x, p.a, p.b, p.c) : [];
+    return dl.map(l => Object.assign({}, l, { pattern: p.label, tf: p.tf }));
+  }
+
+  function addPattern(){
+    const x=+$("mpX").value, a=+$("mpA").value, b=+$("mpB").value, c=+$("mpC").value;
+    if(![x,a,b,c].every(Number.isFinite)){ alert('Ingresa X, A, B y C del patrón'); return; }
+    const label = ($("mpLabel").value || '').trim() || ($("mpTf").value + '-' + (patterns.length + 1));
+    patterns.push({ id: Date.now() + '_' + Math.random().toString(36).slice(2,6), label, tf: $("mpTf").value, x, a, b, c });
+    persist();
+    $("mpX").value=''; $("mpA").value=''; $("mpB").value=''; $("mpC").value=''; $("mpLabel").value='';
+    $("mpX").focus();
+    render();
+  }
+  function removePattern(id){ patterns = patterns.filter(p => p.id !== id); persist(); render(); }
+  function clearAll(){ if(patterns.length && confirm('¿Borrar todos los patrones?')){ patterns = []; persist(); render(); } }
+
+  function buildClusters(){
+    const tol = Math.max(0.01, +$("mpTol").value || 5);
+    const all = [];
+    patterns.forEach(p => levelsFor(p).forEach(l => all.push(l)));
+    all.sort((x,y) => x.price - y.price);
+    const groups = [];
+    all.forEach(l => {
+      const g = groups.find(g => Math.abs(g.center - l.price) <= tol);
+      if(g){ g.members.push(l); g.center = g.members.reduce((s,m) => s + m.price, 0) / g.members.length; }
+      else groups.push({ center: l.price, members: [l] });
+    });
+    groups.forEach(g => {
+      g.lo = Math.min(...g.members.map(m => (m.lo != null ? m.lo : m.price)));
+      g.hi = Math.max(...g.members.map(m => (m.hi != null ? m.hi : m.price)));
+      g.spread = g.hi - g.lo;
+      g.patterns = [...new Set(g.members.map(m => m.pattern))];
+      g.tfs = [...new Set(g.members.map(m => m.tf).filter(Boolean))];
+      g.nPat = g.patterns.length;
+      g.dir = g.members.reduce((s,m) => s + m.dir, 0) >= 0 ? 1 : -1;
+      g.score = g.nPat*1000 + g.tfs.length*100 + g.members.length*10 - g.spread;
+    });
+    return { groups, tol };
+  }
+
+  function trade(g, tol){
+    const dir = g.dir;
+    const ref = g.members.slice().sort((a,b) => a.scale - b.scale)[0];  // patrón más local → TP intradía
+    const cRef = ref.cRef;
+    const center = g.center;
+    const farEdge = dir > 0 ? g.hi : g.lo;
+    const slBuf = Math.max(g.spread, tol*2);
+    return {
+      entry: center,
+      sl: farEdge + dir*slBuf,
+      tps: [0.382, 0.618, 1.0].map(fr => center + (cRef - center)*fr)
+    };
+  }
+
+  function render(){
+    $("mpCount").textContent = patterns.length;
+    const list = $("mpList");
+    if(patterns.length === 0){
+      list.innerHTML = '<span class="small muted">Aún no hay patrones. Agrega el primero arriba o importa un CSV exportado previamente.</span>';
+    } else {
+      list.innerHTML =
+        '<table style="width:100%"><thead><tr>' +
+          '<th>Nombre</th><th>TF</th><th>X</th><th>A</th><th>B</th><th>C</th><th></th>' +
+        '</tr></thead><tbody>' +
+        patterns.map(p =>
+          '<tr>' +
+            '<td><b>' + escHtml(p.label) + '</b></td>' +
+            '<td class="small muted">' + escHtml(p.tf || '') + '</td>' +
+            '<td class="small">' + fmt(p.x) + '</td>' +
+            '<td class="small">' + fmt(p.a) + '</td>' +
+            '<td class="small">' + fmt(p.b) + '</td>' +
+            '<td class="small">' + fmt(p.c) + '</td>' +
+            '<td><span data-id="' + p.id + '" class="mpDel" style="cursor:pointer;color:#ef4444;font-weight:bold;">✕</span></td>' +
+          '</tr>'
+        ).join('') +
+        '</tbody></table>';
+      list.querySelectorAll('.mpDel').forEach(el => el.addEventListener('click', () => removePattern(el.getAttribute('data-id'))));
+    }
+
+    const body = $("mpBody"), summary = $("mpSummary");
+    if(patterns.length < 1){
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;">Agrega patrones para ver las confluencias.</td></tr>';
+      summary.style.display = 'none';
+      return;
+    }
+
+    const { groups, tol } = buildClusters();
+    const rows = groups.slice().sort((a,b) => b.score - a.score);
+
+    if(rows.length === 0){
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;">Los patrones cargados no validaron ningún armónico. Revisa los puntos XABC.</td></tr>';
+      summary.style.display = 'none';
+      lastRows = [];
+      return;
+    }
+
+    lastRows = rows.map(g => {
+      const t = trade(g, tol);
+      let grade, gColor;
+      if(g.nPat >= 3){ grade='MÁXIMA'; gColor='#fbbf24'; }
+      else if(g.nPat === 2){ grade='ALTA'; gColor='#22c55e'; }
+      else if(g.members.length >= 2){ grade='MEDIA'; gColor='#f59e0b'; }
+      else { grade='base'; gColor='#8fa1c7'; }
+      const detail = g.members.slice().sort((a,b) => (a.ratio==null?9:a.ratio) - (b.ratio==null?9:b.ratio)).map(m => m.pattern + '·' + (m.ratio==null ? 'PRZ-exacta' : (+m.ratio).toFixed(3) + (m.system === 'BC' ? '(BC)' : ''))).join(' + ');
+      return { lo:g.lo, hi:g.hi, spread:g.spread, nPat:g.nPat, tfs:g.tfs.length, members:g.members.length,
+               patternLabels:g.patterns, detail, dir:(g.dir>0?'SELL':'BUY'), entry:t.entry, sl:t.sl,
+               tp1:t.tps[0], tp2:t.tps[1], tp3:t.tps[2], grade, gColor };
+    });
+
+    body.innerHTML = lastRows.map(r =>
+      '<tr' + (r.nPat >= 3 ? ' class="exact-confluence"' : (r.nPat === 2 ? ' class="extreme-row"' : '')) + '>' +
+        '<td><b>' + fmt(r.lo) + ' – ' + fmt(r.hi) + '</b><br><span class="small muted">ancho ' + fmt(r.spread) + '</span></td>' +
+        '<td class="small"><b>' + r.nPat + ' patrón' + (r.nPat > 1 ? 'es' : '') + '</b>' + (r.tfs > 1 ? ' · ' + r.tfs + ' TF' : '') + (r.members > r.nPat ? ' · ' + r.members + ' niveles' : '') + '<br><span class="muted">' + r.detail + '</span></td>' +
+        '<td><span class="pill ' + (r.dir === 'SELL' ? 'crash-mode' : 'boom-mode') + '" style="font-size:11px;">' + r.dir + '</span></td>' +
+        '<td class="tp-value"><b>' + fmt(r.entry) + '</b></td>' +
+        '<td class="sl-value">' + fmt(r.sl) + '</td>' +
+        '<td class="small">' + fmt(r.tp1) + ' / ' + fmt(r.tp2) + ' / ' + fmt(r.tp3) + '</td>' +
+        '<td><span style="color:' + r.gColor + ';font-weight:bold;">' + r.grade + '</span></td>' +
+      '</tr>'
+    ).join('');
+
+    const confN = lastRows.filter(r => r.nPat >= 2).length;
+    const best = lastRows[0];
+    summary.style.display = 'block';
+    summary.innerHTML =
+      '<b>🔗 ' + lastRows.length + ' entrada' + (lastRows.length>1?'s':'') + ' detectada' + (lastRows.length>1?'s':'') + '</b> de ' + patterns.length + ' patrones · <b>' + confN + '</b> con confluencia (2+ patrones).<br>' +
+      '<b>Cómo leerlo:</b> cada fila es una entrada detectada con la misma lógica que la Sección 1 (solo los armónicos válidos para ese XABC). Donde caen niveles de varios patrones, la fila se fusiona y sube de fuerza: <b>ALTA</b> = 2 patrones, <b style="color:#fbbf24;">MÁXIMA</b> = 3+. Al agregar un patrón en una zona ya existente, esa fila suma y se afina sola. ' +
+      '<span class="small muted">SL/TP son referencias: SL apenas más allá de la zona; TP = retrocesos hacia el C del patrón más local. El precio confirma.</span>';
+  }
+
+  function exportCSV(){
+    if(!patterns.length){ alert('No hay patrones para exportar. Agrega al menos uno.'); return; }
+    const d = globalDec();
+    const f = n => Number.isFinite(n) ? n.toFixed(d) : '';
+    const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const lines = [];
+    lines.push('sep=;');
+    lines.push('#ASISTENTE_ARMONICO_PATRONES_v1');  // firma para validar al re-importar
+    // --- Bloque PATRONES (fuente de verdad, se vuelve a importar) ---
+    lines.push('#PATRONES');
+    lines.push(['Nombre','TF','X','A','B','C'].map(esc).join(';'));
+    patterns.forEach(p => {
+      lines.push([p.label, p.tf || '', f(p.x), f(p.a), f(p.b), f(p.c)].map(esc).join(';'));
+    });
+    // --- Bloque CONFLUENCIAS (referencia; no se importa) ---
+    if(lastRows.length){
+      lines.push('');
+      lines.push('#CONFLUENCIAS');
+      lines.push(['Zona Lo','Zona Hi','Ancho','N Patrones','Patrones origen','TFs','Detalle','Dir','Entrada','SL','TP1','TP2','TP3','Fuerza'].map(esc).join(';'));
+      lastRows.forEach(r => {
+        lines.push([f(r.lo), f(r.hi), f(r.spread), r.nPat, (r.patternLabels||[]).join(' + '), r.tfs, r.detail, r.dir,
+                    f(r.entry), f(r.sl), f(r.tp1), f(r.tp2), f(r.tp3), r.grade].map(esc).join(';'));
+      });
+    }
+    const csv = lines.join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g, '-');
+    link.href = url; link.download = 'patrones_armonicos_' + stamp + '.csv';
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Parser de una línea CSV con separador ';' que respeta comillas dobles
+  function parseCSVLine(line){
+    const out = []; let cur = '', inQ = false;
+    for(let i = 0; i < line.length; i++){
+      const ch = line[i];
+      if(inQ){
+        if(ch === '"'){ if(line[i+1] === '"'){ cur += '"'; i++; } else inQ = false; }
+        else cur += ch;
+      } else {
+        if(ch === '"') inQ = true;
+        else if(ch === ';'){ out.push(cur); cur = ''; }
+        else cur += ch;
+      }
+    }
+    out.push(cur);
+    return out;
+  }
+
+  const num = v => parseFloat(String(v == null ? '' : v).trim().replace(',', '.'));
+
+  function importFromText(text){
+    text = String(text).replace(/^\ufeff/, '');
+    const rawLines = text.split(/\r?\n/);
+    const imported = [];
+    const addRow = cols => {
+      if(!cols || cols.length < 6) return;
+      const [label, tf, xs, as_, bs, cs] = cols;
+      const x = num(xs), a = num(as_), b = num(bs), c = num(cs);
+      if([x,a,b,c].every(Number.isFinite)){
+        imported.push({
+          id: Date.now() + '_' + Math.random().toString(36).slice(2,6),
+          label: (label || '').trim() || ('imp-' + (imported.length + 1)),
+          tf: (tf || '').trim() || 'M15',
+          x, a, b, c
+        });
+      }
+    };
+
+    const startIdx = rawLines.findIndex(l => l.trim().toUpperCase() === '#PATRONES');
+    if(startIdx >= 0){
+      // El bloque exportado: tras #PATRONES va el header, luego filas hasta línea vacía o nuevo bloque
+      for(let k = startIdx + 2; k < rawLines.length; k++){
+        const t = (rawLines[k] || '').trim();
+        if(t === '' || t.startsWith('#')) break;
+        addRow(parseCSVLine(rawLines[k]));
+      }
+    } else {
+      // Fallback: CSV plano con columnas Nombre,TF,X,A,B,C (separador ';' o ',')
+      rawLines.forEach(line => {
+        const t = (line || '').trim();
+        if(!t || t.toLowerCase().startsWith('sep=') || t.startsWith('#')) return;
+        const cols = t.indexOf(';') >= 0 ? parseCSVLine(line) : line.split(',').map(s => s.replace(/^"|"$/g, ''));
+        addRow(cols);  // las filas de cabecera (X,A,B,C no numéricos) se ignoran solas
+      });
+    }
+
+    if(!imported.length){
+      alert('No se encontraron patrones válidos.\n\nImporta un CSV exportado por esta herramienta (bloque "#PATRONES" con columnas Nombre;TF;X;A;B;C) o un CSV plano con esas 6 columnas.');
+      return;
+    }
+
+    if(patterns.length){
+      const replace = confirm('Ya hay ' + patterns.length + ' patrón(es) cargados.\n\nAceptar = REEMPLAZAR por los ' + imported.length + ' importados.\nCancelar = AGREGAR los importados a los existentes.');
+      patterns = replace ? imported : patterns.concat(imported);
+    } else {
+      patterns = imported;
+    }
+    persist();
+    render();
+    alert(imported.length + ' patrón(es) importados correctamente.');
+  }
+
+  $("mpAdd").addEventListener('click', addPattern);
+  $("mpClear").addEventListener('click', clearAll);
+  $("mpExport").addEventListener('click', exportCSV);
+  $("mpImport").addEventListener('click', () => $("mpFile").click());
+  $("mpFile").addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => { importFromText(ev.target.result); e.target.value = ''; };
+    reader.onerror = () => { alert('No se pudo leer el archivo.'); e.target.value = ''; };
+    reader.readAsText(file, 'utf-8');
+  });
+  $("mpTol").addEventListener('input', render);
+  ['mpX','mpA','mpB','mpC'].forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') addPattern(); }));
+  render();
+})();
+</script>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const STORE_T = 'asistente_tiempo_v2';
+
+  function parseIdx(v){ if(v === '' || v == null) return null; const n = Number(v); return Number.isFinite(n) ? Math.round(n) : null; }
+  const r1 = n => Math.round(n * 10) / 10;
+
+  function persist(){
+    try {
+      localStorage.setItem(STORE_T, JSON.stringify({
+        tol: $('tfTol').value, now: $('tfNow').value,
+        x: $('tfX').value, a: $('tfA').value, b: $('tfB').value, c: $('tfC').value
+      }));
+    } catch(e){}
+  }
+  function restore(){
+    try {
+      const s = JSON.parse(localStorage.getItem(STORE_T) || 'null');
+      if(!s) return;
+      if(s.tol != null) $('tfTol').value = s.tol;
+      if(s.now != null) $('tfNow').value = s.now;
+      ['x','a','b','c'].forEach(k => { if(s[k] != null) $('tf' + k.toUpperCase()).value = s[k]; });
+    } catch(e){}
+  }
+
+  const FAMILIES = [
+    { name: 'CD ↔ AB', leg: 'AB', ks: [0.618, 1.0, 1.272, 1.618] },
+    { name: 'CD ↔ BC', leg: 'BC', ks: [1.0, 1.272, 1.618, 2.0, 2.618] },
+    { name: 'CD ↔ XA', leg: 'XA', ks: [0.382, 0.5, 0.618, 1.0] }
+  ];
+  const FIB_ZONES = [13, 21, 34, 55, 89, 144];
+
+  function calc(){
+    const iX = parseIdx($('tfX').value), iA = parseIdx($('tfA').value),
+          iB = parseIdx($('tfB').value), iC = parseIdx($('tfC').value);
+    const iNow = parseIdx($('tfNow').value);
+    const body = $('tfBody'), summary = $('tfSummary'), pills = $('tfPills');
+
+    if([iX, iA, iB, iC].some(v => v === null)){
+      body.innerHTML = '<tr><td colspan="7" class="no-results">Faltan índices de vela: completa X, A, B y C.</td></tr>';
+      summary.style.display = 'none'; pills.innerHTML = ''; return;
+    }
+    if(!(iX < iA && iA < iB && iB < iC)){
+      body.innerHTML = '<tr><td colspan="7" class="no-results">El orden debe ser X &lt; A &lt; B &lt; C (cronológico por índice de vela).</td></tr>';
+      summary.style.display = 'none'; pills.innerHTML = ''; return;
+    }
+
+    const tau = { XA: iA - iX, AB: iB - iA, BC: iC - iB };
+
+    pills.innerHTML =
+      '<span class="pill"><b>τXA</b> ' + tau.XA + ' velas</span>' +
+      '<span class="pill"><b>τAB</b> ' + tau.AB + ' velas</span>' +
+      '<span class="pill"><b>τBC</b> ' + tau.BC + ' velas</span>' +
+      '<span class="pill ok">conteo por índice (sin huecos)</span>';
+
+    const cands = [];
+    FAMILIES.forEach(f => {
+      f.ks.forEach(k => {
+        const tauCD = k * tau[f.leg];
+        if(tauCD <= 0) return;
+        cands.push({ family: f.name, formula: 'τCD = k · τ' + f.leg, k: k.toFixed(3).replace(/0+$/,'').replace(/\.$/,''), tauCD, barD: iC + tauCD });
+      });
+    });
+    FIB_ZONES.forEach(F => {
+      const barD = iX + F;
+      if(barD <= iC) return;
+      cands.push({ family: 'Time Zone (desde X)', formula: 'velaD = X + F', k: 'F=' + F, tauCD: barD - iC, barD });
+    });
+
+    if(!cands.length){
+      body.innerHTML = '<tr><td colspan="7" class="no-results">No se generaron proyecciones válidas.</td></tr>';
+      summary.style.display = 'none'; return;
+    }
+
+    let delta = parseIdx($('tfTol').value);
+    if(!Number.isFinite(delta) || delta <= 0) delta = Math.max(1, Math.round(0.05 * tau.XA));
+
+    let best = { members: [] };
+    cands.forEach(c => {
+      const members = cands.filter(o => Math.abs(o.tauCD - c.tauCD) <= delta);
+      if(members.length > best.members.length) best = { members };
+    });
+    const memTau = best.members.map(m => m.tauCD);
+    const tauCenter = memTau.reduce((s, v) => s + v, 0) / memTau.length;
+    const tauLo = Math.min(...memTau), tauHi = Math.max(...memTau);
+    const barCenter = Math.round(iC + tauCenter);
+    const barLo = Math.round(iC + tauLo), barHi = Math.round(iC + tauHi);
+    const inWin = c => (c.tauCD >= tauLo - 1e-9 && c.tauCD <= tauHi + 1e-9);
+
+    cands.sort((a, b) => a.tauCD - b.tauCD);
+    body.innerHTML = cands.map(c => {
+      const hit = inWin(c);
+      const barRounded = Math.round(c.barD);
+      const faltan = (iNow !== null) ? (barRounded - iNow) : null;
+      const faltanTxt = faltan === null ? '<span class="small muted">—</span>'
+        : (faltan > 0 ? '<span class="small">' + faltan + ' velas</span>'
+        : (faltan === 0 ? '<span class="tf-badge">ahora</span>' : '<span class="small muted">pasó (' + Math.abs(faltan) + ')</span>'));
+      return '<tr class="' + (hit ? 'tf-cluster-row' : '') + '">' +
+        '<td>' + c.family + '</td>' +
+        '<td class="small">' + c.formula + '</td>' +
+        '<td class="small">' + c.k + '</td>' +
+        '<td class="small">' + r1(c.tauCD) + '</td>' +
+        '<td><b>' + barRounded + '</b></td>' +
+        '<td>' + faltanTxt + '</td>' +
+        '<td>' + (hit ? '<span class="tf-badge">✓ sí</span>' : '<span class="small muted">—</span>') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    let faltanWin = '';
+    if(iNow !== null){
+      const d = barCenter - iNow;
+      faltanWin = d > 0 ? ' &nbsp;·&nbsp; faltan ≈ <b>' + d + ' velas</b> desde la vela actual (' + iNow + ')'
+                : d === 0 ? ' &nbsp;·&nbsp; <b>la vela actual está en el centro</b>'
+                : ' &nbsp;·&nbsp; el centro ya pasó hace <b>' + Math.abs(d) + ' velas</b>';
+    }
+    summary.style.display = 'block';
+    summary.innerHTML =
+      '<b>Ventana de velas (PRZ temporal):</b> vela ' + barLo + ' → ' + barHi +
+      ' &nbsp;·&nbsp; centro ≈ <b>vela ' + barCenter + '</b> (τCD ≈ ' + r1(tauCenter) + ' desde C)' + faltanWin + '<br>' +
+      'Apilaron <b>' + best.members.length + '/' + cands.length + '</b> proyecciones con tolerancia δ = <b>' + delta + ' velas</b>. ' +
+      'Cuando el precio alcance tu PRZ de precio <b>dentro de esta ventana de velas</b>, tienes confluencia precio+tiempo: el setup de mayor probabilidad. Fuera de la ventana (precio sin tiempo), trátalo como señal débil.';
+
+    persist();
+  }
+
+  function clearAll(){
+    ['tfX','tfA','tfB','tfC','tfNow'].forEach(id => $(id).value = '');
+    $('tfBody').innerHTML = '<tr><td colspan="7" class="no-results">Ingresa los 4 índices de vela y pulsa «Calcular».</td></tr>';
+    $('tfSummary').style.display = 'none';
+    $('tfPills').innerHTML = '';
+    persist();
+  }
+
+  $('tfCalc').addEventListener('click', calc);
+  $('tfClear').addEventListener('click', clearAll);
+  ['tfTol','tfNow','tfX','tfA','tfB','tfC'].forEach(id => $(id).addEventListener('change', persist));
+  ['tfX','tfA','tfB','tfC'].forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') calc(); }));
+  restore();
 })();
 </script>
 </body>
