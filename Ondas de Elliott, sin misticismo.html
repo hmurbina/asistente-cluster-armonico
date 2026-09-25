@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ondas de Elliott, explicadas con matemáticas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF1F4; --grid:#DCE3EA; --ink:#1B2A41; --muted:#56677C;
+  --motive:#2F5DA8; --corr:#B7791F; --bad:#B3261E; --good:#2E7D4F;
+  --card:#F8FAFB; --line:#C5D0DB;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1720; --grid:#18222E; --ink:#E4EAF1; --muted:#93A3B6;
+    --motive:#82A9EA; --corr:#E3A84E; --bad:#EF6B63; --good:#5CC08A;
+    --card:#15202B; --line:#2A3847;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1720; --grid:#18222E; --ink:#E4EAF1; --muted:#93A3B6;
+  --motive:#82A9EA; --corr:#E3A84E; --bad:#EF6B63; --good:#5CC08A;
+  --card:#15202B; --line:#2A3847;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; color:var(--ink); background:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  font-family:"Literata",Georgia,"Times New Roman",serif;
+  font-size:1.06rem; line-height:1.7;
+}
+.wrap{max-width:46rem;margin:0 auto;padding:0 1.25rem 5rem}
+.wide{max-width:64rem;margin:0 auto;padding:0 1.25rem}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.1;letter-spacing:-.01em}
+h1{font-size:clamp(2.4rem,7vw,4.6rem);font-weight:800;margin:3.5rem 0 .6rem;max-width:14ch}
+h2{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:700;margin:4rem 0 1rem}
+h3{font-size:1.2rem;font-weight:700;margin:2rem 0 .5rem}
+p{margin:0 0 1rem}
+.lede{font-size:1.2rem;color:var(--muted);max-width:40rem}
+a{color:var(--motive)}
+strong{font-weight:600}
+.m{color:var(--motive);font-weight:600}
+.c{color:var(--corr);font-weight:600}
+
+/* hero fractal */
+.hero-fig{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1rem .5rem;margin-top:1.5rem}
+.hero-fig svg{width:100%;height:auto;display:block}
+.levels{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.75rem 0 .25rem}
+.levels button,.presets button{
+  font:600 .95rem "Bricolage Grotesque",system-ui,sans-serif;
+  background:transparent;color:var(--ink);border:1.5px solid var(--line);
+  border-radius:999px;padding:.4rem .95rem;cursor:pointer
+}
+.levels button[aria-pressed="true"],.presets button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--motive);outline-offset:2px}
+.count{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:1rem;color:var(--muted);margin-left:auto}
+.count b{font-size:1.6rem;color:var(--ink)}
+
+/* formulas */
+.f{
+  font-family:"Literata",Georgia,serif;font-style:italic;font-size:1.12rem;
+  background:var(--card);border-left:4px solid var(--motive);
+  padding:.7rem 1rem;margin:1rem 0;border-radius:0 8px 8px 0;overflow-x:auto;white-space:nowrap
+}
+.f.corr{border-left-color:var(--corr)}
+.f.bad{border-left-color:var(--bad)}
+.f span.n{font-style:normal;color:var(--muted);font-size:.9rem;margin-left:1rem;white-space:normal}
+
+/* rules */
+.rule{border:1.5px solid var(--ink);border-radius:12px;padding:1rem 1.2rem;margin:1rem 0;background:var(--card)}
+.rule h3{margin:0 0 .3rem}
+.trap{border-left:4px solid var(--bad);padding:.6rem 1rem;background:var(--card);border-radius:0 8px 8px 0;margin:1rem 0}
+.trap b{color:var(--bad)}
+
+/* tables */
+.tbl{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.98rem;background:var(--card)}
+th,td{padding:.5rem .7rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700}
+td.num{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin:1.2rem 0}
+.pat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem 1rem 1rem}
+.pat svg{width:100%;height:auto;display:block}
+.pat h3{margin:.4rem 0 .2rem;font-size:1.05rem}
+.pat p{font-size:.93rem;margin:0;color:var(--muted)}
+.pat .s{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;color:var(--ink)}
+
+/* validator */
+.lab{background:var(--card);border:1.5px solid var(--ink);border-radius:14px;padding:1.2rem;margin:1.5rem 0}
+.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:.6rem;margin:1rem 0}
+.inputs label{display:flex;flex-direction:column;font:600 .9rem "Bricolage Grotesque",system-ui,sans-serif}
+.inputs input{font:inherit;font-family:"Literata",serif;font-weight:400;font-size:1rem;padding:.4rem .5rem;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);width:100%}
+.presets{display:flex;flex-wrap:wrap;gap:.5rem}
+#chart{width:100%;height:auto;display:block;margin:.5rem 0}
+.results{display:grid;gap:.4rem;margin-top:.5rem}
+.res{display:flex;gap:.6rem;align-items:baseline;font-size:.98rem}
+.res .ic{font-weight:700;min-width:1.4rem}
+.res.ok .ic{color:var(--good)} .res.ko .ic{color:var(--bad)} .res.warn .ic{color:var(--corr)}
+.ratios{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem;margin-top:1rem}
+.ratio{border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem}
+.ratio .k{font-size:.85rem;color:var(--muted)}
+.ratio .v{font:700 1.3rem "Bricolage Grotesque",system-ui,sans-serif}
+.ratio .h{font-size:.85rem}
+
+/* trading section */
+.modes{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem}
+.modes button,.copybtn{
+  font:600 .95rem "Bricolage Grotesque",system-ui,sans-serif;
+  background:transparent;color:var(--ink);border:1.5px solid var(--line);
+  border-radius:999px;padding:.4rem .95rem;cursor:pointer
+}
+.modes button[aria-pressed="true"],.copybtn{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.subhead{font:700 .95rem "Bricolage Grotesque",system-ui,sans-serif;margin:1rem 0 -.4rem;color:var(--muted)}
+#projChart{width:100%;height:auto;display:block;margin:.5rem 0}
+td.rr{font-weight:600;white-space:nowrap}
+td.sl{color:var(--bad);font-weight:600} td.tp{color:var(--good);font-weight:600}
+textarea#tpl{width:100%;min-height:15rem;font:.9rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:.7rem;margin-top:.5rem;resize:vertical}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem}
+.tabs button{
+  font:600 .95rem "Bricolage Grotesque",system-ui,sans-serif;
+  background:transparent;color:var(--ink);border:1.5px solid var(--line);
+  border-radius:999px;padding:.4rem .95rem;cursor:pointer
+}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#setupChart{width:100%;height:auto;display:block;margin:.5rem 0}
+.setup-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.6rem 1.2rem;margin-top:.5rem}
+.setup-info div{font-size:.96rem}
+.setup-info b{display:block;font-family:"Bricolage Grotesque",system-ui,sans-serif}
+.verdict{margin-top:.8rem;padding:.6rem .9rem;border-radius:8px;border:1.5px solid var(--line);font-size:.98rem}
+.verdict.best{border-color:var(--good)}
+.verdict.meh{border-color:var(--corr)}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-top:1rem;align-items:end}
+.calc label{display:flex;flex-direction:column;font:600 .9rem "Bricolage Grotesque",system-ui,sans-serif}
+.calc input{font-family:"Literata",serif;font-size:1rem;padding:.4rem .5rem;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);width:100%}
+.checklist{counter-reset:ck;list-style:none;padding:0;margin:1rem 0}
+.checklist li{counter-increment:ck;position:relative;padding:.55rem 0 .55rem 2.6rem;border-bottom:1px solid var(--line)}
+.checklist li::before{content:counter(ck);position:absolute;left:0;top:.5rem;width:1.8rem;height:1.8rem;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font:700 .9rem "Bricolage Grotesque",system-ui,sans-serif}
+ol.deg{columns:2;column-gap:2rem;padding-left:1.3rem}
+footer{color:var(--muted);font-size:.9rem;margin-top:4rem;border-top:1px solid var(--line);padding-top:1rem}
+svg text{font-family:"Bricolage Grotesque",system-ui,sans-serif}
+@media (max-width:560px){ol.deg{columns:1}.count{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+
+<header class="wide">
+  <h1>Ondas de Elliott, sin misticismo</h1>
+  <p class="lede">Un modelo que describe el precio como un fractal de 5 ondas a favor y 3 en contra. Aquí va con fórmulas, las tres reglas que no se negocian y todas las trampas que hacen fallar los conteos.</p>
+
+  <figure class="hero-fig" aria-label="Ciclo de Elliott a distintos niveles de detalle">
+    <svg id="fractal" viewBox="0 0 1000 400" role="img" aria-label="Ciclo 5-3 de Elliott subdividido de forma fractal"></svg>
+    <div class="levels" role="group" aria-label="Nivel de detalle">
+      <button data-d="1" aria-pressed="true">Un grado</button>
+      <button data-d="2" aria-pressed="false">Dos grados</button>
+      <button data-d="3" aria-pressed="false">Tres grados</button>
+      <span class="count"><b id="nOndas">8</b> ondas en el ciclo</span>
+    </div>
+  </figure>
+</header>
+
+<main class="wrap">
+
+<h2>La idea en una línea</h2>
+<p>El precio avanza en <span class="m">5 ondas motrices</span> (1, 2, 3, 4, 5) y corrige en <span class="c">3 ondas correctivas</span> (A, B, C). Cada onda, al hacer zoom, está hecha del mismo patrón a menor escala. Es un fractal: la misma forma se repite en gráficos de 5 minutos y de 10 años.</p>
+<p>Dentro del impulso, las ondas 1, 3 y 5 van <em>a favor</em> de la tendencia y se dividen en 5; las ondas 2 y 4 van <em>en contra</em> y se dividen en 3. En la corrección pasa lo mismo, pero con la tendencia del grado superior invertida.</p>
+
+<h2>Por qué salen números de Fibonacci</h2>
+<p>Pulsa los botones de arriba y mira el contador: 8, 34, 144. No es casualidad. Llamemos <em>M<sub>k</sub></em> al número de ondas de una onda motriz vista <em>k</em> grados más abajo, y <em>C<sub>k</sub></em> al de una correctiva (tipo zigzag, 5-3-5).</p>
+<div class="f">M<sub>k+1</sub> = 3·M<sub>k</sub> + 2·C<sub>k</sub> &nbsp;&nbsp;&nbsp; C<sub>k+1</sub> = 2·M<sub>k</sub> + C<sub>k</sub></div>
+<p>Una motriz tiene 3 tramos motrices (1, 3, 5) y 2 correctivos (2, 4). Un zigzag tiene 2 motrices (A, C) y 1 correctivo (B). Empezando en <em>M<sub>0</sub> = C<sub>0</sub> = 1</em>:</p>
+<div class="tbl"><table>
+<tr><th>Grados hacia abajo</th><th>Motriz</th><th>Correctiva</th><th>Ciclo completo</th></tr>
+<tr><td>0</td><td class="num">1</td><td class="num">1</td><td class="num">2</td></tr>
+<tr><td>1</td><td class="num">5</td><td class="num">3</td><td class="num">8</td></tr>
+<tr><td>2</td><td class="num">21</td><td class="num">13</td><td class="num">34</td></tr>
+<tr><td>3</td><td class="num">89</td><td class="num">55</td><td class="num">144</td></tr>
+</table></div>
+<p>La matriz de la recurrencia es <em>[[3,2],[2,1]]</em>, que es exactamente <em>Q³</em>, donde <em>Q = [[1,1],[1,0]]</em> es la matriz que genera Fibonacci. Cada grado salta tres posiciones en la sucesión.</p>
+<div class="trap"><b>Lo tricky:</b> esto solo cuadra si todas las correcciones son zigzags. Una corrección plana es 3-3-5 (11 ondas, no 13) y un triángulo es 3-3-3-3-3. En mercados reales el conteo casi nunca da un Fibonacci exacto, y eso no invalida nada.</div>
+
+<h2>Las tres reglas que no se negocian</h2>
+<p>Llamamos <em>P<sub>0</sub></em> al inicio y <em>P<sub>1</sub>…P<sub>5</sub></em> al final de cada onda, en un impulso alcista. La longitud de una onda es <em>L<sub>i</sub> = |P<sub>i</sub> − P<sub>i−1</sub>|</em>. Si una de estas reglas se rompe, el conteo es incorrecto. Sin excepciones.</p>
+
+<div class="rule">
+  <h3>Regla 1. La onda 2 nunca retrocede el 100% de la onda 1</h3>
+  <div class="f bad">P<sub>2</sub> &gt; P<sub>0</sub> <span class="n">equivale a un retroceso (P₁−P₂)/L₁ &lt; 1</span></div>
+  <p>Si el precio cae por debajo del inicio de la onda 1, lo que llamabas "onda 1" no lo era.</p>
+</div>
+
+<div class="rule">
+  <h3>Regla 2. La onda 3 nunca es la más corta de 1, 3 y 5</h3>
+  <div class="f bad">¬( L<sub>3</sub> &lt; L<sub>1</sub> ∧ L<sub>3</sub> &lt; L<sub>5</sub> )</div>
+  <p>Ojo con la lectura: no dice que la 3 sea la más larga. Puede ser la mediana, siempre que no sea la mínima. Suele ser la más larga, pero eso es una tendencia, no la regla.</p>
+</div>
+
+<div class="rule">
+  <h3>Regla 3. La onda 4 no entra en el terreno de la onda 1</h3>
+  <div class="f bad">P<sub>4</sub> &gt; P<sub>1</sub> <span class="n">(excepto en diagonales)</span></div>
+  <p>El mínimo de la onda 4 no puede solapar el máximo de la onda 1. La única excepción son los triángulos diagonales, que veremos más abajo.</p>
+</div>
+
+<p>En un impulso bajista todo se invierte: cambia cada <em>&gt;</em> por <em>&lt;</em>. Matemáticamente basta con multiplicar todos los precios por −1 y aplicar las mismas desigualdades.</p>
+
+<h2>Prueba un conteo</h2>
+<p>Mete seis precios y el validador aplica las tres reglas y calcula las proporciones. Los ejemplos de abajo muestran los fallos más típicos.</p>
+
+<div class="lab">
+  <div class="presets" role="group" aria-label="Ejemplos">
+    <button data-p="100,130,112,180,165,200" aria-pressed="true">Válido</button>
+    <button data-p="100,130,95,170,150,190" aria-pressed="false">Rompe regla 1</button>
+    <button data-p="100,150,125,160,152,210" aria-pressed="false">Rompe regla 2</button>
+    <button data-p="100,130,112,160,125,170" aria-pressed="false">Rompe regla 3</button>
+    <button data-p="100,130,112,180,160,175" aria-pressed="false">Quinta truncada</button>
+    <button data-p="200,170,188,120,135,100" aria-pressed="false">Bajista</button>
+  </div>
+  <div class="inputs" id="inputs"></div>
+  <svg id="chart" viewBox="0 0 640 260" role="img" aria-label="Gráfico del conteo introducido"></svg>
+  <div class="results" id="results" aria-live="polite"></div>
+  <div class="ratios" id="ratios"></div>
+</div>
+
+<h2>La matemática de Fibonacci, sin humo</h2>
+<p>Todo sale de la razón áurea <em>φ</em>, la solución positiva de <em>x² = x + 1</em>:</p>
+<div class="f">φ = (1 + √5) / 2 ≈ 1.618 &nbsp;&nbsp;&nbsp; φ² = φ + 1 ≈ 2.618 &nbsp;&nbsp;&nbsp; 1/φ = φ − 1 ≈ 0.618</div>
+<p>Y el cociente de dos Fibonacci consecutivos tiende a φ: <em>F<sub>n+1</sub>/F<sub>n</sub> → φ</em> (89/55 = 1.618…). Las proporciones que se usan son potencias de φ:</p>
+<div class="tbl"><table>
+<tr><th>Ratio</th><th>De dónde sale</th><th>Uso típico</th></tr>
+<tr><td class="num">0.236</td><td>φ⁻³</td><td>Retroceso poco profundo de la onda 4</td></tr>
+<tr><td class="num">0.382</td><td>φ⁻² = 1 − 0.618</td><td>Retroceso típico de la onda 4</td></tr>
+<tr><td class="num">0.500</td><td>No es Fibonacci, pero se usa mucho</td><td>Retroceso de la onda 2 o de la B</td></tr>
+<tr><td class="num">0.618</td><td>φ⁻¹</td><td>Retroceso típico de la onda 2</td></tr>
+<tr><td class="num">0.786</td><td>√0.618</td><td>Retroceso profundo de la onda 2</td></tr>
+<tr><td class="num">1.000</td><td>φ⁰</td><td>Onda 5 = onda 1; C = A</td></tr>
+<tr><td class="num">1.618</td><td>φ</td><td>Onda 3 = 1.618 × onda 1; C = 1.618 × A</td></tr>
+<tr><td class="num">2.618</td><td>φ²</td><td>Onda 3 extendida</td></tr>
+<tr><td class="num">4.236</td><td>φ³</td><td>Onda 3 muy extendida</td></tr>
+</table></div>
+
+<h3>Dos fórmulas que lo cubren todo</h3>
+<p>Retroceso (cuánto devuelve una onda de la anterior):</p>
+<div class="f">R = (P<sub>1</sub> − P<sub>2</sub>) / (P<sub>1</sub> − P<sub>0</sub>) <span class="n">ej. 130 → 112 sobre 100 → 130: R = 18/30 = 0.6</span></div>
+<p>Proyección (dónde podría acabar una onda):</p>
+<div class="f">Objetivo<sub>3</sub> = P<sub>2</sub> + k · L<sub>1</sub>, &nbsp; k ∈ {1.618, 2.618} <span class="n">ej. 112 + 1.618·30 ≈ 160.5</span></div>
+<div class="f corr">Objetivo<sub>5</sub> = P<sub>4</sub> + L<sub>1</sub> &nbsp; ó &nbsp; P<sub>4</sub> + 0.618 · (P<sub>3</sub> − P<sub>0</sub>)</div>
+<div class="trap"><b>Lo tricky:</b> estos ratios son zonas de probabilidad, no niveles exactos. Con 9 ratios distintos, casi cualquier punto cae "cerca" de alguno. Un nivel vale más cuando coinciden varias proyecciones independientes en la misma zona (confluencia).</div>
+<div class="trap"><b>Escala logarítmica:</b> en movimientos grandes (años, o un activo que multiplica su precio), mide proporciones y canales en escala logarítmica. En escala lineal, una subida de 10 a 20 y otra de 100 a 110 parecen iguales en longitud, pero una es +100% y otra +10%. En log, <em>L<sub>i</sub> = |ln P<sub>i</sub> − ln P<sub>i−1</sub>|</em>, y un conteo puede cumplir la regla 2 en una escala y romperla en la otra.</div>
+
+<h2>Las guías: lo que suele pasar</h2>
+<p>A diferencia de las reglas, las guías se pueden incumplir. Sirven para elegir entre conteos posibles.</p>
+<p><strong>Extensión.</strong> Casi siempre una de las ondas 1, 3 o 5 se alarga mucho más que las otras dos. En acciones suele ser la 3; en materias primas es frecuente que sea la 5. Si la 3 se extiende, las ondas 1 y 5 tienden a la igualdad (<em>L<sub>5</sub> ≈ L<sub>1</sub></em>).</p>
+<p><strong>Alternancia.</strong> Si la onda 2 es rápida y profunda (un zigzag), la onda 4 tiende a ser lenta y lateral (plana o triángulo), y al revés. También alternan en tiempo: si una dura poco, la otra suele durar más.</p>
+<p><strong>Canalización.</strong> Traza una línea por el final de las ondas 2 y 4, y una paralela por el final de la 3. La onda 5 suele terminar cerca de esa paralela.</p>
+<p><strong>Profundidad de la corrección.</strong> Una corrección suele terminar en la zona de la onda 4 previa de un grado menor.</p>
+<p><strong>Personalidad de cada onda.</strong> La 1 nace con escepticismo y poco volumen. La 2 asusta porque devuelve casi todo. La 3 es la más fuerte, con más volumen y noticias favorables. La 4 es aburrida y confusa. La 5 sube con euforia pero con menos fuerza interna (divergencias en el RSI y menos volumen que en la 3).</p>
+
+<h2>Patrones correctivos, donde se pierde casi todo el mundo</h2>
+<p>Los impulsos son fáciles de reconocer. Las correcciones tienen muchas formas y a mitad de camino suelen parecerse entre sí. La notación <span class="s">5-3-5</span> indica cuántas subondas tiene cada tramo.</p>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="trap"><b>La plana expandida engaña:</b> la onda B supera el inicio de la corrección y parece que la tendencia anterior continúa. Mucha gente entra justo ahí, y luego la C cae con fuerza por debajo del final de la A.</div>
+<div class="trap"><b>El triángulo nunca es onda 2.</b> Aparece en la onda 4, en la B, o como último tramo (Y o Z) de una combinación. Si ves un triángulo en lo que creías onda 2, el conteo está mal.</div>
+<div class="trap"><b>La onda B es la trampa por excelencia.</b> Rebota lo suficiente para parecer el inicio de un nuevo impulso. La pista: suele moverse en 3 subondas, no en 5, y con volumen flojo.</div>
+
+<h2>Cómo operar las correcciones</h2>
+<p>La idea central, y lo más contraintuitivo: <strong>las correcciones casi nunca se operan por dentro; se esperan</strong>. Son lentas, se solapan y cambian de forma a mitad de camino. Su valor está en que te dan un punto de entrada con el riesgo acotado para la siguiente onda motriz.</p>
+<p>Todo el ciclo en un solo gráfico, con los mismos precios del validador (100 → 200) y la corrección ABC completa. Las <span class="c">ondas correctivas</span> (2, 4 y A-B-C) están en ocre, con sus subondas en pequeño. Elige un setup para ver la zona de espera, el gatillo, el stop y el objetivo.</p>
+
+<div class="lab">
+  <div class="tabs" role="group" aria-label="Setups">
+    <button data-s="none" aria-pressed="true">Solo el ciclo</button>
+    <button data-s="s1" aria-pressed="false">Onda 3 (tras la 2)</button>
+    <button data-s="s2" aria-pressed="false">Onda 5 (tras la 4)</button>
+    <button data-s="s3" aria-pressed="false">Onda C (tras la B)</button>
+    <button data-s="s4" aria-pressed="false">Fin del ABC</button>
+  </div>
+  <svg id="setupChart" viewBox="0 0 680 340" role="img" aria-label="Ciclo completo con setups de entrada"></svg>
+  <div id="setupInfo"></div>
+  <div class="calc" id="calc" hidden>
+    <label>Capital<input type="number" id="cap" value="10000" min="0" step="any"></label>
+    <label>Riesgo por operación (%)<input type="number" id="rsk" value="1" min="0" step="0.1"></label>
+    <div id="calcOut" style="grid-column:1/-1"></div>
+  </div>
+</div>
+
+<h3>Cómo saber que una corrección ha terminado</h3>
+<p>Nunca lo sabes con certeza, pero la probabilidad sube cuando se juntan varias de estas señales:</p>
+<p><strong>La onda c (o C) tiene 5 subondas.</strong> Es la prueba estructural más importante. Si la c solo tiene 3, la corrección probablemente se está complicando (doble tres, plana expandida).</p>
+<p><strong>Igualdad c = a.</strong> En zigzags es lo más frecuente. Alternativas: <em>c = 1.618·a</em> o <em>c = 0.618·a</em>.</p>
+<p><strong>Retroceso Fibonacci.</strong> 50–61.8% para una onda 2; 23.6–38.2% para una onda 4.</p>
+<p><strong>Zona de la onda 4 previa de grado menor.</strong> En el gráfico, la C termina en 160, justo debajo de la onda 4 (165). No es casualidad; es una de las guías más fiables.</p>
+<p><strong>Divergencia de momento.</strong> El precio marca un nuevo extremo en la c, pero el RSI o el MACD no lo confirman.</p>
+
+<h3>El setup que debes esperar</h3>
+<p>Si solo vas a operar uno, que sea este: <strong>entrar en la onda 3 al terminar la onda 2</strong>. Es la onda más larga y rápida, y el stop está definido por una regla que no se negocia. La lista de comprobación:</p>
+<ol class="checklist">
+  <li><strong>Impulso previo en 5 subondas.</strong> Sin un 1 claro en cinco tramos no hay onda 2 que esperar; podría ser una A de una corrección.</li>
+  <li><strong>Retroceso en 3 subondas (a-b-c).</strong> Si el retroceso baja en 5, probablemente no es una onda 2 sino el inicio de algo bajista.</li>
+  <li><strong>La c interna llega a la zona 50–61.8%</strong> de la onda 1, idealmente con <em>c ≈ a</em> y divergencia en el RSI.</li>
+  <li><strong>Gatillo:</strong> el precio rompe el extremo de la subonda b (o la línea del canal a-b). No compres en la zona "porque toca"; espera a que el precio te confirme que la c terminó.</li>
+  <li><strong>Stop</strong> justo más allá del extremo de la onda 2. <strong>Invalidación</strong> del conteo en el inicio de la onda 1 (regla 1).</li>
+  <li><strong>Objetivo</strong> en <em>P<sub>2</sub> + 1.618·L<sub>1</sub></em>. Si la relación beneficio/riesgo no llega a 2, no hay operación.</li>
+</ol>
+<div class="f">Tamaño = (Capital × %riesgo) / |Entrada − Stop| &nbsp;&nbsp;&nbsp; R:R = |Objetivo − Entrada| / |Entrada − Stop|</div>
+
+<h3>Qué onda operar, ordenado</h3>
+<div class="tbl"><table>
+<tr><th>Onda</th><th>Veredicto</th><th>Por qué</th></tr>
+<tr><td class="num">3</td><td>La mejor</td><td>La más larga y rápida. Stop estructural claro (inicio de la 1). Mejor R:R del ciclo.</td></tr>
+<tr><td class="num">C</td><td>Buena, con menos tamaño</td><td>Suele ser larga y directa, pero va contra la tendencia mayor. Solo si la A tiene 5 subondas (zigzag).</td></tr>
+<tr><td class="num">5</td><td>Aceptable</td><td>Recorrido más corto, riesgo de truncamiento y de diagonal final. Mejor para cerrar posiciones que para abrirlas.</td></tr>
+<tr><td class="num">1</td><td>Difícil</td><td>No sabes que es una onda 1 hasta que termina. La entrada útil es en la 2 que viene después.</td></tr>
+<tr><td class="num">2, 4, B</td><td>Evitar</td><td>Correcciones: solapadas, laterales y cambian de forma. La B es la trampa por excelencia. Se esperan, no se operan.</td></tr>
+</table></div>
+<div class="trap"><b>La corrección que se convierte en otra cosa:</b> un zigzag que parece terminado puede convertirse en un doble tres (W-X-Y) y seguir corrigiendo. Por eso el gatillo es la ruptura de b y no la llegada a la zona Fibonacci, y por eso el stop va siempre puesto.</div>
+
+<h2>Proyector de setups</h2>
+<p>Elige qué onda quieres operar, mete los puntos que ya tienes marcados en tu gráfico y el proyector calcula la entrada, el stop, la invalidación y tres objetivos con su R:R. Detecta solo si el movimiento es alcista o bajista. Abajo se genera una plantilla de texto con todo, lista para copiar y pegármela en el chat si quieres que revise el conteo contigo.</p>
+
+<div class="lab" id="proj">
+  <div class="modes" role="group" aria-label="Qué onda quieres operar">
+    <button data-m="w3" aria-pressed="true">Onda 3</button>
+    <button data-m="w5" aria-pressed="false">Onda 5</button>
+    <button data-m="wC" aria-pressed="false">Onda C</button>
+    <button data-m="wN" aria-pressed="false">Tras el ABC</button>
+  </div>
+  <p class="subhead">Contexto</p>
+  <div class="inputs">
+    <label>Activo<input type="text" id="pjAsset" placeholder="EURUSD, BTC…"></label>
+    <label>Temporalidad<input type="text" id="pjTf" placeholder="H4, diario…"></label>
+    <label>Grado<input type="text" id="pjDeg" placeholder="Menor, intermedia…"></label>
+  </div>
+  <p class="subhead">Puntos de las ondas</p>
+  <div class="inputs" id="pjFields"></div>
+  <p class="subhead">Gestión del riesgo</p>
+  <div class="inputs">
+    <label>Margen del stop (% de la onda)<input type="number" id="pjBuf" value="2" min="0" step="0.5"></label>
+    <label>Capital<input type="number" id="pjCap" value="10000" min="0" step="any"></label>
+    <label>Riesgo (%)<input type="number" id="pjRisk" value="1" min="0" step="0.1"></label>
+  </div>
+  <div class="results" id="pjChecks" aria-live="polite"></div>
+  <svg id="projChart" viewBox="0 0 680 280" role="img" aria-label="Proyección del setup"></svg>
+  <div class="tbl" id="pjTable"></div>
+  <p class="subhead">Plantilla para pegar en el chat</p>
+  <textarea id="tpl" readonly aria-label="Plantilla generada"></textarea>
+  <button class="copybtn" id="copyTpl" type="button" style="margin-top:.5rem">Copiar plantilla</button>
+  <span id="copyMsg" style="margin-left:.6rem;color:var(--muted);font-size:.9rem"></span>
+</div>
+
+<h2>Casos especiales</h2>
+
+<h3>Diagonales: la excepción a la regla 3</h3>
+<p>Son cuñas donde la onda 4 sí solapa con la 1. Solo aparecen en posiciones concretas:</p>
+<p><strong>Diagonal final</strong> en la onda 5 o en la C. Estructura <span class="s">3-3-3-3-3</span>. Marca agotamiento y suele ir seguida de un giro brusco que devuelve toda la diagonal.</p>
+<p><strong>Diagonal inicial</strong> en la onda 1 o en la A. Estructura <span class="s">5-3-5-3-5</span> (a veces 3-3-3-3-3).</p>
+<p>En una diagonal contractiva las líneas convergen y las longitudes decrecen:</p>
+<div class="f">L<sub>3</sub> &lt; L<sub>1</sub>, &nbsp; L<sub>5</sub> &lt; L<sub>3</sub>, &nbsp; L<sub>4</sub> &lt; L<sub>2</sub></div>
+<p>La regla 2 sigue en pie aunque haya solapamiento: la 3 no puede ser la más corta.</p>
+
+<h3>Quinta truncada</h3>
+<p>La onda 5 no supera el extremo de la 3 (<em>P<sub>5</sub> &lt; P<sub>3</sub></em>). Es rara, suele aparecer tras una onda 3 muy potente y anuncia debilidad. Tiene que tener igualmente 5 subondas; si no las tiene, probablemente no es una quinta.</p>
+
+<h3>Onda 3 de 3</h3>
+<p>El punto de máxima aceleración de toda la estructura: la tercera subonda de la onda 3. Si tu conteo te sitúa ahí y el precio no acelera, revisa el conteo.</p>
+
+<h3>Grados</h3>
+<p>Elliott nombró cada escala del fractal. De mayor a menor:</p>
+<ol class="deg">
+  <li>Gran superciclo (décadas o siglos)</li>
+  <li>Superciclo</li>
+  <li>Ciclo (años)</li>
+  <li>Primaria</li>
+  <li>Intermedia (semanas o meses)</li>
+  <li>Menor</li>
+  <li>Minute (días)</li>
+  <li>Minuette (horas)</li>
+  <li>Subminuette (minutos)</li>
+</ol>
+<p>El fallo más común es mezclar grados: contar como "onda 3" algo que es la subonda 3 de la onda 1. Por eso los conteos serios etiquetan cada grado con una notación distinta (números romanos, números entre paréntesis, letras minúsculas…).</p>
+
+<h2>El problema de fondo: la subjetividad</h2>
+<p>Dos analistas con el mismo gráfico pueden hacer dos conteos distintos y ambos cumplir las reglas. Mirando hacia atrás todo encaja; en tiempo real hay varias lecturas posibles. Eso tiene tres consecuencias prácticas:</p>
+<p><strong>Mantén siempre un conteo alternativo.</strong> El principal es el más probable; el alternativo es el que asumes si el principal se invalida.</p>
+<p><strong>Usa las reglas como nivel de invalidación.</strong> Si cuentas una onda 2 en curso, el inicio de la onda 1 es tu stop lógico: si se cruza, la regla 1 dice que te equivocaste. Esta es la parte más útil del método, porque convierte una opinión en una hipótesis que se puede refutar con un precio concreto.</p>
+<p><strong>Piensa en probabilidades, no en profecías.</strong> Elliott describe la forma habitual del mercado; no predice cuándo ni cuánto con certeza. La evidencia académica sobre su capacidad predictiva es débil, y funciona mejor como marco para organizar escenarios y gestionar el riesgo que como bola de cristal.</p>
+
+<footer>Contenido educativo. No es asesoramiento financiero.</footer>
+</main>
+
+<script>
+(function(){
+  const NS = "http://www.w3.org/2000/svg";
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+
+  /* ---------- Fractal ---------- */
+  const TPL = {
+    M: { pts: [[0,0],[.18,.30],[.27,.14],[.60,.80],[.72,.60],[1,1]], types: ["M","C","M","C","M"] },
+    C: { pts: [[0,0],[.40,.62],[.60,.38],[1,1]], types: ["M","C","M"] }
+  };
+  function expand(segs){
+    const out = [];
+    for (const s of segs){
+      const t = TPL[s.t];
+      const p = t.pts.map(([u,v]) => [s.a[0]+u*(s.b[0]-s.a[0]), s.a[1]+v*(s.b[1]-s.a[1])]);
+      for (let i=0;i<t.types.length;i++) out.push({a:p[i], b:p[i+1], t:t.types[i], g:s.g});
+    }
+    return out;
+  }
+  const P0=[0,.04], P5=[.62,.96], PC=[1,.42];
+  const root = [{a:P0,b:P5,t:"M",g:"M"},{a:P5,b:PC,t:"C",g:"C"}];
+  const levels = [root];
+  for (let i=1;i<=3;i++) levels.push(expand(levels[i-1]));
+
+  const fx = x => 40 + x*920, fy = y => 360 - y*320;
+  function drawFractal(depth){
+    const svg = document.getElementById("fractal");
+    svg.innerHTML = "";
+    const segs = levels[depth];
+    const lw = depth===1 ? 3.5 : depth===2 ? 2.2 : 1.4;
+    if (depth>1){
+      for (const s of levels[1]) el("line",{x1:fx(s.a[0]),y1:fy(s.a[1]),x2:fx(s.b[0]),y2:fy(s.b[1]),stroke:css("--line"),"stroke-width":10,"stroke-linecap":"round"},svg);
+    }
+    for (const s of segs){
+      el("line",{x1:fx(s.a[0]),y1:fy(s.a[1]),x2:fx(s.b[0]),y2:fy(s.b[1]),
+        stroke: s.g==="M" ? css("--motive") : css("--corr"), "stroke-width":lw, "stroke-linecap":"round"}, svg);
+    }
+    const labels = ["1","2","3","4","5","A","B","C"];
+    levels[1].forEach((s,i) => {
+      const up = s.b[1] > s.a[1];
+      el("circle",{cx:fx(s.b[0]),cy:fy(s.b[1]),r:4.5,fill:css("--ink")},svg);
+      const t = el("text",{x:fx(s.b[0]),y:fy(s.b[1]) + (up?-14:28),"text-anchor":"middle","font-size":22,"font-weight":800,
+        fill: i<5 ? css("--motive") : css("--corr")},svg);
+      t.textContent = labels[i];
+    });
+    document.getElementById("nOndas").textContent = segs.length;
+  }
+  let currentDepth = 1;
+  document.querySelectorAll(".levels button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".levels button").forEach(x => x.setAttribute("aria-pressed", x===b));
+    currentDepth = +b.dataset.d; drawFractal(currentDepth);
+  }));
+
+  /* ---------- Gallery ---------- */
+  const PATTERNS = [
+    { name:"Impulso", s:"5-3-5-3-5", txt:"Las tres reglas se cumplen. La onda 3 suele ser la extendida.",
+      pts:[[0,.02],[.18,.32],[.28,.16],[.6,.82],[.74,.6],[1,.98]], lab:["","1","2","3","4","5"], color:"--motive", guides:[[2,4],[1,3]] },
+    { name:"Diagonal final contractiva", s:"3-3-3-3-3", txt:"Cuña que converge. La onda 4 solapa la 1. Anuncia giro.",
+      pts:[[0,.02],[.24,.58],[.4,.24],[.62,.72],[.77,.5],[1,.92]], lab:["","1","2","3","4","5"], color:"--motive", guides:[[1,3],[2,4]] },
+    { name:"Zigzag", s:"5-3-5", txt:"Corrección rápida y profunda. B retrocede entre 38% y 79% de A.",
+      pts:[[0,.95],[.38,.35],[.56,.62],[1,.03]], lab:["","A","B","C"], color:"--corr" },
+    { name:"Plana regular", s:"3-3-5", txt:"Lateral. B vuelve cerca del inicio y C termina cerca del final de A.",
+      pts:[[0,.9],[.3,.35],[.6,.88],[1,.3]], lab:["","A","B","C"], color:"--corr" },
+    { name:"Plana expandida", s:"3-3-5", txt:"B supera el inicio (a partir de 1.05×A); C llega a 1.618×A o más.",
+      pts:[[0,.75],[.3,.35],[.55,.98],[1,.03]], lab:["","A","B","C"], color:"--corr" },
+    { name:"Triángulo contractivo", s:"3-3-3-3-3", txt:"Cinco tramos que se estrechan. Solo en onda 4, B, o al final de una combinación.",
+      pts:[[0,.96],[.2,.08],[.4,.84],[.6,.24],[.8,.68],[1,.42]], lab:["","A","B","C","D","E"], color:"--corr", guides:[[1,3],[2,4]] },
+    { name:"Doble tres (W-X-Y)", s:"W-X-Y", txt:"Dos correcciones unidas por una X. Alarga el tiempo de corrección.",
+      pts:[[0,.96],[.1,.68],[.17,.8],[.3,.5],[.42,.7],[.58,.34],[.7,.52],[.92,.08]], lab:["","","","W","X","","","Y"], color:"--corr" }
+  ];
+  function drawPattern(svg, p){
+    svg.innerHTML = "";
+    const W=300,H=170, gx=x=>18+x*264, gy=y=>150-y*130;
+    if (p.guides){
+      for (const [i,j] of p.guides){
+        const a=p.pts[i], b=p.pts[j], m=(b[1]-a[1])/(b[0]-a[0]);
+        const x0=Math.max(0,a[0]-.1), x1=1;
+        el("line",{x1:gx(x0),y1:gy(a[1]+m*(x0-a[0])),x2:gx(x1),y2:gy(a[1]+m*(x1-a[0])),stroke:css("--muted"),"stroke-width":1,"stroke-dasharray":"4 4"},svg);
+      }
+    }
+    el("polyline",{points:p.pts.map(q=>gx(q[0])+","+gy(q[1])).join(" "),fill:"none",stroke:css(p.color),"stroke-width":3,"stroke-linejoin":"round","stroke-linecap":"round"},svg);
+    p.pts.forEach((q,i)=>{
+      if(!p.lab[i]) return;
+      const prev=p.pts[i-1], up = q[1]>prev[1];
+      el("circle",{cx:gx(q[0]),cy:gy(q[1]),r:3,fill:css("--ink")},svg);
+      const t=el("text",{x:gx(q[0]),y:gy(q[1])+(up?-9:19),"text-anchor":"middle","font-size":14,"font-weight":700,fill:css("--ink")},svg);
+      t.textContent=p.lab[i];
+    });
+  }
+  const gal = document.getElementById("gallery");
+  const patSvgs = [];
+  PATTERNS.forEach(p=>{
+    const d=document.createElement("div"); d.className="pat";
+    const svg=el("svg",{viewBox:"0 0 300 170",role:"img","aria-label":p.name});
+    d.appendChild(svg);
+    d.insertAdjacentHTML("beforeend",`<h3>${p.name} <span class="s" style="font-weight:500;color:var(--muted)">${p.s}</span></h3><p>${p.txt}</p>`);
+    gal.appendChild(d); patSvgs.push([svg,p]);
+  });
+
+  /* ---------- Validator ---------- */
+  const inWrap = document.getElementById("inputs");
+  const inputs = [];
+  for (let i=0;i<6;i++){
+    const l=document.createElement("label");
+    l.innerHTML = `P${i}${i===0?" (inicio)":""}<input type="number" step="any" inputmode="decimal">`;
+    inWrap.appendChild(l);
+    const inp=l.querySelector("input"); inputs.push(inp);
+    inp.addEventListener("input", ()=>{ document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed","false")); validate(); });
+  }
+  const FIBS=[0.236,0.382,0.5,0.618,0.786,1,1.272,1.618,2.618,4.236];
+  const near = r => { let best=null,bd=Infinity; for(const f of FIBS){const d=Math.abs(r-f)/f; if(d<bd){bd=d;best=f;}} return bd<0.06 ? `≈ ${best} de Fibonacci` : "lejos de un ratio Fibonacci"; };
+  const fmt = n => (Math.round(n*1000)/1000).toString();
+
+  function validate(){
+    const P = inputs.map(i=>parseFloat(i.value));
+    const res = document.getElementById("results"), rat=document.getElementById("ratios");
+    res.innerHTML=""; rat.innerHTML="";
+    const add=(cls,ic,txt)=>{res.insertAdjacentHTML("beforeend",`<div class="res ${cls}"><span class="ic">${ic}</span><span>${txt}</span></div>`);};
+    if (P.some(isNaN)){ add("warn","!","Rellena los seis precios."); drawChart(null); return; }
+    const d = Math.sign(P[1]-P[0]) || 1;
+    const q = P.map(x=>x*d);
+    const L1=q[1]-q[0], L2=q[1]-q[2], L3=q[3]-q[2], L4=q[3]-q[4], L5=q[5]-q[4];
+    add("warn","↕", d>0 ? "Impulso alcista detectado." : "Impulso bajista detectado: se aplican las reglas invertidas.");
+    if ([L1,L2,L3,L4,L5].some(x=>x<=0)){
+      add("ko","✗","Los precios no alternan dirección (sube, baja, sube, baja, sube). No es una estructura de 5 ondas.");
+      drawChart(P,{}); return;
+    }
+    const r1 = q[2] > q[0];
+    const r2 = !(L3 < L1 && L3 < L5);
+    const r3 = q[4] > q[1];
+    add(r1?"ok":"ko", r1?"✓":"✗", r1 ? "Regla 1: la onda 2 no supera el inicio de la onda 1." : `Regla 1 rota: la onda 2 retrocede ${fmt(L2/L1*100)}% de la onda 1 (más del 100%).`);
+    add(r2?"ok":"ko", r2?"✓":"✗", r2 ? `Regla 2: la onda 3 (${fmt(L3)}) no es la más corta (onda 1: ${fmt(L1)}, onda 5: ${fmt(L5)}).` : `Regla 2 rota: la onda 3 (${fmt(L3)}) es más corta que la 1 (${fmt(L1)}) y que la 5 (${fmt(L5)}).`);
+    add(r3?"ok":"ko", r3?"✓":"✗", r3 ? "Regla 3: la onda 4 no entra en el terreno de la onda 1." : "Regla 3 rota: la onda 4 solapa con la onda 1. Solo sería válido si es una diagonal.");
+    if (q[5] <= q[3]) add("warn","!","La onda 5 no supera a la 3: sería una quinta truncada (válida, pero rara).");
+    if (r1&&r2&&r3) add("ok","✓","Conteo válido según las tres reglas.");
+    const lens=[L1,L3,L5], ext=["1","3","5"][lens.indexOf(Math.max(...lens))];
+    const box=(k,v,h)=>rat.insertAdjacentHTML("beforeend",`<div class="ratio"><div class="k">${k}</div><div class="v">${v}</div><div class="h">${h}</div></div>`);
+    box("Retroceso onda 2", fmt(L2/L1), near(L2/L1));
+    box("Onda 3 / onda 1", fmt(L3/L1), near(L3/L1));
+    box("Retroceso onda 4", fmt(L4/L3), near(L4/L3));
+    box("Onda 5 / onda 1", fmt(L5/L1), near(L5/L1));
+    box("Onda extendida", ext, "la más larga de 1, 3 y 5");
+    drawChart(P,{r1,r3});
+  }
+
+  function drawChart(P, st){
+    const svg=document.getElementById("chart"); svg.innerHTML="";
+    if(!P) return;
+    const mn=Math.min(...P), mx=Math.max(...P), pad=(mx-mn)*0.12||1;
+    const cx=i=>50+i*110, cy=v=>235-(v-(mn-pad))/((mx+pad)-(mn-pad))*210;
+    const hline=(v,col,txt)=>{ el("line",{x1:30,x2:620,y1:cy(v),y2:cy(v),stroke:col,"stroke-width":1.2,"stroke-dasharray":"5 4"},svg);
+      const t=el("text",{x:620,y:cy(v)-5,"text-anchor":"end","font-size":12,fill:col},svg); t.textContent=txt; };
+    hline(P[0], st.r1===false?css("--bad"):css("--muted"), "inicio onda 1 (límite regla 1)");
+    hline(P[1], st.r3===false?css("--bad"):css("--muted"), "fin onda 1 (límite regla 3)");
+    el("polyline",{points:P.map((v,i)=>cx(i)+","+cy(v)).join(" "),fill:"none",stroke:css("--motive"),"stroke-width":3,"stroke-linejoin":"round"},svg);
+    P.forEach((v,i)=>{
+      el("circle",{cx:cx(i),cy:cy(v),r:4.5,fill:css("--ink")},svg);
+      const up = i>0 && P[i]>P[i-1] || (i===0 && P[1]<P[0]);
+      const t=el("text",{x:cx(i),y:cy(v)+(up?-12:22),"text-anchor":"middle","font-size":14,"font-weight":700,fill:css("--ink")},svg);
+      t.textContent = i===0 ? "0" : String(i);
+    });
+  }
+
+  function setPreset(str){ str.split(",").forEach((v,i)=>inputs[i].value=v); validate(); }
+  document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    setPreset(b.dataset.p);
+  }));
+
+  /* ---------- Setups ---------- */
+  const WAVE = [
+    [0,100,"0",1],[10,130,"1",1],[14,118,"a",2],[17,124,"b",2],[21,112,"2",1],
+    [40,180,"3",1],[44,168,"a",2],[47,176,"b",2],[51,165,"4",1],[62,200,"5",1],
+    [64,188,"i",2],[65.5,194,"ii",2],[68,178,"iii",2],[69.5,183,"iv",2],[71,172,"A",1],
+    [73.5,182,"a",2],[75,177,"b",2],[78,188,"B",1],
+    [80,176,"i",2],[81.5,181,"ii",2],[84.5,166,"iii",2],[86,170,"iv",2],[88,160,"C",1]
+  ];
+  const PROJ = [100,188];
+  const isCorr = i => (i>=1&&i<=3)||(i>=5&&i<=7)||i>=9;
+  const SETUPS = {
+    s1:{ seg:[1,4], zone:[15,25,111.46,115], zoneTxt:"50–61.8% de la onda 1", after:4, entry:124, stop:111.5, inval:100, target:160.5, cls:"best",
+      wait:"Onda 2 en 3 subondas (a-b-c) llegando a 111.5–115, el 50–61.8% de la onda 1.",
+      trig:"Ruptura del máximo de b (124): confirma que la c terminó.",
+      stopTxt:"111.5, bajo el mínimo de la 2. El conteo se invalida en 100 (regla 1).",
+      tgt:"112 + 1.618 × 30 ≈ 160.5",
+      verdict:"El mejor setup del ciclo: stop pequeño, recorrido largo y una regla dura como red de seguridad." },
+    s2:{ seg:[5,8], zone:[45,54,154,163.95], zoneTxt:"23.6–38.2% de la onda 3", after:8, entry:176, stop:164.5, inval:130, target:195, cls:"meh",
+      wait:"Onda 4 lateral, alternando con la 2 (aquí plana frente a zigzag), en 154–164.",
+      trig:"Ruptura del máximo de b (176).",
+      stopTxt:"164.5, bajo el mínimo de la 4. El conteo se invalida en 130 (regla 3).",
+      tgt:"P₄ + L₁ = 165 + 30 = 195 (si la 3 fue la extendida, 5 ≈ 1)",
+      verdict:"Válido pero con menos recorrido. Cuidado con quintas truncadas y diagonales finales." },
+    s3:{ seg:[9,17], zone:[73,80,186,194], zoneTxt:"B: 50–78.6% de A", after:17, entry:177, stop:188.5, inval:200, target:160, cls:"meh",
+      wait:"La A cae en 5 subondas (señal de zigzag) y la B rebota en 3 hasta el 50–78.6% de A.",
+      trig:"Ruptura del mínimo de la subonda b de B (177).",
+      stopTxt:"188.5, sobre el máximo de B. Si supera 200 ya no es un zigzag (podría ser una plana expandida).",
+      tgt:"C = A: 188 − 28 = 160",
+      verdict:"Operación contra la tendencia mayor: usa la mitad de tamaño. Sin A en 5 subondas, no hay setup." },
+    s4:{ seg:[17,22], zone:[84,93,160,165], zoneTxt:"C = A y zona de la onda 4 previa", after:22, entry:170, stop:159.5, inval:null, target:188, cls:"meh",
+      wait:"La C en 5 subondas, con C ≈ A (160) y dentro de la zona de la onda 4 previa (165).",
+      trig:"Ruptura del máximo de la subonda iv de C (170).",
+      stopTxt:"159.5, bajo el mínimo de C. Si lo pierde, la C se está extendiendo (1.618 × A ≈ 142.7).",
+      tgt:"Primer objetivo en el final de B (188).",
+      verdict:"Entrada temprana en la nueva tendencia. La alternativa más segura: esperar a que el nuevo impulso haga su onda 1 y operar su onda 2, que es otra vez el setup de la onda 3." }
+  };
+  const ssx = x => 30 + x*5.3, ssy = p => 305 - (p-95)/(210-95)*280;
+  function crossX(after, price){
+    const pts = WAVE.map(w=>[w[0],w[1]]).concat([PROJ]);
+    for (let i=after;i<pts.length-1;i++){
+      const [x0,p0]=pts[i],[x1,p1]=pts[i+1];
+      if ((price-p0)*(price-p1) <= 0 && p0!==p1) return x0 + (price-p0)/(p1-p0)*(x1-x0);
+    }
+    return pts[after][0];
+  }
+  let currentSetup = "none";
+  function drawSetup(){
+    const svg=document.getElementById("setupChart"); svg.innerHTML="";
+    const S = SETUPS[currentSetup];
+    const hline=(p,col,txt,dash,x0)=>{
+      el("line",{x1:ssx(x0),x2:ssx(100),y1:ssy(p),y2:ssy(p),stroke:col,"stroke-width":1.5,"stroke-dasharray":dash||"none"},svg);
+      const t=el("text",{x:ssx(100)+4,y:ssy(p)+4,"font-size":11,fill:col,"font-weight":700},svg); t.textContent=txt;
+    };
+    if (S){
+      const [x0,x1,pa,pb]=S.zone;
+      el("rect",{x:ssx(x0),y:ssy(Math.max(pa,pb)),width:ssx(x1)-ssx(x0),height:Math.abs(ssy(pa)-ssy(pb))||2,fill:css("--corr"),opacity:.22,rx:3},svg);
+      const zt=el("text",{x:ssx(x0),y:ssy(Math.min(pa,pb))+15,"font-size":11,fill:css("--corr"),"font-weight":700},svg); zt.textContent=S.zoneTxt;
+    }
+    // path
+    for (let i=0;i<WAVE.length-1;i++){
+      const a=WAVE[i], b=WAVE[i+1];
+      const on = !S || (i>=S.seg[0] && i<S.seg[1]);
+      el("line",{x1:ssx(a[0]),y1:ssy(a[1]),x2:ssx(b[0]),y2:ssy(b[1]),stroke:isCorr(i)?css("--corr"):css("--motive"),
+        "stroke-width":on&&S?4:2.6,"stroke-linecap":"round",opacity:on?1:.35},svg);
+    }
+    const last=WAVE[WAVE.length-1];
+    el("line",{x1:ssx(last[0]),y1:ssy(last[1]),x2:ssx(PROJ[0]),y2:ssy(PROJ[1]),stroke:css("--motive"),"stroke-width":2,"stroke-dasharray":"5 5",opacity:.7},svg);
+    const pt=el("text",{x:ssx(PROJ[0]),y:ssy(PROJ[1])-10,"text-anchor":"end","font-size":11,fill:css("--muted")},svg); pt.textContent="¿nuevo impulso?";
+    WAVE.forEach((w,i)=>{
+      if(i===0) return;
+      const up = w[1] > WAVE[i-1][1];
+      const big = w[3]===1;
+      if (big) el("circle",{cx:ssx(w[0]),cy:ssy(w[1]),r:3.5,fill:css("--ink")},svg);
+      const t=el("text",{x:ssx(w[0]),y:ssy(w[1])+(up?(big?-10:-6):(big?20:14)),"text-anchor":"middle",
+        "font-size":big?15:10,"font-weight":big?800:500,fill:big?css("--ink"):css("--muted")},svg);
+      t.textContent=w[2];
+    });
+    if (S){
+      const ex = crossX(S.after, S.entry);
+      hline(S.target, css("--good"), "objetivo "+S.target, "6 4", ex);
+      hline(S.entry, css("--ink"), "entrada "+S.entry, "none", ex);
+      hline(S.stop, css("--bad"), "stop "+S.stop, "none", ex);
+      if (S.inval!==null) hline(S.inval, css("--bad"), "invalida "+S.inval, "2 4", S.seg[0]>=9?60:0);
+      el("circle",{cx:ssx(ex),cy:ssy(S.entry),r:6,fill:"none",stroke:css("--ink"),"stroke-width":2.5},svg);
+    }
+    renderSetupInfo();
+  }
+  function renderSetupInfo(){
+    const box=document.getElementById("setupInfo"), calc=document.getElementById("calc");
+    const S=SETUPS[currentSetup];
+    if(!S){ box.innerHTML='<p style="margin:.5rem 0 0;color:var(--muted)">Ciclo completo: impulso 0→5 con correcciones internas en las ondas 2 y 4, seguido de una corrección A-B-C en zigzag (5-3-5).</p>'; calc.hidden=true; return; }
+    const rr = Math.abs(S.target-S.entry)/Math.abs(S.entry-S.stop);
+    box.innerHTML = `<div class="setup-info">
+      <div><b>Qué esperas</b>${S.wait}</div>
+      <div><b>Gatillo de entrada</b>${S.trig}</div>
+      <div><b>Stop</b>${S.stopTxt}</div>
+      <div><b>Objetivo</b>${S.tgt}. R:R ≈ ${rr.toFixed(2)}</div>
+    </div><div class="verdict ${S.cls}">${S.verdict}</div>`;
+    calc.hidden=false; calcRisk();
+  }
+  function calcRisk(){
+    const S=SETUPS[currentSetup]; if(!S) return;
+    const cap=parseFloat(document.getElementById("cap").value), r=parseFloat(document.getElementById("rsk").value);
+    const out=document.getElementById("calcOut");
+    if(isNaN(cap)||isNaN(r)){ out.textContent="Introduce capital y riesgo."; return; }
+    const riskMoney=cap*r/100, perUnit=Math.abs(S.entry-S.stop), size=riskMoney/perUnit;
+    const reward=size*Math.abs(S.target-S.entry);
+    const dir = S.target>S.entry ? "compra" : "venta";
+    out.innerHTML = `<div class="f" style="margin:.3rem 0 0">Tamaño = ${cap} × ${r}% / |${S.entry} − ${S.stop}| = ${riskMoney.toFixed(2)} / ${perUnit.toFixed(2)} ≈ <b style="font-style:normal">${size.toFixed(2)} unidades</b> <span class="n">(${dir}; pierdes ${riskMoney.toFixed(2)} si salta el stop, ganas ≈ ${reward.toFixed(2)} en el objetivo)</span></div>`;
+  }
+  document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    currentSetup=b.dataset.s; drawSetup();
+  }));
+  ["cap","rsk"].forEach(id=>document.getElementById(id).addEventListener("input",calcRisk));
+
+  /* ---------- Proyector ---------- */
+  const fp = n => { if(!isFinite(n)) return "—"; const a=Math.abs(n)||1; const dec=Math.min(5,Math.max(0,5-Math.floor(Math.log10(a)))); return String(parseFloat(n.toFixed(dec))); };
+  const sgn = x => Math.sign(x)||1;
+  const between = (x,a,b) => (x-a)*(x-b) < 0;
+  const MODES = {
+    w3:{ title:"Onda 3 tras la onda 2",
+      fields:[["P0","Inicio onda 1",100],["P1","Fin onda 1",130],["P2","Fin onda 2",112],["b","Extremo de b en la 2 (opcional)",124,true]],
+      calc(v,buf){
+        const d=sgn(v.P1-v.P0), L1=Math.abs(v.P1-v.P0), ret=(v.P1-v.P2)*d/L1, ck=[];
+        if(ret<=0) ck.push(["ko","✗","P2 no retrocede respecto a P1: no hay onda 2."]);
+        else if(ret>=1) ck.push(["ko","✗",`Regla 1 rota: la onda 2 retrocede ${fp(ret*100)}% de la onda 1.`]);
+        else if(ret>=0.5&&ret<=0.65) ck.push(["ok","✓",`Retroceso de ${fp(ret*100)}%: zona ideal (50–61.8%).`]);
+        else if(ret>=0.382&&ret<=0.786) ck.push(["warn","!",`Retroceso de ${fp(ret*100)}%: aceptable, fuera de la zona ideal.`]);
+        else if(ret<0.382) ck.push(["warn","!",`Retroceso de ${fp(ret*100)}%: poco profundo, puede que la onda 2 no haya terminado.`]);
+        else ck.push(["warn","!",`Retroceso de ${fp(ret*100)}%: muy profundo; vigila el inicio de la onda 1.`]);
+        let entry=v.P2, entryTxt="Entrada agresiva en P2 (orden límite, sin confirmación).";
+        if(!isNaN(v.b)){ if(between(v.b,v.P2,v.P1)){entry=v.b; entryTxt="Ruptura del extremo de b: confirma que la onda 2 terminó.";} else ck.push(["warn","!","b debería estar entre P2 y P1; se ignora."]); }
+        ck.push(["warn","?","Confírmalo en el gráfico: ¿la onda 1 tiene 5 subondas y la 2 tiene 3?"]);
+        return { d, entry, entryTxt, sl:v.P2-d*buf*L1, slTxt:"Más allá del extremo de la onda 2", inval:v.P0, invalTxt:"Inicio de la onda 1 (regla 1)", ck,
+          tps:[[v.P2+d*L1,"Onda 3 = 1 × onda 1"],[v.P2+d*1.618*L1,"Onda 3 = 1.618 × onda 1"],[v.P2+d*2.618*L1,"Onda 3 = 2.618 × onda 1 (extendida)"]],
+          pts:[["0",v.P0],["1",v.P1],["2",v.P2]] };
+      }},
+    w5:{ title:"Onda 5 tras la onda 4",
+      fields:[["P0","Inicio onda 1",100],["P1","Fin onda 1",130],["P2","Fin onda 2",112],["P3","Fin onda 3",180],["P4","Fin onda 4",165],["b","Extremo de b en la 4 (opcional)",176,true]],
+      calc(v,buf){
+        const d=sgn(v.P1-v.P0), L1=Math.abs(v.P1-v.P0), L3=Math.abs(v.P3-v.P2), ck=[];
+        const ret4=(v.P3-v.P4)*d/L3;
+        ck.push(d*(v.P2-v.P0)>0?["ok","✓","Regla 1: la onda 2 no supera el inicio de la 1."]:["ko","✗","Regla 1 rota: revisa P0 y P2."]);
+        ck.push(d*(v.P4-v.P1)>0?["ok","✓","Regla 3: la onda 4 no solapa con la 1."]:["ko","✗","Regla 3 rota: la 4 entra en el terreno de la 1 (solo válido en una diagonal)."]);
+        if(ret4>=0.2&&ret4<=0.4) ck.push(["ok","✓",`Retroceso de la 4: ${fp(ret4*100)}% (zona típica 23.6–38.2%).`]);
+        else ck.push(["warn","!",`Retroceso de la 4: ${fp(ret4*100)}%, fuera de la zona típica.`]);
+        let cap=null;
+        if(L3<L1){ cap=L3; ck.push(["warn","!",`La onda 3 es más corta que la 1, así que la 5 no puede medir más de ${fp(L3)} (regla 2). Techo: ${fp(v.P4+d*L3)}.`]); }
+        let entry=v.P4, entryTxt="Entrada agresiva en P4 (orden límite).";
+        if(!isNaN(v.b)){ if(between(v.b,v.P4,v.P3)){entry=v.b; entryTxt="Ruptura del extremo de b dentro de la onda 4.";} else ck.push(["warn","!","b debería estar entre P4 y P3; se ignora."]); }
+        ck.push(["warn","?","Riesgo propio de la onda 5: truncamiento o diagonal final. Considera cerrar en TP1 o TP2."]);
+        let tps=[[v.P4+d*0.618*L1,"Onda 5 = 0.618 × onda 1"],[v.P4+d*L1,"Onda 5 = onda 1"],[v.P4+d*0.618*Math.abs(v.P3-v.P0),"Onda 5 = 0.618 × (0→3)"]];
+        if(cap!==null) tps=tps.map(([p,w])=>Math.abs(p-v.P4)>cap?[v.P4+d*cap,w+" → recortado al techo de la regla 2"]:[p,w]);
+        return { d, entry, entryTxt, sl:v.P4-d*buf*L3, slTxt:"Más allá del extremo de la onda 4", inval:v.P1, invalTxt:"Fin de la onda 1 (regla 3)", ck, tps,
+          pts:[["0",v.P0],["1",v.P1],["2",v.P2],["3",v.P3],["4",v.P4]] };
+      }},
+    wC:{ title:"Onda C tras la onda B",
+      fields:[["S","Inicio de A (fin del impulso)",200],["A","Fin de A",172],["B","Fin de B",188],["b","Extremo de b dentro de B (opcional)",177,true]],
+      calc(v,buf){
+        const d=sgn(v.A-v.S), LA=Math.abs(v.A-v.S), retB=(v.B-v.A)*(-d)/LA, ck=[];
+        let zig=true, k=[0.618,1,1.618];
+        if(retB<=0){ ck.push(["ko","✗","B no retrocede respecto a A."]); }
+        else if(retB>1){ zig=false; k=[1,1.618,2.618]; ck.push(["warn","!",`B retrocede ${fp(retB*100)}% de A: supera el inicio, sería una plana expandida. La C suele llegar a 1.618 × A.`]); }
+        else if(retB>=0.5&&retB<=0.786) ck.push(["ok","✓",`B retrocede ${fp(retB*100)}% de A: típico de un zigzag (50–78.6%).`]);
+        else if(retB>0.786) ck.push(["warn","!",`B retrocede ${fp(retB*100)}% de A: muy profundo, podría ser una plana.`]);
+        else ck.push(["warn","!",`B retrocede solo ${fp(retB*100)}% de A: puede que la B no haya terminado.`]);
+        let entry=v.B, entryTxt="Entrada agresiva en B (orden límite).";
+        if(!isNaN(v.b)){ if(between(v.b,v.B,v.A)){entry=v.b; entryTxt="Ruptura del extremo de b dentro de B.";} else ck.push(["warn","!","b debería estar entre B y A; se ignora."]); }
+        ck.push(["warn","?","Solo es un setup si la A tiene 5 subondas. Va contra la tendencia mayor: usa la mitad del tamaño."]);
+        return { d, entry, entryTxt, sl:v.B-d*buf*LA, slTxt:"Más allá del extremo de B", inval:zig?v.S:null, invalTxt:zig?"Inicio de A (dejaría de ser zigzag)":"", ck,
+          tps:k.map(x=>[v.B+d*x*LA,`C = ${x} × A`]), pts:[["5",v.S],["A",v.A],["B",v.B]] };
+      }},
+    wN:{ title:"Nuevo impulso tras el ABC",
+      fields:[["S","Inicio de A",200],["A","Fin de A",172],["B","Fin de B",188],["C","Fin de C",160],["iv","Extremo de iv dentro de C (opcional)",170,true]],
+      calc(v,buf){
+        const d=sgn(v.S-v.A), LA=Math.abs(v.A-v.S), LC=Math.abs(v.C-v.B), rc=LC/LA, full=Math.abs(v.S-v.C), ck=[];
+        const nearK=[0.618,1,1.618].find(x=>Math.abs(rc-x)/x<0.07);
+        ck.push(nearK?["ok","✓",`C = ${fp(rc)} × A (≈ ${nearK}): proporción típica de final de corrección.`]:["warn","!",`C = ${fp(rc)} × A: lejos de 0.618, 1 o 1.618; puede que la C no haya terminado.`]);
+        if(d*(v.C-v.A)>0) ck.push(["warn","!","C no supera el final de A: sería una C truncada o el patrón no es un zigzag."]);
+        let entry=v.C, entryTxt="Entrada agresiva en C (orden límite).";
+        if(!isNaN(v.iv)){ if(between(v.iv,v.C,v.B)){entry=v.iv; entryTxt="Ruptura del extremo de iv dentro de C.";} else ck.push(["warn","!","iv debería estar entre C y B; se ignora."]); }
+        ck.push(["warn","?","¿La C tiene 5 subondas? Alternativa más segura: esperar la onda 2 del nuevo impulso y usar el setup de onda 3."]);
+        return { d, entry, entryTxt, sl:v.C-d*buf*LC, slTxt:"Más allá del extremo de C", inval:null, invalTxt:"", ck,
+          tps:[[v.C+d*0.382*full,"Retroceso del 38.2% de A-B-C"],[v.C+d*0.618*full,"Retroceso del 61.8% de A-B-C"],[v.S,"Inicio de A (100%)"]],
+          pts:[["5",v.S],["A",v.A],["B",v.B],["C",v.C]] };
+      }}
+  };
+  let pjMode="w3";
+  const pjVals={};
+  function buildFields(){
+    const box=document.getElementById("pjFields"); box.innerHTML="";
+    MODES[pjMode].fields.forEach(([k,lab,def])=>{
+      const l=document.createElement("label");
+      l.innerHTML=`${lab}<input type="number" step="any" data-k="${k}">`;
+      const inp=l.querySelector("input");
+      inp.value = (pjVals[pjMode]&&pjVals[pjMode][k]!==undefined)?pjVals[pjMode][k]:def;
+      inp.addEventListener("input",()=>{ (pjVals[pjMode]=pjVals[pjMode]||{})[k]=inp.value; drawProj(); });
+      box.appendChild(l);
+    });
+  }
+  function drawProj(){
+    const M=MODES[pjMode], v={};
+    let missing=false;
+    document.querySelectorAll("#pjFields input").forEach(i=>{
+      const f=M.fields.find(x=>x[0]===i.dataset.k); v[i.dataset.k]=parseFloat(i.value);
+      if(isNaN(v[i.dataset.k]) && !f[3]) missing=true;
+    });
+    const buf=(parseFloat(document.getElementById("pjBuf").value)||0)/100;
+    const cap=parseFloat(document.getElementById("pjCap").value), risk=parseFloat(document.getElementById("pjRisk").value);
+    const chk=document.getElementById("pjChecks"), tbl=document.getElementById("pjTable"), svg=document.getElementById("projChart");
+    chk.innerHTML=""; tbl.innerHTML=""; svg.innerHTML="";
+    if(missing){ chk.innerHTML='<div class="res warn"><span class="ic">!</span><span>Rellena los puntos obligatorios.</span></div>'; buildTpl(M,v,null); return; }
+    const R=M.calc(v,buf);
+    R.ck.forEach(([c,i,t])=>chk.insertAdjacentHTML("beforeend",`<div class="res ${c}"><span class="ic">${i}</span><span>${t}</span></div>`));
+    const riskU=Math.abs(R.entry-R.sl), size=(cap*risk/100)/riskU;
+    R.rows=R.tps.map(([p,w],i)=>({n:"TP"+(i+1),p,w,rr:Math.abs(p-R.entry)/riskU}));
+    let h=`<table><tr><th>Nivel</th><th>Precio</th><th>Cómo se calcula</th><th>R:R</th></tr>
+      <tr><td>Entrada (${R.d>0?"compra":"venta"})</td><td class="num">${fp(R.entry)}</td><td>${R.entryTxt}</td><td></td></tr>
+      <tr><td>Stop loss</td><td class="sl">${fp(R.sl)}</td><td>${R.slTxt}, con un margen del ${fp(buf*100)}% de la onda</td><td></td></tr>`;
+    if(R.inval!==null) h+=`<tr><td>Invalidación</td><td class="sl">${fp(R.inval)}</td><td>${R.invalTxt}. Si el precio llega aquí, el conteo está mal</td><td></td></tr>`;
+    R.rows.forEach(r=>h+=`<tr><td>${r.n}</td><td class="tp">${fp(r.p)}</td><td>${r.w}</td><td class="rr" style="color:${r.rr>=2?"var(--good)":r.rr>=1.5?"var(--corr)":"var(--bad)"}">${r.rr.toFixed(2)}</td></tr>`);
+    h+=`</table>`;
+    if(isFinite(size)&&size>0) h+=`<p style="margin:.6rem 0 0;font-size:.96rem">Tamaño de posición: <strong>${fp(size)} unidades</strong>. Pérdida máxima si salta el stop: ${fp(cap*risk/100)}. ${R.rows.some(r=>r.rr>=2)?"Hay al menos un objetivo con R:R ≥ 2.":"Ningún objetivo llega a R:R 2: mejor esperar una entrada con confirmación más cercana al stop o descartar el setup."}</p>`;
+    tbl.innerHTML=h;
+    // chart
+    const tpLast=R.rows[R.rows.length-1].p;
+    const all=R.pts.map(p=>p[1]).concat([R.entry,R.sl,tpLast].concat(R.inval!==null?[R.inval]:[]));
+    const mn=Math.min(...all), mx=Math.max(...all), pad=(mx-mn)*0.08||1;
+    const n=R.pts.length, X=i=>30+i*(380/(n)), Y=p=>260-(p-(mn-pad))/((mx+pad)-(mn-pad))*240;
+    const xe=X(n), xend=560;
+    const hl=(p,col,txt,dash)=>{el("line",{x1:X(0),x2:xend,y1:Y(p),y2:Y(p),stroke:col,"stroke-width":1.3,"stroke-dasharray":dash||"none",opacity:.9},svg);
+      const t=el("text",{x:xend+5,y:Y(p)+4,"font-size":11,"font-weight":700,fill:col},svg); t.textContent=txt+": "+fp(p);};
+    if(R.inval!==null) hl(R.inval,css("--bad"),"inval.","2 4");
+    hl(R.sl,css("--bad"),"SL");
+    hl(R.entry,css("--ink"),"entrada");
+    R.rows.forEach(r=>hl(r.p,css("--good"),r.n,"6 4"));
+    el("polyline",{points:R.pts.map((p,i)=>X(i)+","+Y(p[1])).join(" ")+` ${xe},${Y(R.entry)}`,fill:"none",stroke:css("--motive"),"stroke-width":3,"stroke-linejoin":"round"},svg);
+    el("line",{x1:xe,y1:Y(R.entry),x2:xend-20,y2:Y(R.rows[1].p),stroke:css("--good"),"stroke-width":2.5,"stroke-dasharray":"6 5"},svg);
+    el("circle",{cx:xe,cy:Y(R.entry),r:6,fill:"none",stroke:css("--ink"),"stroke-width":2.5},svg);
+    R.pts.forEach((p,i)=>{
+      const up = i>0 ? p[1]>R.pts[i-1][1] : p[1]>=R.pts[1][1];
+      el("circle",{cx:X(i),cy:Y(p[1]),r:4,fill:css("--ink")},svg);
+      const t=el("text",{x:X(i),y:Y(p[1])+(up?-10:20),"text-anchor":"middle","font-size":14,"font-weight":800,fill:css("--ink")},svg); t.textContent=p[0];
+    });
+    buildTpl(M,v,R);
+  }
+  function buildTpl(M,v,R){
+    const g=id=>document.getElementById(id).value||"—";
+    let t=`SETUP ELLIOTT — ${M.title}\nActivo: ${g("pjAsset")}\nTemporalidad: ${g("pjTf")}\nGrado: ${g("pjDeg")}\n\nPuntos:\n`;
+    M.fields.forEach(([k,lab])=>{ t+=`  ${lab}: ${isNaN(v[k])?"—":v[k]}\n`; });
+    t+=`\nEstructura (responder sí/no):\n  ¿La onda de impulso previa tiene 5 subondas?\n  ¿La corrección tiene 3 subondas?\n  ¿Hay divergencia en el RSI?\n`;
+    if(R){
+      t+=`\nProyección calculada:\n  Dirección: ${R.d>0?"alcista (compra)":"bajista (venta)"}\n  Entrada: ${fp(R.entry)}\n  Stop loss: ${fp(R.sl)}\n`;
+      if(R.inval!==null) t+=`  Invalidación: ${fp(R.inval)}\n`;
+      R.rows.forEach(r=>t+=`  ${r.n}: ${fp(r.p)} (${r.w}, R:R ${r.rr.toFixed(2)})\n`);
+      t+=`\nAvisos:\n`+R.ck.map(c=>"  - "+c[2]).join("\n")+"\n";
+    }
+    t+=`\nNotas / dudas:\n  `;
+    document.getElementById("tpl").value=t;
+  }
+  document.querySelectorAll("#proj .modes button").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll("#proj .modes button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    pjMode=b.dataset.m; buildFields(); drawProj();
+  }));
+  ["pjBuf","pjCap","pjRisk","pjAsset","pjTf","pjDeg"].forEach(id=>document.getElementById(id).addEventListener("input",drawProj));
+  document.getElementById("copyTpl").addEventListener("click",async()=>{
+    const ta=document.getElementById("tpl"), msg=document.getElementById("copyMsg");
+    try{ await navigator.clipboard.writeText(ta.value); msg.textContent="Copiada."; }
+    catch(e){ ta.focus(); ta.select(); try{ document.execCommand("copy"); msg.textContent="Copiada."; }catch(_){ msg.textContent="Texto seleccionado: cópialo con Ctrl+C."; } }
+  });
+  buildFields();
+
+  function renderAll(){ drawFractal(currentDepth); patSvgs.forEach(([s,p])=>drawPattern(s,p)); validate(); drawSetup(); drawProj(); }
+  setPreset("100,130,112,180,165,200");
+  renderAll();
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll); } catch(e){}
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderAll);
+})();
+</script>
+</body>
+</html>

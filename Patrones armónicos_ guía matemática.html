@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Patrones armónicos: guía matemática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=STIX+Two+Text:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4; --surface:#FFFFFF; --ink:#16233A; --muted:#5A6678; --grid:#DDE3EA; --line:#CCD4DE;
+  --accent:#3446C4; --tri:rgba(52,70,196,.09); --fib:#A97A12; --prz:rgba(201,148,32,.17);
+  --bull:#157455; --bear:#B3303D;
+  --tint-bear:rgba(179,48,61,.08); --tint-acc:rgba(52,70,196,.08); --tint-bull:rgba(21,116,85,.09); --tint-fib:rgba(201,148,32,.10);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+    --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+    --bull:#4FC79C; --bear:#FF6F7C;
+    --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+  --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+  --bull:#4FC79C; --bear:#FF6F7C;
+  --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px); scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.62 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+.prose{max-width:720px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+img,svg{max-width:100%}
+
+/* hero */
+.hero{padding:56px 0 28px}
+.hero h1{font-size:clamp(2.7rem,8vw,5.4rem);line-height:.95;letter-spacing:-.025em;font-weight:800;margin:0 0 18px}
+.hero .lead{font-size:1.2rem;max-width:640px;color:var(--muted);margin:0 0 22px}
+.hero .cta{display:inline-block;padding:.6rem 1.1rem;border-radius:6px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:700}
+.hero-fig{margin-top:30px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+
+/* toc */
+.toc{margin:10px 0 0;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.toc ol{margin:0;padding-left:1.3rem;columns:2;column-gap:40px}
+.toc li{margin:.15rem 0}
+@media (max-width:640px){.toc ol{columns:1}}
+
+h2{font-size:clamp(1.6rem,3.5vw,2.1rem);line-height:1.15;letter-spacing:-.01em;margin:4rem 0 1rem;font-weight:800}
+h2 .n{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:600;color:var(--fib);margin-right:.35em}
+h3{font-size:1.2rem;margin:2.2rem 0 .6rem;font-weight:700}
+p{margin:.7rem 0}
+.formula{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.55rem;line-height:1.4;padding:.9rem 1.3rem;border-left:3px solid var(--fib);background:var(--surface);margin:1.3rem 0;border-radius:0 8px 8px 0}
+.formula small{display:block;font-size:.95rem;font-style:normal;font-family:"Schibsted Grotesk",sans-serif;color:var(--muted);margin-top:.2rem}
+.m{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.08em}
+.tricky{background:var(--tint-bear);border-left:3px solid var(--bear);padding:.9rem 1.15rem;margin:1.5rem 0;border-radius:0 8px 8px 0;max-width:720px}
+.tricky b.t{display:block;color:var(--bear);margin-bottom:.2rem}
+.note{background:var(--tint-fib);border-left:3px solid var(--fib);padding:.9rem 1.15rem;margin:1.5rem 0;border-radius:0 8px 8px 0;max-width:720px}
+
+.tablewrap{overflow-x:auto;margin:1rem 0 1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.95rem}
+th,td{padding:.55rem .8rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-weight:700;color:var(--muted);font-size:.86rem;background:var(--tint-acc)}
+td.num{white-space:nowrap}
+
+figure{margin:1.5rem 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+figcaption{color:var(--muted);font-size:.92rem;margin-top:.6rem;max-width:720px}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:580px}
+
+.minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:1.2rem 0}
+.mini{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
+.mini h4{margin:0;font-size:1.05rem}
+.mini p{margin:.1rem 0 .4rem;font-size:.88rem;color:var(--muted)}
+.mini svg{display:block;width:100%;height:auto}
+.tag{font-size:.75rem;padding:1px 8px;border-radius:999px;border:1px solid currentColor;margin-left:6px;vertical-align:2px;font-weight:500}
+.tag.retro{color:var(--accent)} .tag.ext{color:var(--fib)} .tag.esp{color:var(--muted)}
+
+ol.steps{padding-left:1.4rem;max-width:720px}
+ol.steps li{margin:.5rem 0}
+
+.mermaid-panel{background:#FFFFFF;color:#16233A;border-radius:10px;padding:12px;overflow-x:auto;border:1px solid var(--line)}
+
+/* SVG */
+.g-grid{stroke:var(--grid);stroke-width:1}
+.g-xrow{stroke:var(--ink);stroke-width:1.5}
+.g-lbl{fill:var(--muted);font-size:12px;font-family:"Schibsted Grotesk",sans-serif}
+.g-lbl.strong{fill:var(--ink);font-weight:700}
+.g-name{fill:var(--ink);font-size:13px;font-weight:600}
+.g-xline{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.2;opacity:.8}
+.g-prz{fill:var(--prz)}
+.g-tri{fill:var(--tri);stroke:none}
+.g-reg1{fill:var(--tri)} .g-reg2{fill:var(--prz)}
+.g-conn{stroke:var(--accent);stroke-dasharray:5 4;stroke-width:1.2;fill:none;opacity:.85}
+.g-ratio{fill:var(--accent);font-size:12.5px;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.g-proj{stroke:var(--fib);stroke-width:2.2}
+.g-proj.off{stroke-dasharray:3 3;opacity:.6}
+.g-path{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.g-pt{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.g-letter{fill:var(--ink);font-weight:800;font-size:15px}
+.g-letter.sm{font-size:11px}
+.g-trade{stroke-width:1.8}
+.g-trade.dash{stroke-dasharray:6 4}
+.l-bear{stroke:var(--bear)} .l-bull{stroke:var(--bull)} .l-ink{stroke:var(--ink)}
+.g-lead{stroke:var(--line);stroke-width:1}
+.g-rl{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.t-bear{fill:var(--bear)} .t-bull{fill:var(--bull)} .t-ink{fill:var(--ink)} .t-fib{fill:var(--fib)} .t-muted{fill:var(--muted)} .t-acc{fill:var(--accent)}
+.g-tol{fill:var(--grid)}
+.k-retro{fill:var(--accent)} .k-ext{fill:var(--fib)} .k-esp{fill:var(--ink)}
+.g-node{fill:var(--accent)}
+.g-arrow{stroke:var(--accent);stroke-width:1.6;fill:none}
+.g-arrowhead{fill:var(--accent)}
+.g-x{stroke:var(--bear);stroke-width:2.6;stroke-linecap:round}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.8s ease-out .2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.draw{animation:none;stroke-dashoffset:0}html{scroll-behavior:auto}}
+
+/* lab */
+.lab{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;margin:1.4rem 0}
+@media (max-width:880px){.lab{grid-template-columns:1fr}}
+.controls{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;align-self:start}
+.controls label{display:block;margin:.75rem 0;font-weight:600;font-size:.93rem}
+.controls output{float:right;font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.1rem;color:var(--accent)}
+.controls select,.controls input[type=number]{width:100%;margin-top:.25rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.controls input[type=range]{width:100%;accent-color:var(--accent);margin-top:.35rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 label{margin:.4rem 0}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:.75rem 0;padding:.4rem .8rem .6rem}
+legend{font-weight:600;font-size:.93rem;padding:0 .3rem}
+fieldset label{display:inline-flex;align-items:center;gap:.35rem;margin:.2rem 1rem .2rem 0;font-weight:400}
+.btn{display:block;width:100%;margin:.45rem 0;padding:.55rem .8rem;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;text-align:left}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.dir{font-size:.88rem;color:var(--muted);margin:.2rem 0 0}
+.labout{min-width:0}
+.labout .chartbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px}
+.cands{margin:.8rem 0 .3rem;font-size:.93rem}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;border:1px solid var(--line);margin:2px 3px;font-size:.85rem;background:var(--surface)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.msg{padding:.5rem .85rem;border-radius:6px;margin:.4rem 0;font-size:.93rem}
+.msg.warn{background:var(--tint-bear);border-left:3px solid var(--bear)}
+.msg.info{background:var(--tint-acc);border-left:3px solid var(--accent)}
+.msg.ok{background:var(--tint-bull);border-left:3px solid var(--bull)}
+
+footer{margin:5rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <h1>Patrones armónicos</h1>
+  <p class="lead">Geometría de Fibonacci aplicada al precio: cómo se miden, dónde se invalidan, dónde colocar el stop y el objetivo, y cómo un patrón se transforma en otro cuando falla.</p>
+  <a class="cta" href="#laboratorio">Abrir el laboratorio interactivo</a>
+  <div class="hero-fig chart" id="heroChart" aria-hidden="true"></div>
+</header>
+
+<nav class="wrap" aria-label="Contenido">
+  <div class="toc">
+    <ol>
+      <li><a href="#base">La base matemática</a></li>
+      <li><a href="#patrones">Los patrones</a></li>
+      <li><a href="#prz">La PRZ</a></li>
+      <li><a href="#ejemplo">Ejemplo numérico completo</a></li>
+      <li><a href="#stop">Stop loss e invalidación</a></li>
+      <li><a href="#tp">Take profit</a></li>
+      <li><a href="#conversiones">Conversiones entre patrones</a></li>
+      <li><a href="#laboratorio">Laboratorio interactivo</a></li>
+      <li><a href="#resumen">Resumen operativo</a></li>
+    </ol>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1 -->
+<section id="base">
+  <h2><span class="n">1</span>La base: una regla de tres con Fibonacci</h2>
+  <div class="prose">
+    <p>Un patrón armónico tiene cinco puntos (X, A, B, C, D) y cuatro tramos (XA, AB, BC, CD). Todo nivel del patrón sale de una sola fórmula: el precio que retrocede o extiende una fracción <span class="m">r</span> de un tramo que va de P1 a P2.</p>
+    <div class="formula">Nivel(r) = P2 − r · (P2 − P1)<small>Funciona igual en patrones alcistas y bajistas: el signo lo pone la resta.</small></div>
+    <p>Si <span class="m">r</span> &lt; 1 el nivel queda dentro del tramo (retroceso). Si <span class="m">r</span> &gt; 1 el nivel sobrepasa el origen P1 (extensión). En el gráfico, P1 = 100 y P2 = 150.</p>
+  </div>
+  <figure><div class="chart" id="retroChart"></div>
+    <figcaption>El mismo tramo genera niveles de retroceso dentro de él y de extensión más allá de su origen. Los patrones Gartley y Bat terminan en la zona azul; Butterfly y Crab, en la dorada.</figcaption></figure>
+
+  <div class="prose">
+    <h3>Los tres cocientes que definen cualquier patrón</h3>
+  </div>
+  <div class="tablewrap prose"><table>
+    <tr><th>Cociente</th><th>Qué mide</th></tr>
+    <tr><td class="m">B = AB / XA</td><td>Cuánto retrocede B el impulso inicial XA</td></tr>
+    <tr><td class="m">C = BC / AB</td><td>Cuánto retrocede C el tramo AB</td></tr>
+    <tr><td class="m">D = AD / XA</td><td>Dónde termina el patrón respecto a XA. Se confirma con CD / BC y con AB=CD.</td></tr>
+  </table></div>
+
+  <div class="prose"><h3>De dónde salen los números</h3>
+  <p>Casi todos los ratios derivan de φ = 1.618 mediante inversas, cuadrados y raíces:</p></div>
+  <div class="tablewrap prose"><table>
+    <tr><th>Ratio</th><th>Origen</th><th>Ratio</th><th>Origen</th></tr>
+    <tr><td class="num">0.382</td><td class="m">1/φ² = 1 − 0.618</td><td class="num">1.272</td><td class="m">√φ = 1/0.786</td></tr>
+    <tr><td class="num">0.618</td><td class="m">1/φ</td><td class="num">1.414</td><td class="m">√2</td></tr>
+    <tr><td class="num">0.786</td><td class="m">√0.618</td><td class="num">1.618</td><td class="m">φ</td></tr>
+    <tr><td class="num">0.886</td><td class="m">√0.786 = 0.618<sup>¼</sup></td><td class="num">2.24</td><td class="m">√5</td></tr>
+    <tr><td class="num">1.13</td><td class="m">1/0.886</td><td class="num">2.618 · 3.618</td><td class="m">φ² y φ² + 1</td></tr>
+  </table></div>
+
+  <div class="prose"><h3>Los recíprocos: de dónde salen y cuándo aplican</h3>
+    <p>Si C retrocede una fracción <span class="m">r</span> de AB y el patrón se completa con AB = CD, entonces:</p>
+    <div class="formula">CD / BC = AB / (r · AB) = 1 / r</div>
+    <p>Por eso cada retroceso de C tiene "su" extensión de BC, que es exactamente su inverso:</p></div>
+  <div class="tablewrap prose"><table>
+    <tr><th>C retrocede AB</th><td class="num">0.382</td><td class="num">0.500</td><td class="num">0.618</td><td class="num">0.707</td><td class="num">0.786</td><td class="num">0.886</td></tr>
+    <tr><th>CD extiende BC (AB=CD)</th><td class="num">2.618</td><td class="num">2.000</td><td class="num">1.618</td><td class="num">1.414</td><td class="num">1.272</td><td class="num">1.130</td></tr>
+  </table></div>
+  <div class="tricky"><b class="t">Lo tricky</b>El recíproco da el punto donde se completa un AB=CD 1:1, no el D del patrón XABCD. En un XABCD manda el nivel de XA, y de las extensiones de BC que el patrón permite se toma la más cercana a ese nivel. En patrones de extensión profunda (Crab, Alt Bat) el AB=CD 1:1 suele quedar muy lejos de D y no suma confluencia.</div>
+</section>
+
+<!-- 2 -->
+<section id="patrones">
+  <h2><span class="n">2</span>Los patrones</h2>
+  <div class="prose"><p>Cada miniatura está dibujada con sus ratios ideales. La línea discontinua horizontal es el nivel de X: si D queda por encima (en un alcista), el patrón es de retroceso; si queda por debajo, de extensión.</p></div>
+  <div class="minis" id="minis"></div>
+
+  <div class="tablewrap"><table>
+    <tr><th>Patrón</th><th>B (de XA)</th><th>C (de AB)</th><th>D</th><th>Extensión BC</th><th>Tipo</th></tr>
+    <tr><td><b>Gartley</b></td><td class="num">0.618</td><td class="num">0.382–0.886</td><td class="num"><b>0.786 XA</b></td><td class="num">1.272–1.618</td><td>Retroceso</td></tr>
+    <tr><td><b>Bat</b></td><td class="num">0.382–0.50</td><td class="num">0.382–0.886</td><td class="num"><b>0.886 XA</b></td><td class="num">1.618–2.618</td><td>Retroceso</td></tr>
+    <tr><td><b>Alt Bat</b></td><td class="num">≤ 0.382</td><td class="num">0.382–0.886</td><td class="num"><b>1.13 XA</b></td><td class="num">2.0–3.618</td><td>Extensión</td></tr>
+    <tr><td><b>Butterfly</b></td><td class="num">0.786</td><td class="num">0.382–0.886</td><td class="num"><b>1.27 XA</b> (hasta 1.618)</td><td class="num">1.618–2.618</td><td>Extensión</td></tr>
+    <tr><td><b>Crab</b></td><td class="num">0.382–0.618</td><td class="num">0.382–0.886</td><td class="num"><b>1.618 XA</b></td><td class="num">2.618–3.618</td><td>Extensión</td></tr>
+    <tr><td><b>Deep Crab</b></td><td class="num">0.886</td><td class="num">0.382–0.886</td><td class="num"><b>1.618 XA</b></td><td class="num">2.0–3.618</td><td>Extensión</td></tr>
+    <tr><td><b>Cypher</b></td><td class="num">0.382–0.618</td><td>C supera A: 1.272–1.414 de XA</td><td class="num"><b>0.786 XC</b></td><td>—</td><td>Especial</td></tr>
+    <tr><td><b>AB=CD</b></td><td>—</td><td class="num">0.382–0.886</td><td>CD = AB (o 1.272 / 1.618 AB)</td><td>recíproco de C</td><td>Base</td></tr>
+  </table></div>
+
+  <h3>B es el discriminante</h3>
+  <div class="prose"><p>Cuando decides qué esperar, D todavía no existe; B sí. Por eso B filtra qué patrones son posibles y D confirma cuál se completó. Mira las zonas de solapamiento: con B = 0.45 solo caben Bat, Crab y Cypher.</p></div>
+  <figure><div class="chart" id="bMap"></div>
+    <figcaption>Rango de B permitido por cada patrón. La franja gris es la tolerancia práctica de ±0.03. Azul: retroceso. Dorado: extensión. Negro: especial.</figcaption></figure>
+
+  <h3>Dónde termina D: dentro o más allá de X</h3>
+  <figure><div class="chart" id="dMap"></div>
+    <figcaption>En Gartley, Bat y Cypher, D queda antes de X, así que X es una barrera natural para el stop. En el resto, D sobrepasa X y el stop se calcula con el siguiente nivel Fibonacci.</figcaption></figure>
+  <div class="tricky"><b class="t">Lo tricky</b>Tolerancia de ±3–5% en B y C, pero mucho menor en D, que es el nivel que define la entrada. Un "Gartley" con B = 0.70 no es un Gartley: está en la zona gris entre 0.618 y 0.786 y no pertenece a ningún patrón clásico.</div>
+</section>
+
+<!-- 3 -->
+<section id="prz">
+  <h2><span class="n">3</span>La PRZ (Potential Reversal Zone)</h2>
+  <div class="prose">
+    <p>D no es un precio exacto sino una zona formada por la confluencia de varias proyecciones:</p>
+    <ol class="steps">
+      <li><b>El nivel de XA propio del patrón.</b> Es el más importante: define el patrón y marca la entrada.</li>
+      <li><b>La extensión Fibonacci de BC</b> dentro del rango del patrón, la más cercana al nivel de XA.</li>
+      <li><b>AB=CD</b> en su versión 1:1, 1.272 o 1.618, solo si cae cerca. Si queda lejos, no suma.</li>
+    </ol>
+    <div class="formula">PRZ = [ mín(proyecciones), máx(proyecciones) ]</div>
+    <p>Cuanto más estrecha, mejor el setup. Si las proyecciones están muy separadas (más del 10–12% de XA), la confluencia es débil: descarta el patrón o reduce tamaño.</p>
+  </div>
+  <figure><div class="chart" id="przChart"></div>
+    <figcaption>Gartley alcista con X = 100 y A = 150. Las marcas doradas junto a D son las tres proyecciones; la banda dorada es la PRZ resultante.</figcaption></figure>
+</section>
+
+<!-- 4 -->
+<section id="ejemplo">
+  <h2><span class="n">4</span>Ejemplo numérico completo: Gartley alcista</h2>
+  <div class="tablewrap prose"><table>
+    <tr><th>Paso</th><th>Cálculo</th><th>Resultado</th></tr>
+    <tr><td>B</td><td class="m">150 − 0.618 · 50</td><td class="num"><b>119.1</b></td></tr>
+    <tr><td>C (0.618 de AB)</td><td class="m">119.1 + 0.618 · 30.9</td><td class="num"><b>138.2</b></td></tr>
+    <tr><td>D: 0.786 XA</td><td class="m">150 − 0.786 · 50</td><td class="num"><b>110.7</b></td></tr>
+    <tr><td>1.272 BC</td><td class="m">138.2 − 1.272 · 19.1</td><td class="num">113.9</td></tr>
+    <tr><td>1.414 BC (la más cercana)</td><td class="m">138.2 − 1.414 · 19.1</td><td class="num">111.2</td></tr>
+    <tr><td>1.618 BC</td><td class="m">138.2 − 1.618 · 19.1</td><td class="num">107.3</td></tr>
+    <tr><td>AB=CD</td><td class="m">138.2 − 30.9</td><td class="num">107.3</td></tr>
+    <tr><td>PRZ</td><td>entre AB=CD y 1.414 BC</td><td class="num"><b>107.3 – 111.2</b></td></tr>
+  </table></div>
+
+  <figure><div class="chart" id="exChart"></div>
+    <figcaption>Entrada en 110.7 con dos alternativas de stop. El conservador protege X; el agresivo se coloca justo después de 0.886 XA.</figcaption></figure>
+
+  <div class="tablewrap prose"><table>
+    <tr><th></th><th>Stop en X (99.0)</th><th>Stop tras 0.886 (104.7)</th></tr>
+    <tr><td>Riesgo</td><td class="num">11.7</td><td class="num">6.0</td></tr>
+    <tr><td>TP1 = D + 0.382 · (A − D) = 125.7</td><td class="num">R:R 1.28</td><td class="num">R:R 2.5</td></tr>
+    <tr><td>TP2 = D + 0.618 · (A − D) = 135.0</td><td class="num">R:R 2.08</td><td class="num">R:R 4.0</td></tr>
+  </table></div>
+  <div class="tricky"><b class="t">Lo tricky</b>El stop "de libro" en X suele dar un R:R mediocre en un Gartley. Por eso muchos lo colocan justo después de 0.886 XA: si el precio pasa de ahí, el mercado probablemente está construyendo otro patrón (sección 7), y el Gartley ya no es la lectura correcta.</div>
+</section>
+
+<!-- 5 -->
+<section id="stop">
+  <h2><span class="n">5</span>Stop loss e invalidación</h2>
+  <div class="prose">
+    <div class="formula">SL = extremo de la PRZ ± colchón<small>Colchón típico: 0.5–1 ATR, o el siguiente nivel Fibonacci que pertenece a otro patrón.</small></div>
+  </div>
+  <div class="tablewrap prose"><table>
+    <tr><th>Patrón</th><th>SL conservador</th><th>SL agresivo</th></tr>
+    <tr><td>Gartley</td><td>Más allá de X</td><td>Más allá de 0.886 XA</td></tr>
+    <tr><td>Bat</td><td>Más allá de 1.13 XA</td><td>Más allá de X</td></tr>
+    <tr><td>Alt Bat</td><td>Más allá de 1.27 XA</td><td>1.13 XA + colchón</td></tr>
+    <tr><td>Butterfly</td><td>Más allá de 1.618 XA</td><td>Más allá de 1.414 XA</td></tr>
+    <tr><td>Crab</td><td>Más allá de 2.24 XA</td><td>Más allá de 2.0 XA</td></tr>
+    <tr><td>Deep Crab</td><td>Más allá de 2.0 XA</td><td>1.618 XA + colchón</td></tr>
+    <tr><td>Cypher</td><td>Más allá de X</td><td>Más allá de 0.886 XC</td></tr>
+  </table></div>
+
+  <h3>La invalidación ocurre en cada fase, no solo en D</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Fase</th><th>Qué la invalida</th><th>Qué significa</th></tr>
+    <tr><td>Tramo AB</td><td>B supera X (B &gt; 1.0 XA)</td><td>No es un XABCD clásico. Se redefine X o puede formarse un Shark.</td></tr>
+    <tr><td>Tramo BC</td><td>C supera A</td><td>Se invalidan Gartley, Bat, Crab y Butterfly. Aparece un candidato a Cypher.</td></tr>
+    <tr><td>Tramo BC</td><td>C &lt; 0.382 AB</td><td>Estructura débil; CD necesita extensiones enormes.</td></tr>
+    <tr><td>Tramo CD</td><td>El precio atraviesa la PRZ sin reaccionar</td><td>El patrón falla y se pasa al siguiente candidato compatible con B.</td></tr>
+    <tr><td>Tramo CD</td><td>El precio renueva B antes de formar C</td><td>Redibujado: B se mueve y hay que recalcular todo.</td></tr>
+    <tr><td>Tras la entrada</td><td>Cierre más allá del SL</td><td>Invalidación final.</td></tr>
+  </table></div>
+  <div class="tricky"><b class="t">Lo tricky: el redibujado</b>Si después de B el precio marca un nuevo extremo antes de que C se confirme, el B anterior deja de existir. Un punto solo está confirmado cuando el tramo siguiente arranca con claridad; operar con puntos no confirmados es la causa más habitual de patrones "perfectos" que fallan.</div>
+</section>
+
+<!-- 6 -->
+<section id="tp">
+  <h2><span class="n">6</span>Take profit</h2>
+  <div class="prose">
+    <p>El estándar de Scott Carney mide los objetivos sobre el tramo AD:</p>
+    <div class="formula">TP1 = D + 0.382 · (A − D)<br>TP2 = D + 0.618 · (A − D)</div>
+    <p>Objetivos extendidos: el punto C, el punto A, y 1.272 o 1.618 de AD. Otra escuela mide sobre CD, usando C en lugar de A; como C está más cerca de D, los objetivos salen más cortos.</p>
+  </div>
+  <figure><div class="chart" id="tpChart"></div>
+    <figcaption>Mismo Gartley, con los objetivos medidos sobre AD (línea continua) y sobre CD (línea discontinua).</figcaption></figure>
+  <div class="tricky"><b class="t">Lo tricky</b>Ninguna de las dos formas es incorrecta, pero no las mezcles al hacer backtesting: cambian por completo la tasa de acierto y el R:R. Gestión habitual: cerrar parte en TP1 y mover el stop a breakeven.</div>
+</section>
+
+<!-- 7 -->
+<section id="conversiones">
+  <h2><span class="n">7</span>Conversiones: cuándo un patrón se convierte en otro</h2>
+  <div class="prose">
+    <p>Todos los patrones comparten X y A y solo difieren en B y D. Por eso existe una escalera de niveles: si D falla en uno, el precio suele buscar el siguiente, y el patrón resultante depende del B que ya tienes.</p>
+    <div class="formula">0.786 → 0.886 → 1 (X) → 1.13 → 1.27 → 1.414 → 1.618 → 2.0 → 2.24 → 2.618</div>
+  </div>
+  <figure><div class="chart" id="ladder"></div>
+    <figcaption>Cada columna es un valor de B. Las flechas muestran hacia dónde migra el patrón cuando el precio atraviesa D. La zona dorada es "más allá de X".</figcaption></figure>
+
+  <h3>Árbol de decisión según B</h3>
+  <div class="tablewrap prose"><table>
+    <tr><th>B medido</th><th>Candidatos</th><th>Niveles de D a vigilar</th></tr>
+    <tr><td class="num">≤ 0.382</td><td>Alt Bat, Bat, Crab</td><td class="num">0.886 → 1.13 → 1.618</td></tr>
+    <tr><td class="num">0.382–0.50</td><td>Bat, Crab</td><td class="num">0.886 → 1.618</td></tr>
+    <tr><td class="num">0.50–0.618</td><td>Crab (y Gartley si B ≈ 0.618)</td><td class="num">0.786 → 1.618</td></tr>
+    <tr><td class="num">≈ 0.786</td><td>Butterfly</td><td class="num">1.27 → 1.414 → 1.618</td></tr>
+    <tr><td class="num">≈ 0.886</td><td>Deep Crab</td><td class="num">1.618</td></tr>
+    <tr><td>0.382–0.618 y C más allá de A</td><td>Cypher</td><td class="num">0.786 de XC</td></tr>
+  </table></div>
+
+  <h3>Mapa completo de conversiones</h3>
+  <div class="mermaid-panel">
+<pre class="mermaid">
+%%{init: {"theme":"neutral"}}%%
+flowchart TD
+  ABCD["AB=CD"] -->|"aparece un X válido antes de A"| XABCD["Patrón XABCD"]
+  GAR["Gartley, D 0.786"] -->|"rompe X; B = 0.618 encaja en Crab"| CRAB["Crab, D 1.618"]
+  BAT["Bat, D 0.886"] -->|"rompe X y B ≈ 0.382"| ALT["Alt Bat, D 1.13"]
+  ALT -->|"falla 1.13"| CRAB
+  BAT -->|"rompe X con B 0.382–0.50"| CRAB
+  BUT["Butterfly, D 1.27"] -->|"extensión alterna"| BUT2["Butterfly, D 1.618"]
+  GB["Gartley o Bat en formación"] -->|"C supera A"| CY["Cypher, D 0.786 XC"]
+  CY -->|"C no llega a A"| GB
+  SH["Shark"] -->|"su C pasa a ser B"| FO["5-0, D 0.50 BC"]
+  CRAB -->|"rompe 2.24 con fuerza"| NX["Nuevo X: continuación"]
+  BUT2 -->|"rompe 2.0"| NX
+</pre>
+  </div>
+
+  <div class="prose">
+    <h3>Las conversiones, una a una</h3>
+    <p><b>Gartley → Crab.</b> Un Gartley (B = 0.618) que rompe X deja de ser de retroceso. Como 0.618 está dentro del rango de B del Crab, el siguiente objetivo es 1.618 XA. Gartley → Butterfly es imposible: el Butterfly exige B = 0.786.</p>
+    <p><b>Bat → Alt Bat → Crab.</b> La conversión más común. Un Bat que atraviesa 0.886 y X puede completarse en 1.13 si B ≈ 0.382. Si también falla ahí, el siguiente candidato compatible es el Crab en 1.618.</p>
+    <p><b>Butterfly 1.27 → 1.618.</b> No es un cambio de patrón sino su extensión alternativa. Por eso el stop agresivo va más allá de 1.414, no justo después de 1.27.</p>
+    <p><b>Gartley/Bat ↔ Cypher.</b> Si C supera A, el XABCD clásico queda invalidado y se evalúa un Cypher. A la inversa, un Cypher potencial cuyo C no llega a A vuelve a ser candidato a Gartley o Bat.</p>
+    <p><b>AB=CD → XABCD.</b> Todo patrón armónico contiene un AB=CD en sus tres últimos tramos. Si encuentras un X válido antes de A, pasas a un patrón de cinco puntos con más confluencia.</p>
+    <p><b>Shark → 5-0.</b> El Shark se completa en 0.886–1.13 del tramo inicial; si revierte, su C se convierte en el B de un 5-0, que busca un retroceso de 0.50 de BC.</p>
+    <p><b>Patrón fallido → nueva estructura.</b> Cuando un patrón se invalida del todo, el extremo alcanzado suele convertirse en el nuevo X de una estructura en la dirección de la ruptura. Una PRZ rota es a menudo una señal de continuación, no solo un stop.</p>
+  </div>
+  <div class="tricky"><b class="t">Lo tricky</b>Una conversión solo es válida si el B original encaja en el nuevo patrón. No es "si falla, le pongo otro nombre". Si el B no encaja en ningún candidato del siguiente nivel, no hay patrón: hay tendencia.</div>
+</section>
+
+<!-- 8 -->
+<section id="laboratorio">
+  <h2><span class="n">8</span>Laboratorio interactivo</h2>
+  <div class="prose"><p>Mueve B y C, cambia los precios de X y A, e invierte la dirección para ver el patrón bajista. El botón de simular fallo lleva D al siguiente nivel de la escalera y te dice a qué patrón migra con tu B. Si llevas C más allá de A, aparece la conversión a Cypher.</p></div>
+  <div class="lab">
+    <div class="controls">
+      <label>Patrón
+        <select id="pat">
+          <option value="gartley">Gartley</option><option value="bat">Bat</option><option value="altbat">Alt Bat</option>
+          <option value="butterfly">Butterfly</option><option value="crab">Crab</option><option value="deepcrab">Deep Crab</option>
+          <option value="cypher">Cypher</option>
+        </select></label>
+      <div class="row2">
+        <label>Precio X<input id="inX" type="number" step="any" value="100"></label>
+        <label>Precio A<input id="inA" type="number" step="any" value="150"></label>
+      </div>
+      <button class="btn" id="swap" type="button">Invertir dirección</button>
+      <p class="dir" id="dirLbl"></p>
+      <label>B = AB / XA <output id="bOut"></output><input id="bR" type="range" min="0.2" max="1.1" step="0.001"></label>
+      <label><span id="cLbl">C = BC / AB</span> <output id="cOut"></output><input id="cR" type="range" min="0.2" max="1.3" step="0.001"></label>
+      <fieldset><legend>Stop loss</legend>
+        <label><input type="radio" name="sl" value="cons" checked> Conservador</label>
+        <label><input type="radio" name="sl" value="agr"> Agresivo</label>
+      </fieldset>
+      <fieldset><legend>Objetivos medidos sobre</legend>
+        <label><input type="radio" name="tp" value="AD" checked> AD</label>
+        <label><input type="radio" name="tp" value="CD"> CD</label>
+      </fieldset>
+      <button class="btn primary" id="fail" type="button">Simular: el precio atraviesa D</button>
+      <button class="btn" id="toCy" type="button" hidden>Convertir a Cypher</button>
+      <button class="btn" id="ideal" type="button">Restablecer ratios ideales</button>
+      <button class="btn" id="ex" type="button">Cargar el ejemplo del Gartley</button>
+    </div>
+    <div class="labout">
+      <div class="chartbox chart" id="labChart"></div>
+      <div class="cands">Patrones compatibles con este B: <span id="cands"></span></div>
+      <div id="msgs" aria-live="polite"></div>
+      <div class="tablewrap"><table id="labTable"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="resumen">
+  <h2><span class="n">9</span>Resumen operativo</h2>
+  <ol class="steps">
+    <li>Mide B y usa el árbol de decisión para saber qué patrones son posibles.</li>
+    <li>Cuando C se confirme, comprueba que no supere A. Si lo supera, evalúa un Cypher.</li>
+    <li>Calcula la PRZ con el nivel de XA, la extensión de BC más cercana dentro del rango del patrón y, si cae cerca, AB=CD.</li>
+    <li>Coloca el stop justo después del siguiente nivel de la escalera que pertenece a otro patrón.</li>
+    <li>Pon los objetivos en 0.382 y 0.618 de AD (o de CD, pero siempre el mismo método).</li>
+    <li>Calcula el R:R antes de entrar. Si no llega a 1.5–2, descarta el setup aunque el patrón sea perfecto.</li>
+    <li>Si salta el stop, revisa si tu B permite migrar al siguiente patrón de la escalera o si es una ruptura con nuevo X.</li>
+  </ol>
+</section>
+
+<footer>
+  Material educativo sobre la mecánica de los patrones armónicos, basado en los ratios estándar de Scott Carney. No es asesoramiento financiero ni una recomendación de operar. Valida estas reglas con backtesting en tu mercado y temporalidad antes de arriesgar capital.
+</footer>
+</main>
+
+<script>
+const TOL=0.03;
+const FIBS=[1.13,1.272,1.414,1.618,2,2.24,2.618,3.14,3.618];
+const ABCD_R=[1,1.272,1.618];
+const LADDER=[0.786,0.886,1,1.13,1.27,1.414,1.618,2,2.24,2.618];
+const PATTERNS={
+  gartley:{name:'Gartley',b:[.618,.618],bIdeal:.618,cIdeal:.618,d:.786,bc:[1.272,1.618],sl:{cons:1,agr:.886},kind:'retro'},
+  bat:{name:'Bat',b:[.382,.5],bIdeal:.45,cIdeal:.618,d:.886,bc:[1.618,2.618],sl:{cons:1.13,agr:1},kind:'retro'},
+  altbat:{name:'Alt Bat',b:[.3,.382],bIdeal:.35,cIdeal:.886,d:1.13,bc:[2,3.618],sl:{cons:1.27,agr:1.13},kind:'ext'},
+  butterfly:{name:'Butterfly',b:[.786,.786],bIdeal:.786,cIdeal:.618,d:1.27,bc:[1.618,2.618],sl:{cons:1.618,agr:1.414},kind:'ext'},
+  crab:{name:'Crab',b:[.382,.618],bIdeal:.55,cIdeal:.886,d:1.618,bc:[2.618,3.618],sl:{cons:2.24,agr:2},kind:'ext'},
+  deepcrab:{name:'Deep Crab',b:[.886,.886],bIdeal:.886,cIdeal:.5,d:1.618,bc:[2,3.618],sl:{cons:2,agr:1.618},kind:'ext'},
+  cypher:{name:'Cypher',b:[.382,.618],bIdeal:.5,cxIdeal:1.35,d:.786,sl:{cons:1,agr:.886},kind:'esp',cypher:true}
+};
+const lvl=(p1,p2,r)=>p2-r*(p2-p1);
+const fr=r=>{let s=(+r).toFixed(3);s=s.replace(/0+$/,'').replace(/\.$/,'');return s;};
+const fpFactory=xa=>{const d=xa<2?4:xa<20?2:xa<500?1:0;return v=>(+v).toFixed(d);};
+const bFits=(P,b)=>b>=P.b[0]-TOL&&b<=P.b[1]+TOL;
+const candidates=b=>Object.keys(PATTERNS).filter(k=>bFits(PATTERNS[k],b));
+
+function compute(s){
+  const P=PATTERNS[s.key],X=+s.X,A=+s.A,dir=A>X?1:-1,xa=Math.abs(A-X),buf=0.02*xa;
+  const B=lvl(X,A,s.b);
+  const dR=(s.dOverride!=null)?s.dOverride:P.d;
+  let C,D,proj=[],ref;
+  if(P.cypher){
+    C=lvl(A,X,s.cx); D=lvl(X,C,dR);
+    proj.push({label:fr(dR)+' XC',v:D,main:true,inPrz:true}); ref=C;
+  }else{
+    C=lvl(A,B,s.c); D=lvl(X,A,dR);
+    proj.push({label:fr(dR)+' XA',v:D,main:true,inPrz:true});
+    const bc=C-B; let best=null;
+    for(const f of FIBS){if(f<P.bc[0]-1e-9||f>P.bc[1]+1e-9)continue;const v=C-f*bc;if(!best||Math.abs(v-D)<Math.abs(best.v-D))best={f,v};}
+    if(best)proj.push({label:fr(best.f)+' BC',v:best.v,f:best.f,inPrz:true});
+    let bestA=null; const ab=A-B;
+    for(const f of ABCD_R){const v=C-f*ab;if(!bestA||Math.abs(v-D)<Math.abs(bestA.v-D))bestA={f,v};}
+    const near=Math.abs(bestA.v-D)<=0.10*xa;
+    proj.push({label:(bestA.f===1?'AB=CD':'AB=CD '+fr(bestA.f))+(near?'':' (no suma)'),v:bestA.v,inPrz:near,abcd:true});
+    ref=A;
+  }
+  const slAt=mode=>{
+    let r=mode==='agr'?P.sl.agr:P.sl.cons;
+    if((s.dOverride!=null&&r<=dR+1e-9)||r<dR-1e-9){const n=LADDER.find(l=>l>dR+1e-9);r=n!=null?n:dR*1.15;}
+    const lv=P.cypher?lvl(X,C,r):lvl(X,A,r);
+    return {r,v:lv-dir*buf};
+  };
+  const sc=slAt('cons'),sa=slAt('agr'),cur=s.slMode==='agr'?sa:sc;
+  const TP1=D+.382*(ref-D),TP2=D+.618*(ref-D),TP1c=D+.382*(C-D),TP2c=D+.618*(C-D);
+  const risk=Math.abs(D-cur.v);
+  const pz=proj.filter(p=>p.inPrz).map(p=>p.v);
+  return {P,X,A,B,C,D,dir,xa,dR,proj,prz:[Math.min(...pz),Math.max(...pz)],
+    SL:cur.v,slR:cur.r,slCons:sc.v,slAgr:sa.v,TP1,TP2,TP1c,TP2c,risk,
+    rr1:Math.abs(TP1-D)/risk,rr2:Math.abs(TP2-D)/risk,rr1c:Math.abs(TP1c-D)/risk,rr2c:Math.abs(TP2c-D)/risk,s};
+}
+
+function chartSVG(r,opt){
+  const o=Object.assign({W:820,H:460,grid:true,prz:true,proj:true,trade:true,ratios:true,tp:'AD',sl:'one',compact:false,draw:false,xLine:true,label:''},opt);
+  const W=o.W,H=o.H,compact=o.compact;
+  const padL=compact?10:62,padR=compact?10:190,padT=compact?18:30,padB=compact?20:30;
+  const fp=fpFactory(r.xa);
+  const names=['X','A','B','C','D'],v5=[r.X,r.A,r.B,r.C,r.D];
+  const x0=padL+(compact?8:16),x1=W-padR-(compact?8:56);
+  const xs=v5.map((_,i)=>x0+(x1-x0)*i/4);
+  const tpLbl=r.P.cypher?'CD':'AD';
+  const lines=[];
+  if(o.trade){
+    if(o.sl==='both'){lines.push({v:r.slCons,t:'SL conservador '+fp(r.slCons),c:'bear'});lines.push({v:r.slAgr,t:'SL agresivo '+fp(r.slAgr),c:'bear',dash:true});}
+    else lines.push({v:r.SL,t:'SL '+fp(r.SL),c:'bear'});
+    lines.push({v:r.D,t:'Entrada '+fp(r.D),c:'ink'});
+    if(o.tp==='AD'||o.tp==='both'){lines.push({v:r.TP1,t:'TP1 ('+tpLbl+') '+fp(r.TP1),c:'bull'});lines.push({v:r.TP2,t:'TP2 ('+tpLbl+') '+fp(r.TP2),c:'bull'});}
+    if(o.tp==='CD'||o.tp==='both'){lines.push({v:r.TP1c,t:'TP1 (CD) '+fp(r.TP1c),c:'bull',dash:o.tp==='both'});lines.push({v:r.TP2c,t:'TP2 (CD) '+fp(r.TP2c),c:'bull',dash:o.tp==='both'});}
+  }
+  let all=[...v5,...lines.map(l=>l.v)];
+  if(o.proj&&!compact)all.push(...r.proj.map(p=>p.v));
+  let mn=Math.min(...all),mx=Math.max(...all);const pad=(mx-mn)*0.07||1;mn-=pad;mx+=pad;
+  const y=v=>padT+(mx-v)/(mx-mn)*(H-padT-padB);
+  const xEnd=W-padR,P=[],right=[];
+  if(o.grid&&!compact){for(let i=0;i<=4;i++){const v=mn+(mx-mn)*i/4,yy=y(v);P.push(`<line class="g-grid" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}"/><text class="g-lbl" x="${padL-8}" y="${yy+4}" text-anchor="end">${fp(v)}</text>`);}}
+  if(o.prz&&!compact){const a=y(r.prz[1]),b=y(r.prz[0]);P.push(`<rect class="g-prz" x="${xs[3]}" y="${a}" width="${xEnd-xs[3]}" height="${Math.max(3,b-a)}"/>`);right.push({y:(a+b)/2,t:'PRZ '+fp(r.prz[0])+' – '+fp(r.prz[1]),c:'t-fib'});}
+  if(o.xLine){const yy=y(r.X);P.push(`<line class="g-xline" x1="${xs[0]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`);if(!compact)right.push({y:yy,t:'Nivel X '+fp(r.X),c:'t-muted'});}
+  const pt=i=>`${xs[i].toFixed(1)},${y(v5[i]).toFixed(1)}`;
+  P.push(`<polygon class="g-tri" points="${pt(0)} ${pt(1)} ${pt(2)}"/><polygon class="g-tri" points="${pt(2)} ${pt(3)} ${pt(4)}"/>`);
+  const conn=(i,j,t)=>{const ax=xs[i],ay=y(v5[i]),bx=xs[j],by=y(v5[j]);P.push(`<line class="g-conn" x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"/>`);if(t)P.push(`<text class="g-ratio" x="${(ax+bx)/2}" y="${(ay+by)/2+4}" text-anchor="middle"${compact?' style="font-size:11px"':''}>${t}</text>`);};
+  if(o.ratios){
+    if(compact)conn(0,4,fr(r.dR)+(r.P.cypher?' XC':' XA'));
+    else if(r.P.cypher){conn(0,2,'B '+fr(r.s.b));conn(0,3,'C '+fr(r.s.cx)+' XA');conn(0,4,fr(r.dR)+' XC');}
+    else{conn(0,2,'B '+fr(r.s.b));conn(1,3,'C '+fr(r.s.c));const bc=r.proj.find(p=>p.f);conn(2,4,bc?bc.label:'');conn(0,4,fr(r.dR)+' XA');}
+  }
+  if(o.proj&&!compact){for(const p of r.proj){const yy=y(p.v);P.push(`<line class="g-proj${p.inPrz?'':' off'}" x1="${xs[4]-38}" x2="${xs[4]+38}" y1="${yy}" y2="${yy}"/>`);if(!(p.main&&o.trade))right.push({y:yy,t:p.label+' '+fp(p.v),c:'t-fib'});}}
+  for(const l of lines){const yy=y(l.v);P.push(`<line class="g-trade l-${l.c}${l.dash?' dash':''}" x1="${xs[4]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`);right.push({y:yy,t:l.t,c:'t-'+l.c});}
+  P.push(`<polyline class="g-path${o.draw?' draw':''}" pathLength="1" points="${[0,1,2,3,4].map(pt).join(' ')}"/>`);
+  names.forEach((n,i)=>{const yy=y(v5[i]);const high=(i%2===1)===(r.dir===1);
+    P.push(`<circle class="g-pt" cx="${xs[i]}" cy="${yy}" r="${compact?2.8:4.5}"/><text class="g-letter${compact?' sm':''}" x="${xs[i]}" y="${high?yy-(compact?7:12):yy+(compact?15:23)}" text-anchor="middle">${n}</text>`);});
+  if(!compact&&right.length){
+    right.sort((a,b)=>a.y-b.y);const gap=16,ys=right.map(q=>q.y);
+    for(let i=1;i<ys.length;i++)if(ys[i]<ys[i-1]+gap)ys[i]=ys[i-1]+gap;
+    const over=ys[ys.length-1]-(H-6);if(over>0){ys[ys.length-1]-=over;for(let i=ys.length-2;i>=0;i--)if(ys[i]>ys[i+1]-gap)ys[i]=ys[i+1]-gap;}
+    right.forEach((it,i)=>{P.push(`<line class="g-lead" x1="${xEnd+2}" y1="${it.y}" x2="${xEnd+12}" y2="${ys[i]}"/><text class="g-rl ${it.c}" x="${xEnd+16}" y="${ys[i]+4}">${it.t}</text>`);});
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${o.label}">${P.join('')}</svg>`;
+}
+
+function retroSVG(){
+  const W=820,H=320,lo=62,hi=156,y=v=>20+(hi-v)/(hi-lo)*(H-40),P=[];
+  P.push(`<rect class="g-reg1" x="40" y="${y(150)}" width="${W-60}" height="${y(100)-y(150)}"/>`);
+  P.push(`<rect class="g-reg2" x="40" y="${y(100)}" width="${W-60}" height="${y(lo)-y(100)}"/>`);
+  P.push(`<text class="g-lbl strong t-acc" x="270" y="${y(150)+20}">Retroceso: 0 &lt; r &lt; 1, el nivel queda dentro del tramo</text>`);
+  P.push(`<text class="g-lbl strong t-fib" x="270" y="${y(100)+20}">Extensión: r &gt; 1, el nivel supera el origen P1</text>`);
+  [.382,.618,.786,1,1.272,1.618].forEach(r=>{const v=lvl(100,150,r),yy=y(v);
+    P.push(`<line class="${r===1?'g-xrow':'g-proj'}" x1="250" x2="${W-200}" y1="${yy}" y2="${yy}"/><text class="g-rl ${r===1?'t-ink':'t-fib'}" x="${W-190}" y="${yy+4}">r = ${fr(r)}  →  ${v.toFixed(1)}</text>`);});
+  P.push(`<line class="g-path" x1="110" y1="${y(100)}" x2="250" y2="${y(150)}"/>`);
+  P.push(`<circle class="g-pt" cx="110" cy="${y(100)}" r="5"/><circle class="g-pt" cx="250" cy="${y(150)}" r="5"/>`);
+  P.push(`<text class="g-letter" x="100" y="${y(100)+24}" text-anchor="middle">P1 = 100</text><text class="g-letter" x="200" y="${y(150)+4}" text-anchor="end">P2 = 150</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Retroceso frente a extensión">${P.join('')}</svg>`;
+}
+
+function bMapSVG(){
+  const keys=['altbat','bat','crab','cypher','gartley','butterfly','deepcrab'];
+  const W=820,left=120,right=24,top=14,laneH=30,H=top+keys.length*laneH+46;
+  const lo=.25,hi=.95,x=v=>left+(v-lo)/(hi-lo)*(W-left-right),P=[];
+  [.3,.382,.5,.618,.707,.786,.886].forEach(t=>P.push(`<line class="g-grid" x1="${x(t)}" x2="${x(t)}" y1="${top-4}" y2="${H-38}"/><text class="g-lbl" x="${x(t)}" y="${H-22}" text-anchor="middle">${fr(t)}</text>`));
+  keys.forEach((k,i)=>{const p=PATTERNS[k],cy=top+i*laneH+laneH/2;
+    P.push(`<text class="g-name" x="${left-12}" y="${cy+4}" text-anchor="end">${p.name}</text>`);
+    P.push(`<rect class="g-tol" x="${x(p.b[0]-TOL)}" y="${cy-8}" width="${x(p.b[1]+TOL)-x(p.b[0]-TOL)}" height="16" rx="8"/>`);
+    if(p.b[1]-p.b[0]>1e-6)P.push(`<rect class="k-${p.kind}" x="${x(p.b[0])}" y="${cy-4}" width="${x(p.b[1])-x(p.b[0])}" height="8" rx="4"/>`);
+    else P.push(`<circle class="k-${p.kind}" cx="${x(p.b[0])}" cy="${cy}" r="5.5"/>`);});
+  P.push(`<text class="g-lbl" x="${W-right}" y="${H-4}" text-anchor="end">B = AB / XA</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rango de B por patrón">${P.join('')}</svg>`;
+}
+
+function dMapSVG(){
+  const keys=['gartley','bat','cypher','altbat','butterfly','crab','deepcrab'];
+  const W=820,left=120,right=30,top=40,laneH=30,H=top+keys.length*laneH+46;
+  const lo=.7,hi=1.72,x=v=>left+(v-lo)/(hi-lo)*(W-left-right),P=[];
+  P.push(`<rect class="g-reg1" x="${x(lo)}" y="${top-8}" width="${x(1)-x(lo)}" height="${H-top-38}"/><rect class="g-reg2" x="${x(1)}" y="${top-8}" width="${x(hi)-x(1)}" height="${H-top-38}"/>`);
+  P.push(`<text class="g-lbl strong t-acc" x="${x(lo)+6}" y="${top-16}">D antes de X: retroceso</text><text class="g-lbl strong t-fib" x="${x(1)+8}" y="${top-16}">D más allá de X: extensión</text>`);
+  [.786,.886,1.13,1.27,1.414,1.618].forEach(t=>P.push(`<line class="g-grid" x1="${x(t)}" x2="${x(t)}" y1="${top-8}" y2="${H-38}"/><text class="g-lbl" x="${x(t)}" y="${H-22}" text-anchor="middle">${fr(t)}</text>`));
+  P.push(`<line class="g-xrow" x1="${x(1)}" x2="${x(1)}" y1="${top-8}" y2="${H-38}"/><text class="g-lbl strong" x="${x(1)}" y="${H-22}" text-anchor="middle">1 (X)</text>`);
+  keys.forEach((k,i)=>{const p=PATTERNS[k],cy=top+i*laneH+laneH/2;
+    P.push(`<text class="g-name" x="${left-12}" y="${cy+4}" text-anchor="end">${p.name}</text>`);
+    if(k==='butterfly')P.push(`<rect class="g-tol" x="${x(1.27)}" y="${cy-5}" width="${x(1.618)-x(1.27)}" height="10" rx="5"/>`);
+    P.push(`<circle class="k-${p.kind}" cx="${x(p.d)}" cy="${cy}" r="6"/><text class="g-rl t-ink" x="${x(p.d)+11}" y="${cy+4}">${fr(p.d)}${p.cypher?' de XC':''}</text>`);});
+  P.push(`<text class="g-lbl" x="${W-right}" y="${H-4}" text-anchor="end">D como fracción de XA</text>`);
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Posición de D por patrón">${P.join('')}</svg>`;
+}
+
+function ladderSVG(){
+  const W=820,top=76,rowH=38,left=86,H=top+LADDER.length*rowH+12;
+  const yOf=l=>top+LADDER.indexOf(l)*rowH+rowH/2,P=[];
+  P.push(`<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="g-arrowhead" d="M0,0 L10,5 L0,10 z"/></marker></defs>`);
+  P.push(`<rect class="g-reg2" x="${left-10}" y="${yOf(1)}" width="${W-left}" height="${H-yOf(1)-6}"/>`);
+  P.push(`<text class="g-lbl" x="10" y="18">Profundidad de D sobre XA. En un alcista, más abajo significa precio más bajo.</text>`);
+  LADDER.forEach(l=>{const yy=yOf(l);P.push(`<line class="${l===1?'g-xrow':'g-grid'}" x1="${left-10}" x2="${W-10}" y1="${yy}" y2="${yy}"/><text class="g-lbl${l===1?' strong':''}" x="${left-18}" y="${yy+4}" text-anchor="end">${l===1?'1 (X)':fr(l)}</text>`);});
+  const cols=[
+    {h:'B = 0.618',n:[[.786,'Gartley'],[1.618,'Crab'],[2.24,'Invalidación']]},
+    {h:'B ≈ 0.382',n:[[.886,'Bat'],[1.13,'Alt Bat'],[1.618,'Crab'],[2.24,'Invalidación']]},
+    {h:'B = 0.786',n:[[1.27,'Butterfly'],[1.618,'Butterfly alterno'],[2,'Invalidación']]},
+    {h:'B = 0.886',n:[[1.618,'Deep Crab'],[2,'Invalidación']]}];
+  const colW=(W-left-20)/4,cx=i=>left+colW*i+24;
+  cols.forEach((c,i)=>{const X=cx(i);
+    P.push(`<text class="g-name" x="${X-8}" y="${top-24}">${c.h}</text>`);
+    c.n.forEach((nd,j)=>{const yy=yOf(nd[0]);
+      if(j>0){const yp=yOf(c.n[j-1][0]);P.push(`<line class="g-arrow" x1="${X}" y1="${yp+9}" x2="${X}" y2="${yy-11}" marker-end="url(#arr)"/>`);}
+      if(nd[1]==='Invalidación')P.push(`<line class="g-x" x1="${X-6}" y1="${yy-6}" x2="${X+6}" y2="${yy+6}"/><line class="g-x" x1="${X+6}" y1="${yy-6}" x2="${X-6}" y2="${yy+6}"/><text class="g-rl t-bear" x="${X+14}" y="${yy+4}">Stop: nuevo X</text>`);
+      else P.push(`<circle class="g-node" cx="${X}" cy="${yy}" r="6"/><text class="g-rl t-ink" x="${X+14}" y="${yy+4}">${nd[1]}</text>`);});});
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalera de conversiones">${P.join('')}</svg>`;
+}
+
+function abcdSVG(){
+  const W=240,H=150,v=[1,.4,.771,.171],xs=[24,84,150,214],y=q=>16+(1-q)*(H-40);
+  const pts=v.map((q,i)=>`${xs[i]},${y(q)}`).join(' ');
+  let s=`<polyline class="g-path" points="${pts}"/>`;
+  s+=`<line class="g-conn" x1="${xs[0]}" y1="${y(v[0])}" x2="${xs[1]}" y2="${y(v[1])}"/>`;
+  s+=`<text class="g-ratio" x="${(xs[2]+xs[3])/2+20}" y="${(y(v[2])+y(v[3]))/2}" style="font-size:11px">CD = AB</text>`;
+  ['A','B','C','D'].forEach((n,i)=>{const hi=i%2===0;s+=`<circle class="g-pt" cx="${xs[i]}" cy="${y(v[i])}" r="2.8"/><text class="g-letter sm" x="${xs[i]}" y="${hi?y(v[i])-7:y(v[i])+15}" text-anchor="middle">${n}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AB=CD">${s}</svg>`;
+}
+
+function buildStatic(){
+  const ex={key:'gartley',X:100,A:150,b:.618,c:.618,slMode:'cons'};
+  const rEx=compute(ex);
+  document.getElementById('heroChart').innerHTML=chartSVG(rEx,{trade:false,grid:false,draw:true,H:400,label:'Gartley alcista anotado'});
+  document.getElementById('retroChart').innerHTML=retroSVG();
+  document.getElementById('przChart').innerHTML=chartSVG(rEx,{trade:false,label:'PRZ del Gartley'});
+  document.getElementById('exChart').innerHTML=chartSVG(rEx,{sl:'both',tp:'AD',label:'Ejemplo con stops'});
+  document.getElementById('tpChart').innerHTML=chartSVG(rEx,{tp:'both',proj:false,prz:false,label:'Objetivos AD y CD'});
+  document.getElementById('bMap').innerHTML=bMapSVG();
+  document.getElementById('dMap').innerHTML=dMapSVG();
+  document.getElementById('ladder').innerHTML=ladderSVG();
+  const kindTxt={retro:'Retroceso',ext:'Extensión',esp:'Especial'};
+  let html='';
+  ['gartley','bat','altbat','butterfly','crab','deepcrab','cypher'].forEach(k=>{
+    const p=PATTERNS[k];
+    const r=compute({key:k,X:100,A:150,b:p.bIdeal,c:p.cIdeal||.5,cx:p.cxIdeal||1.3,slMode:'cons'});
+    const bTxt=p.b[0]===p.b[1]?fr(p.b[0]):(k==='altbat'?'≤ 0.382':fr(p.b[0])+'–'+fr(p.b[1]));
+    html+=`<div class="mini"><h4>${p.name}<span class="tag ${p.kind}">${kindTxt[p.kind]}</span></h4><p>B ${bTxt}, D ${fr(p.d)}${p.cypher?' XC':' XA'}</p>${chartSVG(r,{compact:true,W:240,H:170,trade:false,prz:false,proj:false,grid:false,label:p.name})}</div>`;});
+  html+=`<div class="mini"><h4>AB=CD<span class="tag esp">Base</span></h4><p>C 0.382–0.886, CD igual a AB</p>${abcdSVG()}</div>`;
+  document.getElementById('minis').innerHTML=html;
+}
+
+/* laboratorio */
+const st={key:'gartley',X:100,A:150,b:.618,c:.618,cx:1.35,dOverride:null,slMode:'cons',tpMode:'AD',sim:'',broken:false};
+const $=id=>document.getElementById(id);
+function setIdeal(){const P=PATTERNS[st.key];st.b=P.bIdeal;if(P.cypher)st.cx=P.cxIdeal;else st.c=P.cIdeal;st.dOverride=null;st.sim='';st.broken=false;}
+function syncControls(){
+  const P=PATTERNS[st.key];$('pat').value=st.key;$('bR').value=st.b;
+  const cR=$('cR');
+  if(P.cypher){cR.min=1.1;cR.max=1.6;cR.value=st.cx;$('cLbl').textContent='C como extensión de XA';}
+  else{cR.min=0.2;cR.max=1.3;cR.value=st.c;$('cLbl').textContent='C = BC / AB';}
+  $('inX').value=st.X;$('inA').value=st.A;
+}
+function update(){
+  const P=PATTERNS[st.key];
+  $('bOut').textContent=fr(st.b);$('cOut').textContent=fr(P.cypher?st.cx:st.c);
+  if(!isFinite(st.X)||!isFinite(st.A)||st.X===st.A){$('labChart').innerHTML='';$('msgs').innerHTML='<div class="msg warn">Introduce precios distintos para X y A.</div>';$('labTable').innerHTML='';return;}
+  const r=compute(st),fp=fpFactory(r.xa);
+  $('dirLbl').textContent=r.dir===1?'Alcista: X abajo, A arriba, compra en D.':'Bajista: X arriba, A abajo, venta en D.';
+  $('labChart').innerHTML=chartSVG(r,{tp:st.tpMode,label:'Patrón '+P.name});
+  const cs=st.b>1?[]:candidates(st.b);
+  $('cands').innerHTML=cs.length?cs.map(k=>`<span class="chip${k===st.key?' on':''}">${PATTERNS[k].name}</span>`).join(''):'<span class="chip">ninguno</span>';
+  const m=[];
+  if(st.sim)m.push(['info',st.sim]);
+  if(st.b>1)m.push(['warn','B supera X (B > 1): no es un XABCD clásico. Redefine X o evalúa un Shark.']);
+  else if(!bFits(P,st.b)){const lst=cs.map(k=>PATTERNS[k].name).join(', ');m.push(['warn',`B = ${fr(st.b)} no encaja con ${P.name}. ${lst?'Por B, los candidatos son: '+lst+'.':'Está en una zona gris: ningún patrón clásico lo admite.'}`]);}
+  if(!P.cypher){
+    if(st.c>1)m.push(['warn','C supera A: el XABCD clásico queda invalidado. Evalúa un Cypher con el botón de conversión.']);
+    else if(st.c>.886+TOL)m.push(['warn','C por encima de 0.886 de AB: fuera del rango estándar (0.382–0.886).']);
+    else if(st.c<.382-TOL)m.push(['warn','C por debajo de 0.382 de AB: estructura débil, CD tendrá que extenderse muchísimo.']);
+  }else if(st.cx<1.272-TOL||st.cx>1.414+TOL)m.push(['warn','En un Cypher, C debe extender XA entre 1.272 y 1.414.']);
+  const w=(r.prz[1]-r.prz[0])/r.xa;
+  if(w>.12)m.push(['warn',`PRZ ancha (${(w*100).toFixed(0)}% de XA): la confluencia es débil.`]);
+  const rr1=st.tpMode==='CD'?r.rr1c:r.rr1,rr2=st.tpMode==='CD'?r.rr2c:r.rr2;
+  if(rr1<1)m.push(['warn',`R:R hasta TP1 de ${rr1.toFixed(2)}: el setup no compensa el riesgo.`]);
+  if(!m.length)m.push(['ok','Ratios dentro del rango del patrón y confluencia aceptable.']);
+  $('msgs').innerHTML=m.map(x=>`<div class="msg ${x[0]}">${x[1]}</div>`).join('');
+  const T1=st.tpMode==='CD'?r.TP1c:r.TP1,T2=st.tpMode==='CD'?r.TP2c:r.TP2,base=P.cypher?' XC':' XA';
+  const rows=[['B',fp(r.B),fr(st.b)+' de XA'],['C',fp(r.C),P.cypher?fr(st.cx)+' de XA (más allá de A)':fr(st.c)+' de AB'],['D (entrada)',fp(r.D),fr(r.dR)+base]];
+  r.proj.filter(p=>!p.main).forEach(p=>rows.push(['Proyección '+p.label,fp(p.v),p.inPrz?'dentro de la PRZ':'demasiado lejos de D']));
+  rows.push(['PRZ',fp(r.prz[0])+' – '+fp(r.prz[1]),(w*100).toFixed(1)+'% de XA']);
+  rows.push(['Stop loss',fp(r.SL),'más allá de '+fr(r.slR)+base+' + colchón de 2% de XA']);
+  rows.push(['TP1',fp(T1),'0.382 de '+(st.tpMode==='CD'||P.cypher?'CD':'AD')]);
+  rows.push(['TP2',fp(T2),'0.618 de '+(st.tpMode==='CD'||P.cypher?'CD':'AD')]);
+  rows.push(['Riesgo',fp(r.risk),'distancia entrada–stop']);
+  rows.push(['R:R',rr1.toFixed(2)+' / '+rr2.toFixed(2),'hasta TP1 / TP2']);
+  $('labTable').innerHTML='<tr><th>Nivel</th><th>Precio</th><th>Detalle</th></tr>'+rows.map(x=>`<tr><td>${x[0]}</td><td class="num"><b>${x[1]}</b></td><td>${x[2]}</td></tr>`).join('');
+  $('fail').disabled=!!P.cypher||st.broken;
+  $('toCy').hidden=!!P.cypher||st.c<=1;
+}
+function simulateFail(){
+  const P=PATTERNS[st.key];if(P.cypher)return;
+  const dR=st.dOverride!=null?st.dOverride:P.d;
+  if(st.key==='butterfly'&&dR<1.618-1e-9){st.dOverride=1.618;st.sim='El precio atravesó 1.27 XA. El Butterfly admite su extensión alterna en 1.618 XA: mismo patrón, nuevo D y nuevo stop.';return update();}
+  const next=Object.keys(PATTERNS).filter(k=>!PATTERNS[k].cypher&&PATTERNS[k].d>dR+1e-9&&bFits(PATTERNS[k],st.b)).sort((a,b)=>PATTERNS[a].d-PATTERNS[b].d)[0];
+  if(next){
+    const crossX=dR<1&&PATTERNS[next].d>1;
+    st.sim=`El precio atravesó ${fr(dR)} XA${crossX?' y rompió X':''}. Con B = ${fr(st.b)}, el siguiente patrón compatible es ${PATTERNS[next].name}, con D en ${fr(PATTERNS[next].d)} XA.`;
+    st.key=next;st.dOverride=null;$('pat').value=next;
+  }else{
+    st.sim=`Con B = ${fr(st.b)} no hay ningún patrón compatible más allá de ${fr(dR)} XA. Es una ruptura: el extremo que marque el precio será el nuevo X de una estructura en la dirección del movimiento.`;
+    st.broken=true;
+  }
+  update();
+}
+function initLab(){
+  syncControls();
+  $('pat').addEventListener('change',e=>{st.key=e.target.value;setIdeal();syncControls();update();});
+  $('bR').addEventListener('input',e=>{st.b=+e.target.value;st.sim='';st.broken=false;st.dOverride=null;update();});
+  $('cR').addEventListener('input',e=>{if(PATTERNS[st.key].cypher)st.cx=+e.target.value;else st.c=+e.target.value;st.sim='';update();});
+  $('inX').addEventListener('input',e=>{st.X=parseFloat(e.target.value);update();});
+  $('inA').addEventListener('input',e=>{st.A=parseFloat(e.target.value);update();});
+  $('swap').addEventListener('click',()=>{const t=st.X;st.X=st.A;st.A=t;syncControls();update();});
+  document.querySelectorAll('input[name=sl]').forEach(i=>i.addEventListener('change',e=>{st.slMode=e.target.value;update();}));
+  document.querySelectorAll('input[name=tp]').forEach(i=>i.addEventListener('change',e=>{st.tpMode=e.target.value;update();}));
+  $('fail').addEventListener('click',simulateFail);
+  $('ideal').addEventListener('click',()=>{setIdeal();syncControls();update();});
+  $('ex').addEventListener('click',()=>{Object.assign(st,{key:'gartley',X:100,A:150,b:.618,c:.618,dOverride:null,sim:'',broken:false});syncControls();update();});
+  $('toCy').addEventListener('click',()=>{const r=compute(st);const cx=(r.C-r.X)/(r.A-r.X);st.key='cypher';st.cx=Math.min(1.6,Math.max(1.1,cx));st.dOverride=null;st.sim=`Convertido a Cypher: C queda en ${fr(cx)} de XA. D pasa a medirse como 0.786 de XC y los objetivos sobre CD.`;syncControls();update();});
+  update();
+}
+buildStatic();
+initLab();
+</script>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="/_runtime/mermaid-11.16.1.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+</body>
+</html>

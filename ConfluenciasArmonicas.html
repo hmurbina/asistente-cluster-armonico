@@ -1,0 +1,1923 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confluencias armónicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=STIX+Two+Text:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4; --surface:#FFFFFF; --ink:#16233A; --muted:#5A6678; --grid:#DDE3EA; --line:#CCD4DE;
+  --accent:#3446C4; --tri:rgba(52,70,196,.09); --fib:#A97A12; --prz:rgba(201,148,32,.17);
+  --bull:#157455; --bear:#B3303D;
+  --tint-bear:rgba(179,48,61,.08); --tint-acc:rgba(52,70,196,.08); --tint-bull:rgba(21,116,85,.09); --tint-fib:rgba(201,148,32,.10);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+    --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+    --bull:#4FC79C; --bear:#FF6F7C;
+    --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+  --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+  --bull:#4FC79C; --bear:#FF6F7C;
+  --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1260px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+svg{max-width:100%}
+.m{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.08em}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* hero */
+.hero{padding:44px 0 22px}
+.hero .kicker{color:var(--fib);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.15rem;margin:0 0 4px}
+.hero input.title{display:block;width:100%;background:transparent;border:0;border-bottom:2px dashed transparent;color:var(--ink);
+  font:800 clamp(2.4rem,7vw,4.8rem)/1 "Schibsted Grotesk",system-ui,sans-serif;letter-spacing:-.025em;padding:0 0 6px;margin:0 0 12px}
+.hero input.title::placeholder{color:var(--line)}
+.hero input.title:hover{border-bottom-color:var(--line)}
+.hero input.title:focus{outline:none;border-bottom-color:var(--accent)}
+.hero .lead{font-size:1.12rem;max-width:680px;color:var(--muted);margin:0 0 20px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.toolbar .fieldset-inline{display:flex;flex-direction:column;gap:3px;font-size:.86rem;font-weight:600;color:var(--muted)}
+.toolbar select,.toolbar input{padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400;font-size:.95rem}
+.toolbar .spacer{flex:1}
+.dirty{font-size:.86rem;color:var(--bear);font-weight:600}
+
+/* toc */
+.toc{margin:18px 0 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.toc ol{margin:0;padding-left:1.3rem;display:flex;flex-wrap:wrap;gap:4px 34px}
+.toc li::marker{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib)}
+
+h2{font-size:clamp(1.5rem,3.2vw,2rem);line-height:1.15;letter-spacing:-.01em;margin:3.2rem 0 .5rem;font-weight:800}
+h2 .n{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:600;color:var(--fib);margin-right:.35em}
+.intro{max-width:760px;color:var(--muted);margin:.2rem 0 1rem}
+
+/* botones */
+.btn{display:inline-block;padding:.5rem .85rem;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;font-size:.95rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sm{padding:.2rem .55rem;font-size:.84rem;font-weight:500}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.controls .btn.block{display:block;width:100%;margin:.45rem 0;text-align:left}
+
+/* lab */
+.lab{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;margin:1rem 0}
+@media (max-width:900px){.lab{grid-template-columns:1fr}}
+.controls{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;align-self:start}
+.controls h3{margin:0 0 .4rem;font-size:1.05rem}
+.controls label{display:block;margin:.6rem 0;font-weight:600;font-size:.92rem}
+.controls label .opt{font-weight:400;color:var(--muted)}
+.controls output{float:right;font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.1rem;color:var(--accent)}
+.controls select,.controls input[type=text],.controls input[type=number]{width:100%;margin-top:.25rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.controls input[type=range]{width:100%;accent-color:var(--accent);margin-top:.35rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 label{margin:.35rem 0}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:.7rem 0;padding:.35rem .8rem .55rem}
+legend{font-weight:600;font-size:.92rem;padding:0 .3rem}
+fieldset label{display:inline-flex !important;align-items:center;gap:.35rem;margin:.2rem 1rem .2rem 0 !important;font-weight:400 !important}
+.dir{font-size:.88rem;color:var(--muted);margin:.2rem 0 0}
+.formmsg{font-size:.9rem;color:var(--bear);min-height:1.3em;margin:.3rem 0}
+.labout{min-width:0}
+.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;overflow-x:auto}
+.chartbox svg{display:block;width:100%;height:auto;min-width:620px}
+.cands{margin:.8rem 0 .3rem;font-size:.93rem;line-height:2}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;border:1px solid var(--line);margin:2px 3px;font-size:.85rem;background:var(--surface);color:var(--ink);font-family:inherit;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip.no{color:var(--muted);border-style:dashed}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700;border-style:solid}
+.chip .best{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);margin-left:4px}
+.chip.on .best{color:var(--surface)}
+.chip .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.msg{padding:.5rem .85rem;border-radius:6px;margin:.4rem 0;font-size:.93rem}
+.msg.warn{background:var(--tint-bear);border-left:3px solid var(--bear)}
+.msg.info{background:var(--tint-acc);border-left:3px solid var(--accent)}
+.msg.ok{background:var(--tint-bull);border-left:3px solid var(--bull)}
+.msg.fib{background:var(--tint-fib);border-left:3px solid var(--fib)}
+.ptitle{font-size:1.1rem;margin:1.4rem 0 .4rem}
+ol.ladder{margin:.3rem 0;padding-left:1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem .6rem 2.2rem}
+ol.ladder li{margin:.35rem 0;font-size:.93rem}
+ol.ladder li::marker{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib)}
+ol.ladder li.cur{font-weight:600}
+ol.ladder li.brk{list-style:none;margin-left:-1.2rem;margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--line);font-weight:400}
+
+/* tablas */
+.tablewrap{overflow-x:auto;margin:1rem 0 1.2rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.94rem}
+th,td{padding:.55rem .8rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-weight:700;color:var(--muted);font-size:.85rem;background:var(--tint-acc)}
+td.num{white-space:nowrap}
+#ztable{min-width:1000px}
+tr.flash td{animation:flash 1.4s ease-out}
+@keyframes flash{from{background:var(--prz)}to{background:transparent}}
+
+/* tarjetas de patrón */
+.minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start}
+.mini{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:12px;background:var(--surface);cursor:pointer}
+.mini:hover{border-color:var(--accent);border-left-color:var(--c)}
+.mini.sel{box-shadow:0 0 0 2px var(--accent)}
+.mini.off{opacity:.5}
+.mini h4{margin:0;font-size:1.05rem;line-height:1.3}
+.mini p{margin:.15rem 0 .35rem;font-size:.86rem;color:var(--muted)}
+.mini p.err{color:var(--bear)}
+.mini svg{display:block;width:100%;height:auto}
+.mini .pbtns{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{white-space:nowrap;display:inline-block;margin-top:2px;font-size:.74rem;padding:1px 8px;border-radius:999px;border:1px solid currentColor;margin-left:6px;vertical-align:2px;font-weight:500;color:var(--muted)}
+.tag.fib{color:var(--fib)} .tag.acc{color:var(--accent)} .tag.bull{color:var(--bull)} .tag.bear{color:var(--bear)}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:var(--surface)}
+
+figure{margin:1rem 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;min-width:720px}
+figcaption{color:var(--muted);font-size:.92rem;margin-top:.6rem;max-width:760px}
+.legend{margin-top:.5rem}
+.summary{display:flex;flex-wrap:wrap;gap:4px 22px;color:var(--muted);font-size:.93rem;margin:.2rem 0 .6rem}
+.summary b{color:var(--ink);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.2rem;font-weight:600}
+
+/* zonas */
+.rank{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:600;font-size:1.5rem;color:var(--fib)}
+.zprice{font-weight:800;font-size:1.25rem}
+.zsub{font-size:.85rem;color:var(--muted)}
+.side{font-weight:800;font-size:1.05rem}
+.t-bull{color:var(--bull)} .t-bear{color:var(--bear)}
+.bar{height:6px;border-radius:3px;background:var(--grid);overflow:hidden;margin:4px 0;width:120px}
+.bar i{display:block;height:100%;background:var(--fib)}
+.plan{display:grid;grid-template-columns:auto auto;gap:1px 12px;font-size:.92rem}
+.plan span{color:var(--muted)}
+.mgroup{font-size:.88rem;line-height:1.4;margin:0 0 4px}
+.mgroup .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.ztags{margin-top:4px}
+.ztag{display:inline-block;font-size:.76rem;border-radius:999px;padding:0 8px;margin:2px 4px 0 0;border:1px solid var(--line);color:var(--muted)}
+.ztag.good{border-color:var(--bull);color:var(--bull)} .ztag.bad{border-color:var(--bear);color:var(--bear)} .ztag.in{border-color:var(--fib);color:var(--fib)}
+details.settings{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:1rem 0}
+details.settings summary{cursor:pointer;font-weight:700}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px}
+@media (max-width:560px){.fgrid{grid-template-columns:1fr}}
+.fcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:12px 14px}
+.fcard h4{margin:0 0 .15rem;font-size:1.05rem}
+.fcard .chartbox{padding:4px;border:0;margin:.3rem 0}
+.fcard .chartbox svg{min-width:0}
+.fcard .plan{grid-template-columns:auto auto auto auto}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;max-width:min(520px,92vw);width:100%}
+dialog::backdrop{background:rgba(10,15,25,.45)}
+.dlg{padding:18px 20px}
+.dlg h3{margin:0 0 .6rem;font-size:1.2rem}
+.dlg label{display:block;font-weight:600;font-size:.92rem;margin:.6rem 0}
+.dlg label.inline{display:flex;gap:8px;align-items:flex-start;font-weight:400}
+.dlg input[type=text]{width:100%;margin-top:.25rem;padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.dlgbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
+#slTable tr.cur td{background:var(--tint-fib);font-weight:600}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 16px;margin-top:8px}
+.sgrid label{display:block;font-weight:600;font-size:.9rem;margin:.4rem 0}
+.sgrid input,.sgrid select{width:100%;margin-top:.25rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.checks{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:.93rem}
+.checks label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.hint{font-size:.88rem;color:var(--muted);margin:.4rem 0 0;max-width:760px}
+
+/* SVG */
+.g-grid{stroke:var(--grid);stroke-width:1}
+.g-lbl{fill:var(--muted);font-size:12px;font-family:"Schibsted Grotesk",sans-serif}
+.g-xline{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.2;opacity:.8}
+.g-prz{fill:var(--prz)}
+.g-zone{fill:var(--tint-fib);stroke:var(--fib);stroke-width:1;stroke-dasharray:2 3}
+.g-tri{fill:var(--tri);stroke:none}
+.g-conn{stroke:var(--accent);stroke-dasharray:5 4;stroke-width:1.2;fill:none;opacity:.85}
+.g-ratio{fill:var(--accent);font-size:12.5px;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;font-family:"Schibsted Grotesk",sans-serif}
+.g-proj{stroke:var(--fib);stroke-width:2.2}
+.g-proj.off{stroke-dasharray:3 3;opacity:.6}
+.g-path{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.g-path.fut{stroke-dasharray:7 6;opacity:.7}
+.g-pt{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.g-pt.fut{stroke-dasharray:2 2}
+.g-letter{fill:var(--ink);font-weight:800;font-size:15px;font-family:"Schibsted Grotesk",sans-serif}
+.g-letter.sm{font-size:11px}
+.g-trade{stroke-width:1.8}
+.l-bear{stroke:var(--bear)} .l-bull{stroke:var(--bull)} .l-ink{stroke:var(--ink)}
+.g-lead{stroke:var(--line);stroke-width:1}
+.g-rl{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;font-family:"Schibsted Grotesk",sans-serif}
+.s-bear{fill:var(--bear)} .s-bull{fill:var(--bull)} .s-ink{fill:var(--ink)} .s-fib{fill:var(--fib)} .s-muted{fill:var(--muted)} .s-acc{fill:var(--accent)}
+.g-price{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:6 4}
+.g-path.pre{opacity:.45;stroke-width:2}
+.g-pt.pre{opacity:.6} .g-letter.pre{fill:var(--muted);font-weight:600}
+.g-proj.hist{stroke:var(--accent);stroke-dasharray:6 3}
+.g-trade.dash{stroke-dasharray:6 4}
+.g-xmark{stroke:var(--bear);stroke-width:2.6;stroke-linecap:round}
+.g-hit{stroke:transparent;stroke-width:14;fill:none;cursor:pointer}
+.g-zband{cursor:pointer}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.draw{animation:none;stroke-dashoffset:0}html{scroll-behavior:auto}tr.flash td{animation:none}}
+
+footer{margin:4rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <p class="kicker">Confluencias armónicas · toca el título para nombrar el activo</p>
+  <input id="assetName" class="title" type="text" placeholder="Nombre del activo" aria-label="Nombre del activo" autocomplete="off">
+  <p class="lead">Registra cada patrón del movimiento, grande o pequeño. El simulador te muestra el patrón más probable y en qué se convierte si falla; la vista consolidada los pone todos juntos con sus zonas de confluencia.</p>
+  <div class="toolbar">
+    <label class="fieldset-inline">Tipo de activo
+      <select id="assetType"><option value="boom">Boom (picos al alza)</option><option value="crash">Crash (picos a la baja)</option><option value="other">Otro sintético o mercado</option></select></label>
+    <label class="fieldset-inline">Decimales
+      <select id="assetDec"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select></label>
+    <label class="fieldset-inline">Precio actual
+      <input id="assetPrice" type="text" inputmode="decimal" placeholder="opcional" style="width:130px"></label>
+    <span class="spacer"></span>
+    <span id="dirty" class="dirty" hidden>Cambios sin guardar</span>
+    <button class="btn primary" id="btnSave" type="button">Guardar activo</button>
+    <button class="btn" id="btnLoad" type="button">Cargar activo</button>
+    <button class="btn" id="btnNew" type="button">Nuevo activo</button>
+    <button class="btn" id="btnTheme" type="button" aria-label="Cambiar tema">Tema: sistema</button>
+    <input type="file" id="fileIn" accept=".json,.csv,application/json,text/csv" hidden>
+  </div>
+  <dialog id="saveDlg" aria-labelledby="saveTitle">
+    <form method="dialog" class="dlg">
+      <h3 id="saveTitle">Guardar activo</h3>
+      <label>Nombre del activo<input id="svAsset" type="text" placeholder="ej. Boom 1000 Index" autocomplete="off"></label>
+      <label>Nombre del archivo<input id="svFile" type="text" autocomplete="off"></label>
+      <label class="inline"><input type="checkbox" id="svDate" checked> Agregar la fecha al nombre (para guardar versiones del historial)</label>
+      <p class="hint">Se guardará como <b id="svPreview"></b></p>
+      <p class="hint" id="svWhere"></p>
+      <div class="dlgbtns">
+        <button class="btn" value="cancel" type="submit">Cancelar</button>
+        <button class="btn primary" id="svOk" type="button">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+  <div hidden>
+  </div>
+  <nav class="toc" aria-label="Secciones">
+    <ol>
+      <li><a href="#patrones">Patrones del movimiento</a></li>
+      <li><a href="#simulador">Simulador</a></li>
+      <li><a href="#consolidado">Vista consolidada</a></li>
+      <li><a href="#zonas">Zonas de entrada</a></li>
+      <li><a href="#historial">Historial y proyección</a></li>
+    </ol>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- 1 -->
+<section id="patrones">
+  <h2><span class="n">1</span>Patrones del movimiento</h2>
+  <p class="intro">Empieza por la estructura mayor y sigue con las internas, de cualquier temporalidad. Sin X se trata como AB=CD; con D, como patrón completado. Toca una tarjeta para llevarla al simulador.</p>
+  <div class="lab">
+    <div class="controls">
+      <h3 id="formTitle">Nuevo patrón</h3>
+      <div class="row2">
+        <label>Etiqueta<input id="fLabel" type="text" placeholder="Estructura mayor"></label>
+        <label>Temporalidad<input id="fTf" type="text" list="tfList" placeholder="H1"></label>
+      </div>
+      <datalist id="tfList"><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option></datalist>
+      <div class="row2">
+        <label>X <span class="opt">opcional</span><input id="fX" type="text" inputmode="decimal"></label>
+        <label>A<input id="fA" type="text" inputmode="decimal"></label>
+        <label>B<input id="fB" type="text" inputmode="decimal"></label>
+        <label>C<input id="fC" type="text" inputmode="decimal"></label>
+        <label>D <span class="opt">real, si ya giró</span><input id="fD" type="text" inputmode="decimal"></label>
+        <label>Pivotes tras D<input id="fPost" type="text" placeholder="E; F… (10420; 10180)"></label>
+      </div>
+      <label>Patrón esperado<select id="fKey"></select></label>
+      <div class="formmsg" id="fMsg" role="status"></div>
+      <button class="btn primary block" id="fSubmit" type="button">Agregar patrón</button>
+      <button class="btn block" id="fCancel" type="button" hidden>Cancelar edición</button>
+    </div>
+    <div class="minis" id="plist"></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="simulador">
+  <h2><span class="n">2</span>Simulador</h2>
+  <p class="intro">Muestra el patrón seleccionado con su proyección más probable. Toca otro patrón en la fila de candidatos para ver cómo quedaría si se convierte en él, o mueve las coordenadas: nada se guarda hasta que pulses «Aplicar al patrón».</p>
+  <div class="lab">
+    <div class="controls">
+      <label>Patrón del listado<select id="simPick"></select></label>
+      <div class="row2">
+        <label>X<input id="sX" type="text" inputmode="decimal"></label>
+        <label>A<input id="sA" type="text" inputmode="decimal"></label>
+        <label>B<input id="sB" type="text" inputmode="decimal"></label>
+        <label>C<input id="sC" type="text" inputmode="decimal"></label>
+        <label>D <span class="opt">real</span><input id="sD" type="text" inputmode="decimal"></label>
+        <label>Pivotes tras D<input id="sPost" type="text" placeholder="E; F…"></label>
+      </div>
+      <p class="dir" id="simDir"></p>
+      <label>B = AB / XA <output id="bOut"></output><input id="bR" type="range" min="0.2" max="1.7" step="0.001"></label>
+      <label>C = BC / AB <output id="cOut"></output><input id="cR" type="range" min="0.2" max="2.3" step="0.001"></label>
+      <fieldset><legend>Stop loss</legend>
+        <label><input type="radio" name="sl" value="agr"> SL1 agresivo</label>
+        <label><input type="radio" name="sl" value="cons" checked> SL2 conservador</label>
+      </fieldset>
+      <fieldset><legend>Objetivos medidos sobre</legend>
+        <label><input type="radio" name="tp" value="AD" checked> AD</label>
+        <label><input type="radio" name="tp" value="CD"> CD</label>
+      </fieldset>
+      <button class="btn primary block" id="simFail" type="button">Simular: el precio atraviesa D</button>
+      <button class="btn block" id="simApply" type="button" disabled>Aplicar al patrón</button>
+      <button class="btn block" id="simReset" type="button" disabled>Restablecer coordenadas</button>
+    </div>
+    <div class="labout">
+      <div class="chartbox" id="simChart"></div>
+      <div class="cands" id="simCands"></div>
+      <div id="simMsgs" aria-live="polite"></div>
+      <div class="tablewrap"><table id="simTable"></table></div>
+      <div id="simLadder"></div>
+      <div id="simResult"></div>
+    </div>
+  </div>
+  <details class="settings" id="slRef">
+    <summary>Cómo se calculan los SL (referencia)</summary>
+    <p class="hint">En el simulador, el stop va más allá del siguiente nivel de Fibonacci después de D, medido sobre el mismo tramo que D, más un colchón del 2% de ese tramo. SL1 es el primer nivel siguiente; SL2 es donde el patrón queda roto y suele empezar el siguiente de la escalera. La fila resaltada es el patrón que estás simulando.</p>
+    <div class="tablewrap"><table id="slTable"></table></div>
+    <p class="hint">Ejemplo: Bat alcista con X = 10000 y A = 11000. XA = 1000, así que SL2 = 1.13 XA bajo A = 9870, menos 20 pts de colchón (2% de XA) = <b>9850</b>. Los valores 1.2 y 1.8 no son ratios canónicos: son puntos intermedios elegidos porque el siguiente nivel Fibonacci queda demasiado cerca o demasiado lejos.</p>
+    <h3 class="ptitle">SL de las zonas de entrada (sección 4)</h3>
+    <p class="hint">Una zona no pertenece a un solo patrón, así que usa una regla propia. El SL va detrás del borde lejano de la zona, a una distancia igual al <b>mayor</b> de estos valores:</p>
+    <div class="tablewrap"><table>
+      <tr><th>Componente</th><th>Qué mide</th></tr>
+      <tr><td>Ancho del núcleo</td><td>Distancia entre los bordes donde todas las bandas de la zona se solapan.</td></tr>
+      <tr><td>25% de la dispersión</td><td>Una cuarta parte de la distancia entre el nivel más alto y el más bajo de la zona.</td></tr>
+      <tr><td>Media banda promedio</td><td>La mitad de la banda de precisión promedio de los niveles de la zona.</td></tr>
+      <tr><td>Holgura mínima</td><td>Los puntos fijos que configures en los ajustes (por defecto 0).</td></tr>
+      <tr><td>Margen del SL</td><td>Porcentaje del tramo más pequeño entre los patrones de la zona (por defecto 10%). Casi siempre es el que manda.</td></tr>
+    </table></div>
+  </details>
+</section>
+
+<!-- 3 -->
+<section id="consolidado">
+  <h2><span class="n">3</span>Vista consolidada</h2>
+  <p class="intro">Todos los patrones activos sobre la misma escala de precio. Los más grandes ocupan más ancho y todos terminan en el presente, a la derecha. El seleccionado se resalta con su proyección; a la derecha, las zonas de confluencia.</p>
+  <figure>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px">
+      <div class="summary" id="summary"></div>
+      <div class="cands" style="margin:0" id="consScale">Escala:
+        <button type="button" class="chip on" data-scale="all">Todo el movimiento</button>
+        <button type="button" class="chip" data-scale="sel">Ajustar al seleccionado</button>
+      </div>
+    </div>
+    <div class="scroll" id="consChart"></div>
+    <div class="legend" id="consLegend"></div>
+    <figcaption>Toca una línea o un nombre de la leyenda para seleccionar ese patrón. Toca una franja de zona para ir a su plan de entrada.</figcaption>
+  </figure>
+</section>
+
+<!-- 4 -->
+<section id="zonas">
+  <h2><span class="n">4</span>Zonas de entrada</h2>
+  <p class="intro">Cada nivel tiene una banda proporcional al tramo que lo genera; una zona aparece donde las bandas se solapan. El lado depende del precio actual (zona debajo, compra; encima, venta). TP1 y TP2 en 0.382 y 0.618 del tramo que llega a la zona.</p>
+  <div class="tablewrap">
+    <table id="ztable">
+      <thead><tr><th>#</th><th>Zona</th><th>Lado</th><th>Fuerza</th><th>Plan</th><th>Qué coincide</th></tr></thead>
+      <tbody id="zbody"></tbody>
+    </table>
+  </div>
+  <details class="settings">
+    <summary>Ajustes del cálculo de zonas</summary>
+    <div class="sgrid">
+      <label>Precisión de cada nivel (% de su tramo)<input id="sBand" type="text" inputmode="decimal"></label>
+      <label>Holgura mínima (pts)<input id="sMinPts" type="text" inputmode="decimal"></label>
+      <label>Tolerancia de ratios (±)<input id="sSlack" type="text" inputmode="decimal"></label>
+      <label>Margen del SL (% del tramo menor)<input id="sSl" type="text" inputmode="decimal"></label>
+      <label>Ratios propios<input id="sExtra" type="text" placeholder="ej. 0.18, 2.6"></label>
+      <label>Mínimo de niveles por zona<input id="sMinLev" type="number" min="1" step="1"></label>
+      <label>Mínimo de patrones por zona<input id="sMinPat" type="number" min="1" step="1"></label>
+      <label>Zonas a mostrar<input id="sMax" type="number" min="1" step="1"></label>
+      <label>Ordenar zonas por<select id="sSort"><option value="score">Fuerza</option><option value="dist">Cercanía al precio</option></select></label>
+    </div>
+    <div class="checks">
+      <label><input type="checkbox" id="gXA"> Grilla XA</label>
+      <label><input type="checkbox" id="gBC"> Grilla BC</label>
+      <label><input type="checkbox" id="gABCD"> Grilla AB=CD</label>
+      <label><input type="checkbox" id="gST"> Puntos X, B, C, A</label>
+      <label><input type="checkbox" id="gPassed"> Incluir niveles ya superados</label>
+      <label><input type="checkbox" id="sHist"> Usar el historial del activo</label>
+    </div>
+    <p class="hint">Un nivel de un patrón grande tiene banda ancha y uno de un patrón pequeño, banda fina. Sube la precisión si ves pocas zonas; bájala si las zonas salen demasiado amplias.</p>
+  </details>
+</section>
+
+<!-- 5 -->
+<section id="historial">
+  <h2><span class="n">5</span>Historial y proyección</h2>
+  <p class="intro">Lo que ya pasó en este activo. Cada D real y cada pivote posterior que registras alimenta estas estadísticas, calibra el D de los patrones pendientes y arma los siguientes patrones con movimientos confirmados.</p>
+  <div class="summary" id="histSummary"></div>
+
+  <h3 class="ptitle">Patrones que se pueden armar con lo confirmado</h3>
+  <p class="hint" style="margin-bottom:.6rem">Se toman los últimos cuatro pivotes confirmados de cada cadena (o tres, para un AB=CD) como X′, A′, B′ y C′ de un patrón nuevo y se proyecta su D′.</p>
+  <div class="fgrid" id="histFuture"></div>
+
+  <h3 class="ptitle">Resultados por tipo de patrón</h3>
+  <div class="tablewrap"><table id="histTypes"></table></div>
+
+  <h3 class="ptitle">Ratios que respeta este activo</h3>
+  <figure style="margin-top:.4rem">
+    <div class="scroll" id="histRatios"></div>
+    <figcaption id="histRatiosTxt"></figcaption>
+  </figure>
+
+  <h3 class="ptitle">Registro de resultados</h3>
+  <div class="tablewrap"><table id="histLog"></table></div>
+</section>
+
+<footer>
+  Herramienta de apoyo basada en los ratios estándar de Scott Carney. Ubica zonas de probable reacción, pero no garantiza que el precio reaccione: confirma con tu gatillo de entrada y gestiona el riesgo. No es asesoramiento financiero.
+</footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const isF = Number.isFinite;
+const num = v => { if(v == null) return NaN; const s = String(v).trim().replace(/\s/g,'').replace(',', '.'); return s === '' ? NaN : Number(s); };
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fr = r => (+r).toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+
+/* ============ Teoría ============ */
+const FIB_RET = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886];
+const FIB_EXT = [1.13, 1.272, 1.414, 1.618, 2.0, 2.24, 2.618, 3.14, 3.618];
+const ABCD_SET = [0.618, 0.786, 1, 1.272, 1.618, 2.0, 2.618];
+const KEY_XA = new Set([0.618, 0.786, 0.886, 1.13, 1.272, 1.618, 2.618]);
+const KEY_BC = new Set([1.272, 1.618, 2.0, 2.24, 2.618, 3.618]);
+const KEY_AB = new Set([1, 1.272, 1.618]);
+const COLORS = ['#3F7FD6','#8E5CCB','#C28A16','#C9507F','#1E9C84','#D8702C','#6E9B2A','#5A66D9','#C94545','#2A9DC0'];
+
+// Patrones clásicos (Carney). b: rango B/XA · d: retroceso/extensión XA (el primero es el principal)
+// bc: rango de proyección CD/BC · abcd: variantes AB=CD. C siempre 0.382–0.886 de AB.
+const HARM = [
+  {name:'Gartley',     b:[0.618,0.618], d:[0.786],             bc:[1.13,1.618],  abcd:[1,1.272]},
+  {name:'Bat',         b:[0.382,0.5],   d:[0.886],             bc:[1.618,2.618], abcd:[1.272]},
+  {name:'Bat alterno', b:[0.236,0.382], d:[1.13],              bc:[2.0,3.618],   abcd:[1.272,1.618]},
+  {name:'Butterfly',   b:[0.786,0.786], d:[1.272,1.414,1.618], bc:[1.618,2.24],  abcd:[1.272]},
+  {name:'Crab',        b:[0.382,0.618], d:[1.618],             bc:[2.24,3.618],  abcd:[1.618]},
+  {name:'Deep Crab',   b:[0.886,0.886], d:[1.618],             bc:[2.0,3.618],   abcd:[1.272,1.618]}
+];
+const FAM_RANK = {pat:6, post:5, xa:4, bc:3, abcd:2, st:1};
+
+// Encaje de un ratio en un rango: 1 dentro, decae hasta 0.5 en el borde de la tolerancia, 0 fuera
+function fitR(v, lo, hi, slack){
+  if(!isF(v)) return 0;
+  if(v >= lo - 1e-9 && v <= hi + 1e-9) return 1;
+  const dev = v < lo ? lo - v : v - hi;
+  return dev <= slack ? 1 - 0.5 * dev / slack : 0;
+}
+const parseExtra = s => String(s || '').split(/[;\s]+|,(?=\s)|,(?=\d+\.)/).map(num).filter(v => isF(v) && v > 0 && v < 10);
+
+/* ============ Estado ============ */
+const DEFAULT_SETTINGS = {bandPct:1.5, minPts:0, ratioSlack:0.03, slPct:10, useHistory:true, minLevels:2, minPatterns:1, maxZones:12, sort:'score', extra:'',
+  grid:{xa:true, bc:true, abcd:true, struct:true, passed:false}};
+const blankState = () => ({asset:{name:'', type:'boom', decimals:2, price:null}, settings:clone(DEFAULT_SETTINGS), patterns:[], selectedId:null});
+let state = blankState();
+let dirty = false, editingId = null;
+let analyses = [], zones = [];
+let hist = {out:new Map(), byKey:{}, legs:[], bins:[], pref:new Set(), total:0, onFib:0, chance:0};
+const PIV = ['E','F','G','H','I','J','K','L'];
+
+const dec = () => state.asset.decimals;
+const fmt = n => isF(n) ? n.toFixed(dec()) : '–';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const colorOf = id => { const p = state.patterns.find(q => q.id === id); return p ? p.color : '#888'; };
+const labelOf = id => { const p = state.patterns.find(q => q.id === id); return p ? (p.label || 'Sin nombre') : '?'; };
+
+/* ============ Análisis de un patrón ============ */
+function analyze(p){
+  const S = state.settings, G = S.grid;
+  const {X, A, B, C, D} = p;
+  const hasX = isF(X), hasD = isF(D);
+  const r = {p, ok:false, errors:[], matches:[], levels:[], dir:0, ratios:{}};
+  if(![A,B,C].every(isF)){ r.errors.push('Faltan A, B o C.'); return r; }
+  const AB = Math.abs(B - A), BC = Math.abs(C - B);
+  if(!AB || !BC){ r.errors.push('A, B y C no pueden repetirse.'); return r; }
+  if(Math.sign(B - A) !== -Math.sign(C - B)){ r.errors.push('B y C deben alternar (zigzag).'); return r; }
+  let dir, XA = null;
+  if(hasX){
+    XA = Math.abs(A - X);
+    if(!XA || Math.sign(A - X) !== -Math.sign(B - A)){ r.errors.push('X→A debe ir contra A→B.'); return r; }
+    dir = Math.sign(A - X);
+  } else dir = Math.sign(C - B);
+  if(hasD && Math.sign(D - C) !== -dir){ r.errors.push('C→D debe ir contra B→C.'); return r; }
+  const post = Array.isArray(p.post) ? p.post.filter(isF) : [];
+  if(post.length){
+    if(!hasD){ r.errors.push('Registra D antes de los pivotes posteriores.'); return r; }
+    let prev = C, cur = D;
+    for(const q of post){ if(q === cur || Math.sign(q - cur) !== -Math.sign(cur - prev)){ r.errors.push('Los pivotes después de D deben alternar (zigzag).'); return r; } prev = cur; cur = q; }
+  }
+
+  r.ok = true; r.dir = dir;          // dir>0: CD cae y la reacción esperada en D es alcista
+  const R = r.ratios;
+  if(hasX) R.bxa = AB / XA;
+  R.cab = BC / AB;
+  const cBeyondA = (C - A) * dir > 0;
+  const bBeyondX = hasX && (B - X) * dir < 0;
+  if(hasX && cBeyondA) R.cx = Math.abs(C - X) / XA;
+  if(hasD){ if(hasX) R.dxa = Math.abs(D - A) / XA; R.dbc = Math.abs(D - C) / BC; R.dab = Math.abs(D - C) / AB; }
+  const legRef = hasD ? Math.abs(A - D) : (hasX ? XA : AB);
+
+  const L = [];
+  const add = (price, w, fam, label, react, anchor) => {
+    if(isF(price)) L.push({price, w, fam, labels:[label], react, anchorDist:Math.abs(price - anchor), patId:p.id, legRef});
+  };
+  const xaP = k => A - dir * k * XA;
+  const bcP = k => C - dir * k * BC;
+  const abP = k => C - dir * k * AB;
+  const sl = S.ratioSlack;
+  const extra = parseExtra(S.extra);
+
+  if(!hasD){
+    const cRet = fitR(R.cab, 0.382, 0.886, sl);
+    // Patrones clásicos XABCD
+    if(hasX && !cBeyondA && !bBeyondX && cRet > 0){
+      HARM.forEach(h => {
+        const bf = fitR(R.bxa, h.b[0], h.b[1], sl);
+        if(bf <= 0) return;
+        r.matches.push({name:h.name, fit:Math.min(bf, cRet), info:'D ' + h.d.map(fr).join(' / ') + ' XA'});
+        h.d.forEach((k,i) => add(xaP(k), i ? 3 : 5, 'pat', h.name + ': D ' + fr(k) + ' XA', dir, A));
+        FIB_EXT.filter(k => k >= h.bc[0] - 1e-9 && k <= h.bc[1] + 1e-9)
+          .forEach(k => add(bcP(k), 2, 'pat', h.name + ': CD ' + fr(k) + '×BC', dir, C));
+        h.abcd.forEach(k => add(abP(k), 2.5, 'pat', h.name + ': AB=CD' + (k === 1 ? '' : ' ' + fr(k)), dir, C));
+      });
+    }
+    // Shark y Cypher (C supera a A)
+    if(hasX && cBeyondA && !bBeyondX){
+      const cf = fitR(R.cab, 1.13, 1.618, sl);
+      if(cf > 0 && R.bxa < 1){
+        r.matches.push({name:'Shark', fit:cf, info:'D 0.886 / 1.13 XA'});
+        add(xaP(0.886), 5, 'pat', 'Shark: D 0.886 XA', dir, A);
+        add(xaP(1.13), 4, 'pat', 'Shark: D 1.13 XA', dir, A);
+        FIB_EXT.filter(k => k >= 1.618 - 1e-9 && k <= 2.24 + 1e-9).forEach(k => add(bcP(k), 2, 'pat', 'Shark: CD ' + fr(k) + '×BC', dir, C));
+      }
+      const bf = fitR(R.bxa, 0.382, 0.618, sl), xf = fitR(R.cx, 1.13, 1.414, sl);
+      if(bf > 0 && xf > 0){
+        const XC = Math.abs(C - X);
+        r.matches.push({name:'Cypher', fit:Math.min(bf, xf), info:'D 0.786 XC'});
+        add(C - dir * 0.786 * XC, 5, 'pat', 'Cypher: D 0.786 XC', dir, C);
+      }
+    }
+    // 5-0 (B supera a X)
+    if(bBeyondX){
+      const bf = fitR(R.bxa, 1.13, 1.618, sl), cf = fitR(R.cab, 1.618, 2.24, sl);
+      if(bf > 0 && cf > 0){
+        r.matches.push({name:'5-0', fit:Math.min(bf, cf), info:'D 0.5 BC'});
+        add(bcP(0.5), 5, 'pat', '5-0: D 0.5 BC', dir, C);
+        add(abP(1), 3, 'pat', '5-0: AB=CD recíproco', dir, C);
+      }
+    }
+    // Proyección recíproca de BC (C en .382 → CD 2.618 BC; .618 → 1.618; .886 → 1.13 …) y AB=CD puro
+    if(cRet > 0){
+      const k = 1 / R.cab;
+      add(bcP(k), 3, 'pat', 'BC recíproco ' + fr(k), dir, C);
+      if(!hasX){
+        r.matches.push({name:'AB=CD', fit:cRet, info:'CD 1 / 1.272 / 1.618 AB'});
+        add(abP(1), 4, 'pat', 'AB=CD 1:1', dir, C);
+        add(abP(1.272), 3, 'pat', 'AB=CD 1.272', dir, C);
+        add(abP(1.618), 3, 'pat', 'AB=CD 1.618', dir, C);
+      }
+    }
+    // Grilla Fibonacci del patrón
+    if(hasX && G.xa){
+      [...FIB_RET, 1, ...FIB_EXT].forEach(k => add(xaP(k), KEY_XA.has(k) ? 1.5 : 1, 'xa', fr(k) + ' XA', dir, A));
+      extra.forEach(k => add(xaP(k), 1, 'xa', fr(k) + ' XA (propio)', dir, A));
+    }
+    if(G.bc){
+      [...FIB_RET, 1, ...FIB_EXT].forEach(k => add(bcP(k), KEY_BC.has(k) ? 1.5 : 1, 'bc', fr(k) + ' BC', dir, C));
+      extra.forEach(k => add(bcP(k), 1, 'bc', fr(k) + ' BC (propio)', dir, C));
+    }
+    if(G.abcd) ABCD_SET.forEach(k => add(abP(k), KEY_AB.has(k) ? 1.5 : 1, 'abcd', 'AB=CD ' + fr(k), dir, C));
+    if(G.struct){ add(B, 0.75, 'st', 'Punto B', dir, B); if(hasX) add(X, 0.75, 'st', 'Punto X', dir, X); }
+    const cal = histCalibration(p);
+    if(cal) add(cal.price, 3.5, 'pat', cal.label, dir, C);
+    if(!G.passed){ for(let i = L.length - 1; i >= 0; i--) if((L[i].price - C) * -dir <= 0) L.splice(i, 1); }
+  } else {
+    // Patrón completado: identificar y proyectar objetivos desde D
+    if(hasX){
+      HARM.forEach(h => {
+        const bf = fitR(R.bxa, h.b[0], h.b[1], sl);
+        if(bf <= 0) return;
+        const near = h.d.find(k => Math.abs(R.dxa - k) <= Math.max(0.04, k * 0.04));
+        if(near) r.matches.push({name:h.name + ' completado', fit:bf, info:'D ≈ ' + fr(near) + ' XA'});
+      });
+    } else if(fitR(R.dab, 0.9, 1.1, 0) > 0 || Math.abs(R.dab - 1.272) < 0.05 || Math.abs(R.dab - 1.618) < 0.06){
+      r.matches.push({name:'AB=CD completado', fit:1, info:'CD ≈ ' + fr(R.dab) + ' AB'});
+    }
+    const AD = Math.abs(A - D), CD = Math.abs(C - D);
+    const cw = post.length ? 1.5 : 1;   // un D con reacción registrada es un pivote real: pesa más
+    [...FIB_RET, 1].forEach(k => add(D + dir * k * AD, ((k === 0.382 || k === 0.618) ? 2 : 1) * cw, 'post', fr(k) + ' AD (objetivo)', -dir, D));
+    FIB_RET.forEach(k => add(D + dir * k * CD, ((k === 0.382 || k === 0.618) ? 1.5 : 1) * cw, 'post', fr(k) + ' CD', -dir, D));
+    extra.forEach(k => add(D + dir * k * AD, 1, 'post', fr(k) + ' AD (propio)', -dir, D));
+    if(G.struct){ add(C, 0.75, 'st', 'Punto C', -dir, C); add(A, 0.75, 'st', 'Punto A', -dir, A); }
+    if(!G.passed){ for(let i = L.length - 1; i >= 0; i--) if((L[i].price - D) * dir <= 0) L.splice(i, 1); }
+    if(post.length){
+      const ch = [C, D, ...post], nm = ['C', 'D', ...post.map((_,i) => PIV[i])];
+      const L1 = ch[ch.length - 2], L2 = ch[ch.length - 1], legDir = Math.sign(L2 - L1), lg = Math.abs(L2 - L1);
+      const tn = nm[nm.length - 2] + nm[nm.length - 1];
+      FIB_RET.forEach(k => add(L2 - legDir * k * lg, (k === 0.382 || k === 0.618 || k === 0.786) ? 1.8 : 1.2, 'post', fr(k) + ' tramo ' + tn + ' (confirmado)', legDir, L2));
+      add(D, 1.5, 'st', 'D confirmado', 0, D);
+      post.forEach((q,i) => add(q, 1.5, 'st', 'Pivote ' + PIV[i] + ' confirmado', 0, q));
+    }
+  }
+
+  // Fusionar niveles idénticos del mismo patrón
+  L.sort((m,n) => m.price - n.price);
+  const merged = [];
+  L.forEach(l => {
+    const last = merged[merged.length - 1];
+    if(last && Math.abs(last.price - l.price) <= 1e-7 * Math.max(1, Math.abs(l.price))){
+      if(l.w > last.w){ last.w = l.w; last.anchorDist = l.anchorDist; last.react = l.react; }
+      if(FAM_RANK[l.fam] > FAM_RANK[last.fam]) last.fam = l.fam;
+      l.labels.forEach(t => { if(!last.labels.includes(t)) last.labels.push(t); });
+    } else merged.push(l);
+  });
+  merged.forEach((l,i) => {
+    if(S.useHistory && hist.pref.size){
+      const m = String(l.labels[0]).match(/(\d+(?:\.\d+)?)/);
+      if(m && [...hist.pref].some(f => Math.abs(+m[1] - f) < 0.002)){ l.w *= 1.25; l.labels.push('ratio frecuente del activo'); }
+    }
+    l.h = Math.max(S.minPts, S.bandPct / 100 * Math.max(l.anchorDist, 0.25 * legRef));
+    l.key = p.id + ':' + i;
+  });
+  r.levels = merged;
+  r.hasX = hasX; r.hasD = hasD;
+  return r;
+}
+
+/* ============ Zonas de confluencia ============ */
+function scoreOf(mem){
+  const by = new Map();
+  mem.forEach(m => { if(!by.has(m.patId)) by.set(m.patId, []); by.get(m.patId).push(m.w); });
+  let total = 0;
+  by.forEach(ws => { const mx = Math.max(...ws); total += mx + 0.5 * (ws.reduce((s,v) => s + v, 0) - mx); });
+  return total * (1 + 0.4 * (by.size - 1));
+}
+
+function buildZones(levels){
+  const S = state.settings;
+  let pool = levels.map(l => ({...l, lo:l.price - l.h, hi:l.price + l.h}));
+  const out = [];
+  while(pool.length && out.length < 80){
+    let best = null;
+    pool.forEach(c => {
+      const q = c.lo;
+      const mem = pool.filter(l => l.lo <= q + 1e-12 && l.hi >= q - 1e-12);
+      if(mem.length < S.minLevels) return;
+      const pats = new Set(mem.map(m => m.patId));
+      if(pats.size < S.minPatterns) return;
+      const sc = scoreOf(mem);
+      if(!best || sc > best.score) best = {mem, score:sc, pats};
+    });
+    if(!best) break;
+    const m = best.mem;
+    const coreLo = Math.max(...m.map(x => x.lo)), coreHi = Math.min(...m.map(x => x.hi));
+    const priceLo = Math.min(...m.map(x => x.price)), priceHi = Math.max(...m.map(x => x.price));
+    const wsum = m.reduce((s,x) => s + x.w, 0);
+    let center = m.reduce((s,x) => s + x.w * x.price, 0) / wsum;
+    center = Math.min(coreHi, Math.max(coreLo, center));
+    out.push({members:m, score:best.score, nPat:best.pats.size, coreLo, coreHi, priceLo, priceHi, center,
+              avgH: m.reduce((s,x) => s + x.h, 0) / m.length});
+    const used = new Set(m.map(x => x.key));
+    pool = pool.filter(l => !used.has(l.key));
+  }
+  return out;
+}
+
+function strengthOf(s){
+  if(s >= 14) return 'Muy fuerte';
+  if(s >= 8) return 'Fuerte';
+  if(s >= 4.5) return 'Media';
+  return 'Débil';
+}
+
+function planZones(){
+  const P = state.asset.price;
+  const type = state.asset.type;
+  zones.forEach((z, i) => {
+    z.rank = i + 1;
+    const dom = z.members.reduce((a,b) => b.w > a.w ? b : a);
+    const domA = analyses.find(a => a.p.id === dom.patId);
+    let side;
+    if(isF(P)) side = z.center < P ? 1 : -1;
+    else {
+      const s = z.members.reduce((acc,m) => acc + m.w * m.react, 0);
+      side = s !== 0 ? Math.sign(s) : (dom.react || 1);
+    }
+    z.side = side;
+    z.inside = isF(P) && P >= Math.min(z.coreLo, z.priceLo) && P <= Math.max(z.coreHi, z.priceHi);
+    z.agree = z.members.filter(m => m.react === side).length;
+    z.against = z.members.filter(m => m.react === -side).length;
+    const entry = z.center;
+    const coreW = z.coreHi - z.coreLo, spread = z.priceHi - z.priceLo;
+    const minLeg = Math.min(...z.members.map(m => m.legRef));
+    const buffer = Math.max(coreW, spread * 0.25, z.avgH * 0.5, state.settings.minPts, state.settings.slPct / 100 * minLeg);
+    z.entry = entry;
+    z.sl = side > 0 ? Math.min(z.coreLo, z.priceLo) - buffer : Math.max(z.coreHi, z.priceHi) + buffer;
+    const pp = domA ? [domA.p.X, domA.p.A, domA.p.B, domA.p.C, domA.p.D].filter(isF) : [];
+    const ref = pp.length ? (side > 0 ? Math.max(...pp) : Math.min(...pp)) : NaN;
+    if(isF(ref) && (ref - entry) * side > 0){
+      z.tp1 = entry + 0.382 * (ref - entry);
+      z.tp2 = entry + 0.618 * (ref - entry);
+      z.tpRef = 'tramo de ' + labelOf(dom.patId);
+    } else { z.tp1 = NaN; z.tp2 = NaN; z.tpRef = ''; }
+    const risk = Math.abs(entry - z.sl);
+    z.rr = isF(z.tp1) && risk > 0 ? Math.abs(z.tp1 - entry) / risk : NaN;
+    z.rr2 = isF(z.tp2) && risk > 0 ? Math.abs(z.tp2 - entry) / risk : NaN;
+    z.spike = type === 'boom' ? (side > 0 ? 'with' : 'against') : type === 'crash' ? (side < 0 ? 'with' : 'against') : null;
+  });
+  // Próxima zona en la dirección de la operación (referencia para TP)
+  zones.forEach(z => {
+    const ahead = zones.filter(o => o !== z && (o.center - z.entry) * z.side > 0)
+                       .sort((a,b) => Math.abs(a.center - z.entry) - Math.abs(b.center - z.entry));
+    z.next = ahead[0] || null;
+  });
+}
+
+
+
+/* ============ Simulador: definiciones ============ */
+// sl: [conservador, agresivo] en ratio de la misma base que D. next: a qué migra si el precio atraviesa D.
+const SIM = {
+  gartley:   {name:'Gartley',        fam:'xabcd', b:[.618,.618], d:.786,  base:'XA', bc:[1.13,1.618],  abcd:[1,1.272],     sl:[1,.886],      next:'crab'},
+  bat:       {name:'Bat',            fam:'xabcd', b:[.382,.5],   d:.886,  base:'XA', bc:[1.618,2.618], abcd:[1.272],       sl:[1.13,1],      next:'altbat'},
+  altbat:    {name:'Bat alterno',    fam:'xabcd', b:[.236,.382], d:1.13,  base:'XA', bc:[2,3.618],     abcd:[1.272,1.618], sl:[1.272,1.2],   next:'crab'},
+  butterfly: {name:'Butterfly',      fam:'xabcd', b:[.786,.786], d:1.272, base:'XA', bc:[1.618,2.24],  abcd:[1.272],       sl:[1.618,1.414], next:'butterfly2'},
+  butterfly2:{name:'Butterfly 1.618',fam:'xabcd', b:[.786,.786], d:1.618, base:'XA', bc:[2.24,2.618],  abcd:[1.618],       sl:[2.24,2],      next:null, hidden:true},
+  crab:      {name:'Crab',           fam:'xabcd', b:[.382,.618], d:1.618, base:'XA', bc:[2.24,3.618],  abcd:[1.618],       sl:[2.24,2],      next:null},
+  deepcrab:  {name:'Deep Crab',      fam:'xabcd', b:[.886,.886], d:1.618, base:'XA', bc:[2,3.618],     abcd:[1.272,1.618], sl:[2.24,2],      next:null},
+  shark:     {name:'Shark',          fam:'shark', d:.886,  base:'XA', bc:[1.618,2.24], sl:[1.13,1],     next:'shark2'},
+  shark2:    {name:'Shark 1.13',     fam:'shark', d:1.13,  base:'XA', bc:[1.618,2.24], sl:[1.272,1.2],  next:null, hidden:true},
+  cypher:    {name:'Cypher',         fam:'cypher',d:.786,  base:'XC', sl:[1,.886],     next:null},
+  fiveo:     {name:'5-0',            fam:'fiveo', d:.5,    base:'BC', sl:[.786,.618],  next:null},
+  abcd:      {name:'AB=CD',          fam:'abcd',  d:1,     base:'AB', sl:[1.272,1.13], next:'abcd2'},
+  abcd2:     {name:'AB=CD 1.272',    fam:'abcd',  d:1.272, base:'AB', sl:[1.618,1.414],next:'abcd3', hidden:true},
+  abcd3:     {name:'AB=CD 1.618',    fam:'abcd',  d:1.618, base:'AB', sl:[2,1.8],      next:null, hidden:true}
+};
+const rangeTxt = b => b[0] === b[1] ? fr(b[0]) : fr(b[0]) + '–' + fr(b[1]);
+
+function geom(c){
+  const {X, A, B, C, D} = c, hasX = isF(X), hasD = isF(D);
+  if(![A,B,C].every(isF)) return {ok:false, err:'Faltan A, B o C.'};
+  const ab = Math.abs(B - A), bc = Math.abs(C - B);
+  if(!ab || !bc) return {ok:false, err:'A, B y C no pueden repetirse.'};
+  if(Math.sign(B - A) !== -Math.sign(C - B)) return {ok:false, err:'B y C deben alternar (zigzag).'};
+  let dir, xa = NaN;
+  if(hasX){ xa = Math.abs(A - X); if(!xa || Math.sign(A - X) !== -Math.sign(B - A)) return {ok:false, err:'X→A debe ir contra A→B.'}; dir = Math.sign(A - X); }
+  else dir = Math.sign(C - B);
+  if(hasD && Math.sign(D - C) !== -dir) return {ok:false, err:'C→D debe ir contra B→C.'};
+  const post = Array.isArray(c.post) ? c.post.filter(isF) : [];
+  if(post.length){
+    if(!hasD) return {ok:false, err:'Registra D antes de los pivotes posteriores.'};
+    let prev = C, cur = D;
+    for(const q of post){ if(q === cur || Math.sign(q - cur) !== -Math.sign(cur - prev)) return {ok:false, err:'Los pivotes después de D deben alternar (zigzag).'}; prev = cur; cur = q; }
+  }
+  const R = {cab: bc / ab};
+  if(hasX){ R.bxa = ab / xa; R.cx = Math.abs(C - X) / xa; }
+  return {ok:true, hasX, hasD, dir, xa, ab, bc, R, post, cBeyondA:(C - A) * dir > 0, bBeyondX: hasX && (B - X) * dir < 0};
+}
+
+function simFit(key, g){
+  const P = SIM[key], sl = state.settings.ratioSlack, R = g.R;
+  const no = why => ({fit:0, why});
+  if(P.fam === 'xabcd'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(g.cBeyondA) return no('C supera a A: mira Cypher o Shark.');
+    if(g.bBeyondX) return no('B supera a X: mira 5-0.');
+    const bf = fitR(R.bxa, P.b[0], P.b[1], sl), cf = fitR(R.cab, .382, .886, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y ${P.name} pide ${rangeTxt(P.b)}.`);
+    if(!cf) return no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(P.fam === 'shark'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Shark, C debe superar a A (1.13–1.618 de AB).');
+    const cf = fitR(R.cab, 1.13, 1.618, sl);
+    if(!cf || R.bxa >= 1) return no(`C está en ${fr(R.cab)} de AB y el Shark pide 1.13–1.618.`);
+    return {fit:cf};
+  }
+  if(P.fam === 'cypher'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Cypher, C debe superar a A (1.13–1.414 de XA).');
+    const bf = fitR(R.bxa, .382, .618, sl), xf = fitR(R.cx, 1.13, 1.414, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y el Cypher pide 0.382–0.618.`);
+    if(!xf) return no(`C extiende ${fr(R.cx)} de XA y el Cypher pide 1.13–1.414.`);
+    return {fit:Math.min(bf, xf)};
+  }
+  if(P.fam === 'fiveo'){
+    if(!g.bBeyondX) return no('En un 5-0, B debe superar a X (1.13–1.618 de XA).');
+    const bf = fitR(R.bxa, 1.13, 1.618, sl), cf = fitR(R.cab, 1.618, 2.24, sl);
+    if(!bf || !cf) return no(`Pide B 1.13–1.618 de XA y C 1.618–2.24 de AB.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(g.cBeyondA) return no('C supera a A: no es un AB=CD.');
+  const cf = fitR(R.cab, .382, .886, sl);
+  return cf ? {fit:cf} : no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+}
+
+function simCompute(c, key, slMode, tpMode){
+  const g = geom(c); if(!g.ok) return {ok:false, err:g.err};
+  const P = SIM[key], {X, A, B, C} = c, dir = g.dir;
+  if((P.base === 'XA' || P.base === 'XC') && !g.hasX) return {ok:false, err:P.name + ' necesita el punto X.'};
+  const XC = g.hasX ? Math.abs(C - X) : NaN;
+  const at = {XA:k => A - dir * k * g.xa, XC:k => C - dir * k * XC, BC:k => C - dir * k * g.bc, AB:k => C - dir * k * g.ab}[P.base];
+  const bcP = k => C - dir * k * g.bc, abP = k => C - dir * k * g.ab;
+  const leg = g.hasX ? g.xa : g.ab;
+  const Dp = at(P.d);
+  const proj = [{label:fr(P.d) + ' ' + P.base, v:Dp, main:true, inPrz:true}];
+  let bcBest = null;
+  if(P.bc){
+    FIB_EXT.forEach(f => { if(f < P.bc[0] - 1e-9 || f > P.bc[1] + 1e-9) return; const v = bcP(f); if(!bcBest || Math.abs(v - Dp) < Math.abs(bcBest.v - Dp)) bcBest = {f, v}; });
+    if(bcBest) proj.push({label:fr(bcBest.f) + ' BC', v:bcBest.v, inPrz:true, bc:true});
+  }
+  if(P.abcd){
+    let best = null; P.abcd.forEach(f => { const v = abP(f); if(!best || Math.abs(v - Dp) < Math.abs(best.v - Dp)) best = {f, v}; });
+    const near = Math.abs(best.v - Dp) <= 0.10 * leg;
+    proj.push({label:(best.f === 1 ? 'AB=CD' : 'AB=CD ' + fr(best.f)) + (near ? '' : ' (lejos)'), v:best.v, inPrz:near});
+  }
+  if(P.base === 'AB' && fitR(g.R.cab, .382, .886, .03) > 0){
+    const k = 1 / g.R.cab, v = bcP(k), near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'BC recíproco ' + fr(k) + (near ? '' : ' (lejos)'), v, inPrz:near, bc:true});
+  }
+  if(key === 'fiveo'){ const v = abP(1), near = Math.abs(v - Dp) <= 0.10 * leg; proj.push({label:'AB=CD recíproco' + (near ? '' : ' (lejos)'), v, inPrz:near}); }
+  const hs = state.settings.useHistory && hist.byKey[key];
+  if(hs && hs.devN >= 2){
+    const v = Dp - dir * hs.devMean * leg, near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'D según historial (' + hs.devN + ')', v, inPrz:near, hist:true});
+  }
+  const pz = proj.filter(p => p.inPrz).map(p => p.v);
+  const prz = [Math.min(...pz), Math.max(...pz)];
+  const E = g.hasD ? c.D : Dp;
+  let slR = slMode === 'agr' ? P.sl[1] : P.sl[0];
+  if(slR <= P.d + 1e-9) slR = P.d * 1.15;
+  const baseLeg = {XA:g.xa, XC:XC, BC:g.bc, AB:g.ab}[P.base];
+  const SL = at(slR) - dir * 0.02 * baseLeg;
+  const refAD = (P.fam === 'cypher' || P.fam === 'shark' || P.fam === 'fiveo') ? C : A;
+  const ref = tpMode === 'CD' ? C : refAD;
+  const tpLbl = (tpMode === 'CD' || ref === C) ? 'CD' : 'AD';
+  const TP1 = E + 0.382 * (ref - E), TP2 = E + 0.618 * (ref - E);
+  const risk = Math.abs(E - SL);
+  const pts = [];
+  if(g.hasX) pts.push({n:'X', v:X});
+  pts.push({n:'A', v:A}, {n:'B', v:B}, {n:'C', v:C}, {n:'D', v:g.hasD ? c.D : Dp, fut:!g.hasD});
+  const iD = pts.length - 1;
+  if(g.hasD) g.post.forEach((v,i) => pts.push({n:PIV[i], v}));
+  const iOf = n => pts.findIndex(p => p.n === n);
+  const conns = [];
+  if(g.hasX){
+    conns.push([iOf('X'), iOf('B'), 'B ' + fr(g.R.bxa)]);
+    if(P.fam === 'cypher') conns.push([iOf('X'), iOf('C'), 'C ' + fr(g.R.cx) + ' XA']);
+    else conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    if(bcBest) conns.push([iOf('B'), iOf('D'), fr(bcBest.f) + ' BC']);
+    conns.push([iOf('X'), iOf('D'), fr(P.d) + ' ' + P.base]);
+  } else {
+    conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    conns.push([iOf('B'), iOf('D'), 'CD ' + fr(P.d) + ' AB']);
+  }
+  const breached = g.hasD && (c.D - SL) * dir < 0;
+  return {ok:true, g, P, key, pts, iD, conns, proj, prz, Dp, E, SL, slR, TP1, TP2, tpLbl, risk,
+          rr1:Math.abs(TP1 - E) / risk, rr2:Math.abs(TP2 - E) / risk, hasD:g.hasD, hasX:g.hasX, dir, leg, breached, C};
+}
+
+// Encajes buenos (≥65%) cuentan igual: entre ellos gana la PRZ que el precio tocaría primero, como en la escalera
+const tier = f => f >= 0.65 ? 2 : f > 0 ? 1 : 0;
+// Ranking: compatibles primero, luego mejor encaje, luego el que el precio tocaría primero (o el más cercano a D real)
+function rankCands(c){
+  const g = geom(c); if(!g.ok) return [];
+  return Object.keys(SIM).filter(k => !SIM[k].hidden).map(k => {
+    const f = simFit(k, g);
+    const r = simCompute(c, k, 'cons', 'AD');
+    const dist = r.ok ? Math.abs(r.Dp - (g.hasD ? c.D : c.C)) : Infinity;
+    // con X, un patrón XABCD es más específico que un AB=CD suelto
+    const spec = g.hasX && SIM[k].fam !== 'abcd' ? 1 : 0;
+    return {key:k, fit:f.fit, why:f.why || '', dist, spec};
+  }).sort((a,b) => ((b.fit > 0) - (a.fit > 0)) || (b.spec - a.spec) || (g.hasD ? a.dist - b.dist : (tier(b.fit) - tier(a.fit)) || (a.dist - b.dist)));
+}
+
+// Escalera: el siguiente patrón con D más profundo que tu B admite (Butterfly tiene su alterno en 1.618)
+function nextOf(k, g){
+  const P = SIM[k];
+  if(P.fam !== 'xabcd') return P.next;
+  if(k === 'butterfly') return 'butterfly2';
+  if(!g || !g.ok) return null;
+  return Object.keys(SIM).filter(q => SIM[q].fam === 'xabcd' && !SIM[q].hidden && SIM[q].d > P.d + 1e-9 && simFit(q, g).fit > 0)
+    .sort((a,b) => SIM[a].d - SIM[b].d)[0] || null;
+}
+
+/* ============ Historial: resultados reales, estadísticas y patrones futuros ============ */
+const PARENT = {butterfly2:'butterfly', shark2:'shark', abcd2:'abcd', abcd3:'abcd'};
+const FIB_ALL = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886, 1, 1.13, 1.272, 1.414, 1.618, 2, 2.24, 2.618, 3.14, 3.618];
+const noD = c => ({X:c.X, A:c.A, B:c.B, C:c.C, D:NaN, post:[]});
+function bestKeyNoD(c){ const rk = rankCands(noD(c)); const b = rk.find(x => x.fit > 0); return b ? b.key : null; }
+const expectedKeyOf = p => (p.key && SIM[p.key]) ? p.key : bestKeyNoD(p);
+
+// Cadena de pivotes confirmados de un patrón: X, A, B, C, D, E, F…
+function chainOf(p){
+  const g = geom(coordsOf(p)); if(!g.ok) return [];
+  const ch = [];
+  if(isF(p.X)) ch.push({n:'X', v:p.X});
+  ch.push({n:'A', v:p.A}, {n:'B', v:p.B}, {n:'C', v:p.C});
+  if(isF(p.D)) ch.push({n:'D', v:p.D});
+  g.post.forEach((v,i) => ch.push({n:PIV[i], v}));
+  return ch;
+}
+
+// Qué pasó realmente: dónde giró D frente a la PRZ, SL1 (agresivo), SL2 (conservador) y hasta dónde reaccionó
+function outcomeOf(p){
+  const c = coordsOf(p);
+  if(!isF(c.D)) return {status:'pendiente'};
+  const c0 = noD(c), g0 = geom(c0), gf = geom(c);
+  if(!g0.ok || !gf.ok) return {status:'error'};
+  const key = expectedKeyOf(p);
+  if(!key) return {status:'sin patrón'};
+  const rc = simCompute(c0, key, 'cons', 'AD'), ra = simCompute(c0, key, 'agr', 'AD');
+  if(!rc.ok || !ra.ok) return {status:'error'};
+  const dir = g0.dir, D = c.D, leg = rc.leg;
+  const beyond = v => (v - D) * dir >= 0;
+  const przNear = dir > 0 ? rc.prz[1] : rc.prz[0];
+  const hitSL1 = beyond(ra.SL), hitSL2 = beyond(rc.SL), reachedPRZ = beyond(przNear);
+  const dev = (rc.Dp - D) * dir / leg;
+  const E = gf.post[0], AD = Math.abs(c.A - D);
+  const reactFrac = isF(E) ? Math.abs(E - D) / AD : NaN;
+  let best = null;
+  Object.keys(SIM).forEach(k => {
+    const f = simFit(PARENT[k] || k, g0); if(!f.fit) return;
+    const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return;
+    const d = Math.abs(r.Dp - D) / r.leg; if(!best || d < best.d) best = {k, d};
+  });
+  const baseLen = {XA:g0.xa, XC:isF(c.X) ? Math.abs(c.C - c.X) : NaN, BC:g0.bc, AB:g0.ab}[SIM[key].base];
+  const baseFrom = SIM[key].base === 'XA' ? c.A : c.C;
+  const realRatio = Math.abs(D - baseFrom) / baseLen;
+  const status = hitSL2 ? 'invalidado' : !reachedPRZ ? 'giró antes' : hitSL1 ? 'tocó SL1' : 'en PRZ';
+  return {status, key, Dp:rc.Dp, prz:rc.prz, SL1:ra.SL, SL2:rc.SL, hitSL1, hitSL2, reachedPRZ, dev, leg, E, reactFrac,
+          reacted:gf.post.length > 0, tp1:reactFrac >= 0.382, tp2:reactFrac >= 0.618,
+          completedAs:best && best.d <= 0.06 ? best.k : null, realRatio, base:SIM[key].base, dir};
+}
+const STATUS_TXT = {'invalidado':'Invalidado (SL2)', 'giró antes':'Giró antes de la PRZ', 'tocó SL1':'Tocó SL1 y aguantó', 'en PRZ':'Giró en la PRZ', 'pendiente':'Pendiente'};
+const STATUS_CLS = {'invalidado':'bear', 'giró antes':'acc', 'tocó SL1':'fib', 'en PRZ':'bull', 'pendiente':''};
+
+function computeHistory(){
+  const H = {out:new Map(), byKey:{}, legs:[], bins:FIB_ALL.map(f => ({f, n:0})), pref:new Set(), total:0, onFib:0, chance:0};
+  state.patterns.forEach(p => {
+    const o = outcomeOf(p); H.out.set(p.id, o);
+    if(!o.key || o.status === 'pendiente') return;
+    const s = H.byKey[o.key] || (H.byKey[o.key] = {n:0, reacted:0, invalid:0, sl1:0, before:0, devs:[], reacts:[], tp1:0, tp2:0, completedAs:{}});
+    s.n++;
+    if(o.hitSL2) s.invalid++; else if(o.hitSL1) s.sl1++;
+    if(!o.reachedPRZ) s.before++;
+    if(!o.hitSL2){ s.devs.push(o.dev); if(o.reacted) s.reacted++; }
+    if(isF(o.reactFrac)){ s.reacts.push(o.reactFrac); if(o.tp1) s.tp1++; if(o.tp2) s.tp2++; }
+    const ca = o.completedAs || 'ninguno exacto'; s.completedAs[ca] = (s.completedAs[ca] || 0) + 1;
+  });
+  Object.values(H.byKey).forEach(s => {
+    s.devN = s.devs.length; s.devMean = s.devN ? s.devs.reduce((a,b) => a + b, 0) / s.devN : 0;
+    s.reactMean = s.reacts.length ? s.reacts.reduce((a,b) => a + b, 0) / s.reacts.length : NaN;
+  });
+  // Tramos confirmados (sin duplicar los que comparten varios patrones)
+  const seen = new Set(), rd = v => (+v).toFixed(dec() + 1);
+  state.patterns.forEach(p => {
+    const ch = chainOf(p);
+    for(let i = 2; i < ch.length; i++){
+      const k = rd(ch[i - 2].v) + '|' + rd(ch[i - 1].v) + '|' + rd(ch[i].v); if(seen.has(k)) continue; seen.add(k);
+      const l1 = Math.abs(ch[i - 1].v - ch[i - 2].v), l2 = Math.abs(ch[i].v - ch[i - 1].v);
+      if(l1 > 0) H.legs.push({q:l2 / l1, name:ch[i - 1].n + ch[i].n + ' / ' + ch[i - 2].n + ch[i - 1].n, pid:p.id});
+    }
+  });
+  H.legs.forEach(l => {
+    let b = null; FIB_ALL.forEach(f => { const d = Math.abs(l.q - f) / f; if(d <= 0.03 && (!b || d < b.d)) b = {f, d}; });
+    l.fib = b ? b.f : null; if(b){ H.bins.find(x => x.f === b.f).n++; H.onFib++; }
+  });
+  H.total = H.legs.length;
+  if(H.total){
+    const qs = H.legs.map(l => l.q), lo = Math.max(0.2, Math.min(...qs)), hi = Math.min(3.8, Math.max(...qs));
+    if(hi > lo){ const cov = FIB_ALL.filter(f => f >= lo && f <= hi).reduce((a,f) => a + 0.06 * f, 0); H.chance = Math.min(1, cov / (hi - lo)); }
+  }
+  if(H.total >= 10) H.bins.filter(b => b.n >= 3 && b.n / H.total >= 0.1).sort((a,b) => b.n - a.n).slice(0, 3).forEach(b => H.pref.add(b.f));
+  return H;
+}
+
+// D calibrado con el desvío medio real de ese tipo de patrón en este activo
+function histCalibration(p){
+  if(!state.settings.useHistory || isF(p.D)) return null;
+  const key = expectedKeyOf(p); if(!key) return null;
+  const st = hist.byKey[key]; if(!st || st.devN < 2) return null;
+  const r = simCompute(noD(p), key, 'cons', 'AD'); if(!r.ok) return null;
+  return {price:r.Dp - r.dir * st.devMean * r.leg, label:SIM[key].name + ': D según historial (' + st.devN + ')'};
+}
+
+// Patrones futuros: con los últimos 4 (o 3) pivotes confirmados de cada cadena
+function futureCandidates(){
+  const out = [];
+  state.patterns.forEach(p => {
+    if(!p.enabled) return;
+    const o = hist.out.get(p.id); if(!o || o.status === 'pendiente' || o.status === 'error') return;
+    const ch = chainOf(p); if(ch.length < 4) return;
+    const w = ch.slice(-4), c = {X:w[0].v, A:w[1].v, B:w[2].v, C:w[3].v, D:NaN, post:[]};
+    const g = geom(c);
+    if(g.ok){
+      const b = rankCands(c).find(x => x.fit > 0);
+      if(b && SIM[b.key].fam !== 'abcd'){ out.push({p, o, win:w, coords:c, key:b.key, fit:b.fit, r:simCompute(c, b.key, 'cons', 'AD'), prefix:ch.slice(0, -4)}); return; }
+    }
+    const w3 = ch.slice(-3), c3 = {X:NaN, A:w3[0].v, B:w3[1].v, C:w3[2].v, D:NaN, post:[]}, g3 = geom(c3);
+    if(g3.ok && simFit('abcd', g3).fit > 0){ out.push({p, o, win:w3, coords:c3, key:'abcd', fit:simFit('abcd', g3).fit, r:simCompute(c3, 'abcd', 'cons', 'AD'), prefix:ch.slice(0, -3)}); return; }
+    out.push({p, o, win:w, coords:c, key:null, why:g.ok ? 'Los últimos pivotes todavía no encajan en ningún patrón clásico.' : g.err, prefix:ch.slice(0, -4)});
+  });
+  return out;
+}
+
+/* ============ Dibujo del patrón individual (estilo guía) ============ */
+function patternChart(r, o){
+  // o.prefix: pivotes anteriores (cadena confirmada) · o.rename: nombres para r.pts · o.extra: líneas adicionales
+  o = Object.assign({W:860, H:480, compact:false, zones:[], color:null, prefix:[], rename:null, extra:[]}, o);
+  const W = o.W, H = o.H, cp = o.compact;
+  const padL = cp ? 8 : 66, padR = cp ? 8 : 240, padT = cp ? 18 : 28, padB = cp ? 18 : 28;
+  const own = r.pts.map((p,i) => ({...p, n:o.rename ? o.rename[i] : p.n}));
+  const off = o.prefix.length, pts = [...o.prefix.map(p => ({...p, pre:true})), ...own], n = pts.length;
+  const iD = off + (isF(r.iD) ? r.iD : r.pts.length - 1), iC = iD - 1;
+  const x0 = padL + (cp ? 8 : 16), x1 = W - padR - (cp ? 8 : 60);
+  const xs = pts.map((_,i) => x0 + (x1 - x0) * i / (n - 1));
+  const xEnd = W - padR;
+  const lines = cp ? [] : [
+    {v:r.SL, t:(o.slName || 'SL') + ' ' + fmt(r.SL), c:'bear'},
+    {v:r.E, t:(r.hasD ? 'D real ' : 'Entrada ') + fmt(r.E), c:'ink'},
+    {v:r.TP1, t:'TP1 (' + r.tpLbl + ') ' + fmt(r.TP1), c:'bull'},
+    {v:r.TP2, t:'TP2 (' + r.tpLbl + ') ' + fmt(r.TP2), c:'bull'}, ...o.extra];
+  const all = [...pts.map(p => p.v), ...lines.map(l => l.v)];
+  if(!cp) all.push(...r.proj.map(p => p.v));
+  let mn = Math.min(...all), mx = Math.max(...all); const pad = (mx - mn) * 0.07 || 1; mn -= pad; mx += pad;
+  const y = v => padT + (mx - v) / (mx - mn) * (H - padT - padB);
+  const S = [], right = [];
+  if(!cp){
+    for(let i = 0; i <= 4; i++){ const v = mn + (mx - mn) * i / 4, yy = y(v);
+      S.push(`<line class="g-grid" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}"/><text class="g-lbl" x="${padL - 8}" y="${yy + 4}" text-anchor="end">${fmt(v)}</text>`); }
+    o.zones.forEach(z => {
+      const lo = Math.min(z.coreLo, z.priceLo), hi = Math.max(z.coreHi, z.priceHi);
+      if(hi < mn || lo > mx) return;
+      const a = y(Math.min(hi, mx)), b = y(Math.max(lo, mn));
+      S.push(`<rect class="g-zone" x="${xs[iC]}" y="${a}" width="${xEnd - xs[iC]}" height="${Math.max(2, b - a)}"/>`);
+      right.push({y:(a + b) / 2, t:'Zona ' + z.rank + ' · ' + strengthOf(z.score).toLowerCase(), c:'s-fib'});
+    });
+    const a = y(r.prz[1]), b = y(r.prz[0]);
+    S.push(`<rect class="g-prz" x="${xs[iC]}" y="${a}" width="${xEnd - xs[iC]}" height="${Math.max(3, b - a)}"/>`);
+    right.push({y:(a + b) / 2, t:'PRZ ' + fmt(r.prz[0]) + ' – ' + fmt(r.prz[1]), c:'s-fib'});
+    if(r.hasX){ const yy = y(pts[off].v); S.push(`<line class="g-xline" x1="${xs[off]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`); right.push({y:yy, t:'Nivel ' + pts[off].n + ' ' + fmt(pts[off].v), c:'s-muted'}); }
+  }
+  const pt = i => `${xs[i].toFixed(1)},${y(pts[i].v).toFixed(1)}`;
+  if(r.hasX) S.push(`<polygon class="g-tri" points="${pt(off)} ${pt(off + 1)} ${pt(off + 2)}"/>`);
+  S.push(`<polygon class="g-tri" points="${pt(iD - 2)} ${pt(iD - 1)} ${pt(iD)}"/>`);
+  const conn = (i, j, t) => { i += off; j += off; const ax = xs[i], ay = y(pts[i].v), bx = xs[j], by = y(pts[j].v);
+    S.push(`<line class="g-conn" x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"/>`);
+    if(t) S.push(`<text class="g-ratio" x="${(ax + bx) / 2}" y="${(ay + by) / 2 + 4}" text-anchor="middle"${cp ? ' style="font-size:10.5px"' : ''}>${t}</text>`); };
+  if(cp){ const last = r.conns[r.conns.length - 1]; conn(last[0], last[1], last[2]); }
+  else r.conns.forEach(q => conn(q[0], q[1], q[2]));
+  if(!cp){
+    r.proj.forEach(p => { const yy = y(p.v);
+      S.push(`<line class="g-proj${p.inPrz ? '' : ' off'}${p.hist ? ' hist' : ''}" x1="${xs[iD] - 38}" x2="${xs[iD] + 38}" y1="${yy}" y2="${yy}"/>`);
+      if(!p.main) right.push({y:yy, t:p.label + ' ' + fmt(p.v), c:p.hist ? 's-acc' : 's-fib'}); });
+    lines.forEach(l => { const yy = y(l.v);
+      S.push(`<line class="g-trade l-${l.c}${l.dash ? ' dash' : ''}" x1="${xs[iD]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`); right.push({y:yy, t:l.t, c:'s-' + l.c}); });
+    if(isF(state.asset.price) && state.asset.price > mn && state.asset.price < mx){
+      const yy = y(state.asset.price);
+      S.push(`<line class="g-price" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}" opacity=".5"/>`); right.push({y:yy, t:'Precio ' + fmt(state.asset.price), c:'s-ink'}); }
+  }
+  const stroke = o.color ? ` style="stroke:${o.color}"` : '';
+  const realIdx = pts.map((p,i) => p.fut ? -1 : i).filter(i => i >= 0);
+  if(off) S.push(`<polyline class="g-path pre" points="${pts.slice(0, off + 1).map((_,i) => pt(i)).join(' ')}"${stroke}/>`);
+  S.push(`<polyline class="g-path${o.draw ? ' draw' : ''}" pathLength="1" points="${realIdx.filter(i => i >= off).map(pt).join(' ')}"${stroke}/>`);
+  pts.forEach((p,i) => { if(p.fut) S.push(`<polyline class="g-path fut" points="${pt(i - 1)} ${pt(i)}"${stroke}/>`); });
+  pts.forEach((p, i) => { const yy = y(p.v);
+    const nb = i > 0 ? pts[i - 1].v : pts[i + 1].v, high = p.v >= nb;
+    S.push(`<circle class="g-pt${p.fut ? ' fut' : ''}${p.pre ? ' pre' : ''}" cx="${xs[i]}" cy="${yy}" r="${cp ? 2.8 : 4.5}"/><text class="g-letter${cp ? ' sm' : ''}${p.pre ? ' pre' : ''}" x="${xs[i]}" y="${high ? yy - (cp ? 7 : 12) : yy + (cp ? 15 : 23)}" text-anchor="middle">${esc(p.n)}</text>`); });
+  if(!cp && right.length){
+    right.sort((a,b) => a.y - b.y); const gap = 16, ys = right.map(q => q.y);
+    for(let i = 1; i < ys.length; i++) if(ys[i] < ys[i - 1] + gap) ys[i] = ys[i - 1] + gap;
+    const over = ys[ys.length - 1] - (H - 6);
+    if(over > 0){ ys[ys.length - 1] -= over; for(let i = ys.length - 2; i >= 0; i--) if(ys[i] > ys[i + 1] - gap) ys[i] = ys[i + 1] - gap; }
+    right.forEach((it, i) => S.push(`<line class="g-lead" x1="${xEnd + 2}" y1="${it.y}" x2="${xEnd + 12}" y2="${ys[i]}"/><text class="g-rl ${it.c}" x="${xEnd + 16}" y="${ys[i] + 4}">${esc(it.t)}</text>`));
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(o.label || 'Patrón')}">${S.join('')}</svg>`;
+}
+
+/* ============ Estado del simulador ============ */
+const sim = {coords:null, key:null, slMode:'cons', tpMode:'AD', msg:'', modified:false, broken:false, draw:false};
+const selectedPattern = () => state.patterns.find(p => p.id === state.selectedId) || null;
+const coordsOf = p => ({X:p.X, A:p.A, B:p.B, C:p.C, D:p.D, post:Array.isArray(p.post) ? p.post.filter(isF) : []});
+const parsePivots = t => String(t || '').split(/[;\s]+|,(?=\s)/).map(num).filter(isF);
+
+function selectPattern(id, opts){
+  const p = state.patterns.find(q => q.id === id);
+  state.selectedId = p ? p.id : null;
+  sim.coords = p ? coordsOf(p) : null;
+  sim.key = null; sim.msg = ''; sim.modified = false; sim.broken = false; sim.draw = true;
+  syncSimInputs();
+  renderPatterns(); renderSim(); renderConsolidated();
+  if(opts && opts.scroll) $('simulador').scrollIntoView({block:'start'});
+}
+function ensureSelection(){
+  if(!selectedPattern()){
+    const first = state.patterns.find(p => p.enabled) || state.patterns[0];
+    state.selectedId = first ? first.id : null;
+    sim.coords = first ? coordsOf(first) : null; sim.key = null; sim.modified = false; sim.msg = ''; sim.broken = false;
+    syncSimInputs();
+  } else if(!sim.coords){ sim.coords = coordsOf(selectedPattern()); syncSimInputs(); }
+}
+function effectiveKey(){
+  if(!sim.coords) return null;
+  if(sim.key) return sim.key;
+  const p = selectedPattern();
+  if(p && p.key && SIM[p.key] && simCompute(sim.coords, p.key, 'cons', 'AD').ok) return p.key;   // patrón esperado fijado
+  const rk = rankCands(noD(sim.coords));
+  const best = rk.find(x => x.fit > 0) || rk.find(x => simCompute(sim.coords, x.key, 'cons', 'AD').ok);
+  return best ? best.key : null;
+}
+function simResultFor(){
+  const k = effectiveKey(); if(!k) return null;
+  const r = simCompute(sim.coords, k, sim.slMode, sim.tpMode);
+  return r.ok ? r : null;
+}
+function syncSimInputs(){
+  const c = sim.coords || {};
+  ['X','A','B','C','D'].forEach(k => { $('s' + k).value = isF(c[k]) ? c[k] : ''; });
+  $('sPost').value = (c.post || []).join('; ');
+  const opts = state.patterns.map(p => `<option value="${p.id}">${esc(p.label || 'Sin nombre')}${p.tf ? ' · ' + esc(p.tf) : ''}</option>`).join('');
+  $('simPick').innerHTML = opts || '<option value="">Sin patrones</option>';
+  if(state.selectedId) $('simPick').value = state.selectedId;
+}
+function syncSliders(g){
+  const bR = $('bR'), cR = $('cR');
+  if(g && g.ok){
+    bR.disabled = !g.hasX;
+    if(g.hasX){ bR.value = g.R.bxa; $('bOut').textContent = fr(g.R.bxa); } else $('bOut').textContent = 'sin X';
+    cR.disabled = false; cR.value = g.R.cab; $('cOut').textContent = fr(g.R.cab);
+  } else { bR.disabled = cR.disabled = true; $('bOut').textContent = $('cOut').textContent = '–'; }
+}
+
+function zonesTouching(lo, hi, leg){
+  const tol = 0.01 * leg;
+  return visibleZones().filter(z => {
+    const zl = Math.min(z.coreLo, z.priceLo), zh = Math.max(z.coreHi, z.priceHi);
+    return zh >= lo - tol && zl <= hi + tol;
+  }).slice(0, 3);
+}
+
+function renderSim(){
+  const p = selectedPattern();
+  const has = !!(p && sim.coords);
+  ['simFail'].forEach(id => $(id).disabled = !has);
+  $('simApply').disabled = !(has && sim.modified);
+  $('simReset').disabled = !(has && sim.modified);
+  if(!has){
+    $('simChart').innerHTML = '<div class="empty">Agrega un patrón en la sección 1 para simularlo aquí.</div>';
+    $('simCands').innerHTML = ''; $('simMsgs').innerHTML = ''; $('simTable').innerHTML = ''; $('simDir').textContent = '';
+    syncSliders(null); renderSlTable(null); return;
+  }
+  const g = geom(sim.coords);
+  syncSliders(g);
+  if(!g.ok){
+    $('simChart').innerHTML = `<div class="empty">${esc(g.err)}</div>`;
+    $('simCands').innerHTML = ''; $('simTable').innerHTML = '';
+    $('simMsgs').innerHTML = `<div class="msg warn">${esc(g.err)} Corrige las coordenadas.</div>`; return;
+  }
+  $('simDir').textContent = g.hasD
+    ? (g.dir > 0 ? 'Completado abajo: la reacción esperada es alcista.' : 'Completado arriba: la reacción esperada es bajista.')
+    : (g.dir > 0 ? 'Alcista: D se forma abajo, compra en la PRZ.' : 'Bajista: D se forma arriba, venta en la PRZ.');
+  const rk = rankCands(noD(sim.coords));
+  const bestKey = (rk.find(x => x.fit > 0) || {}).key;
+  const k = effectiveKey();
+  const pSel = selectedPattern(), expKey = pSel && pSel.key;
+  const r = k ? simCompute(sim.coords, k, sim.slMode, sim.tpMode) : null;
+  // candidatos
+  let chips = rk.map(x => {
+    const on = x.key === k || (SIM[k] && SIM[k].hidden && SIM[k].name.startsWith(SIM[x.key].name) && false);
+    return `<button type="button" class="chip${x.key === k ? ' on' : ''}${x.fit > 0 ? '' : ' no'}" data-key="${x.key}" title="${esc(x.fit > 0 ? 'Encaje ' + Math.round(x.fit * 100) + '%' : x.why)}">${SIM[x.key].name}${x.fit > 0 ? ' ' + Math.round(x.fit * 100) + '%' : ''}${x.key === bestKey ? '<span class="best">más probable</span>' : ''}${x.key === expKey ? '<span class="best">esperado</span>' : ''}</button>`;
+  }).join('');
+  if(k && SIM[k].hidden) chips += `<button type="button" class="chip on" data-key="${k}">${SIM[k].name}</button>`;
+  $('simCands').innerHTML = 'Proyectar como: ' + chips;
+  if(!r || !r.ok){
+    $('simChart').innerHTML = `<div class="empty">${esc(r ? r.err : 'Sin proyección posible con estas coordenadas.')}</div>`;
+    $('simTable').innerHTML = ''; $('simLadder').innerHTML = ''; $('simResult').innerHTML = ''; $('simMsgs').innerHTML = `<div class="msg warn">${esc(r ? r.err : 'Sin proyección posible.')} Elige otro candidato.</div>`; return;
+  }
+  const touching = zonesTouching(r.prz[0], r.prz[1], r.leg);
+  const otherMode = sim.slMode === 'agr' ? 'cons' : 'agr', rO = simCompute(sim.coords, k, otherMode, sim.tpMode);
+  const slName = m => m === 'agr' ? 'SL1 agresivo' : 'SL2 conservador';
+  $('simChart').innerHTML = patternChart(r, {zones:touching, draw:sim.draw, label:'Simulación ' + SIM[k].name, slName:slName(sim.slMode),
+    extra:rO.ok ? [{v:rO.SL, t:slName(otherMode) + ' ' + fmt(rO.SL), c:'bear', dash:true}] : []});
+  sim.draw = false;
+  // mensajes
+  const m = [];
+  if(sim.msg) m.push(['info', sim.msg]);
+  if(sim.modified) m.push(['fib', 'Coordenadas simuladas: todavía no se aplican al patrón guardado.']);
+  const fitK = simFit(SIM[k].hidden ? k : k, g);
+  if(!fitK.fit){
+    const alts = rk.filter(x => x.fit > 0).map(x => SIM[x.key].name).join(', ');
+    m.push(['warn', `${fitK.why} Así, ${SIM[k].name} es solo un escenario de conversión.${alts ? ' Compatibles hoy: ' + alts + '.' : ''}`]);
+  } else if(k === bestKey && !sim.key) m.push(['ok', `${SIM[k].name} es el patrón más probable con estos ratios.`]);
+  if(r.breached) m.push(['warn', 'El D real ya superó el stop de este patrón: queda invalidado. Prueba el siguiente de la escalera.']);
+  const w = (r.prz[1] - r.prz[0]) / r.leg;
+  if(w > .12) m.push(['warn', `PRZ ancha (${(w * 100).toFixed(0)}% del tramo): la confluencia interna es débil.`]);
+  if(r.rr1 < 1) m.push(['warn', `R:R hasta TP1 de ${r.rr1.toFixed(2)}: el setup no compensa el riesgo.`]);
+  if(touching.length) m.push(['ok', 'La PRZ coincide con ' + touching.map(z => `la zona ${z.rank} (${strengthOf(z.score).toLowerCase()}, ${z.nPat} patr${z.nPat > 1 ? 'ones' : 'ón'})`).join(' y ') + '.']);
+  else if(zones.length) m.push(['info', 'La PRZ no coincide con ninguna zona de confluencia de los otros patrones.']);
+  $('simMsgs').innerHTML = m.map(x => `<div class="msg ${x[0]}">${esc(x[1])}</div>`).join('');
+  // tabla
+  const base = ' ' + SIM[k].base;
+  const rows = [];
+  if(r.hasX) rows.push(['B', fmt(sim.coords.B), fr(g.R.bxa) + ' de XA']);
+  rows.push(['C', fmt(sim.coords.C), SIM[k].fam === 'cypher' ? fr(g.R.cx) + ' de XA (más allá de A)' : fr(g.R.cab) + ' de AB']);
+  rows.push([r.hasD ? 'D proyectado' : 'D (entrada)', fmt(r.Dp), fr(SIM[k].d) + base]);
+  if(r.hasD) rows.push(['D real', fmt(sim.coords.D), 'entrada tomada en el D real']);
+  r.proj.filter(q => !q.main).forEach(q => rows.push(['Proyección ' + q.label, fmt(q.v), q.inPrz ? 'dentro de la PRZ' : 'demasiado lejos de D']));
+  rows.push(['PRZ', fmt(r.prz[0]) + ' – ' + fmt(r.prz[1]), (w * 100).toFixed(1) + '% del tramo']);
+  rows.push([sim.slMode === 'agr' ? 'SL1 agresivo' : 'SL2 conservador', fmt(r.SL), 'más allá de ' + fr(r.slR) + base + ' + colchón de 2%']);
+  if(rO.ok) rows.push([otherMode === 'agr' ? 'SL1 agresivo' : 'SL2 conservador', fmt(rO.SL), 'más allá de ' + fr(rO.slR) + base]);
+  rows.push(['TP1', fmt(r.TP1), '0.382 de ' + r.tpLbl]);
+  rows.push(['TP2', fmt(r.TP2), '0.618 de ' + r.tpLbl]);
+  rows.push(['R:R', r.rr1.toFixed(2) + ' / ' + r.rr2.toFixed(2), 'hasta TP1 / TP2']);
+  const nx = nextOf(k, g);
+  rows.push(['Si atraviesa D', nx ? SIM[nx].name : 'Invalidación', nx ? 'D pasa a ' + fr(SIM[nx].d) + ' ' + SIM[nx].base : 'el extremo que marque será un nuevo X']);
+  $('simTable').innerHTML = '<tr><th>Nivel</th><th>Precio</th><th>Detalle</th></tr>' + rows.map(x => `<tr><td>${x[0]}</td><td class="num"><b>${x[1]}</b></td><td>${esc(x[2])}</td></tr>`).join('');
+  $('simFail').disabled = sim.broken;
+  renderLadderPanel(k, g);
+  renderResultPanel(k);
+  renderSlTable(k);
+}
+
+function renderSlTable(k){
+  const order = ['gartley','bat','altbat','butterfly','butterfly2','crab','deepcrab','shark','shark2','cypher','fiveo','abcd','abcd2','abcd3'];
+  $('slTable').innerHTML = '<tr><th>Patrón</th><th>D</th><th>SL1 agresivo</th><th>SL2 conservador</th><th>Colchón</th></tr>' +
+    order.map(q => { const P = SIM[q], b = ' ' + P.base;
+      return `<tr class="${q === k ? 'cur' : ''}"><td>${P.name}</td><td class="num">${fr(P.d)}${b}</td><td class="num">${fr(P.sl[1])}${b}</td><td class="num">${fr(P.sl[0])}${b}${P.sl[0] === 1 && P.base === 'XA' ? ' (X)' : ''}${P.sl[0] === 1 && P.base === 'XC' ? ' (X)' : ''}</td><td>2% de ${P.base}</td></tr>`; }).join('');
+}
+
+// Escalera completa: en qué se convierte si el precio atraviesa D, y el escenario de ruptura
+function renderLadderPanel(k, g){
+  const box = $('simLadder');
+  const c0 = noD(sim.coords), g0 = geom(c0);
+  if(!g0.ok){ box.innerHTML = ''; return; }
+  const P = SIM[k];
+  // inicio de la escalera: el patrón compatible de la misma familia con D menos profundo
+  let start = PARENT[k] || k;
+  if(P.fam === 'xabcd'){
+    const comp = Object.keys(SIM).filter(q => SIM[q].fam === 'xabcd' && !SIM[q].hidden && simFit(q, g0).fit > 0).sort((a,b) => SIM[a].d - SIM[b].d);
+    if(comp.length && simFit(start, g0).fit > 0) start = comp[0];
+  }
+  const steps = []; let cur = start, guard = 0;
+  while(cur && guard++ < 8){
+    const rc = simCompute(c0, cur, 'cons', 'AD'), ra = simCompute(c0, cur, 'agr', 'AD');
+    if(!rc.ok) break;
+    steps.push({k:cur, D:rc.Dp, SL1:ra.SL, SL2:rc.SL, prz:rc.prz});
+    cur = nextOf(cur, g0);
+  }
+  if(!steps.length){ box.innerHTML = ''; return; }
+  const last = steps[steps.length - 1], dir = g0.dir, Dr = sim.coords.D;
+  const passed = v => isF(Dr) && (v - Dr) * dir >= 0;
+  const li = steps.map((st, i) => {
+    let tag = '';
+    if(isF(Dr)){
+      if(passed(st.SL2)) tag = '<span class="tag bear">D real pasó su SL2</span>';
+      else if(passed(st.SL1)) tag = '<span class="tag fib">D real tocó SL1</span>';
+      else if(passed(dir > 0 ? st.prz[1] : st.prz[0])) tag = '<span class="tag bull">D real giró aquí</span>';
+    }
+    return `<li class="${st.k === k ? 'cur' : ''}"><button type="button" class="chip${st.k === k ? ' on' : ''}" data-key="${st.k}">${SIM[st.k].name}</button>
+      D <b class="num">${fmt(st.D)}</b> <span class="zsub">(${fr(SIM[st.k].d)} ${SIM[st.k].base})</span> · SL1 <span class="num">${fmt(st.SL1)}</span> · SL2 <span class="num">${fmt(st.SL2)}</span> ${tag}</li>`;
+  }).join('');
+  const Cp = sim.coords.C, Ap = last.SL2;
+  const newDir = dir > 0 ? 'bajista (venta en su D′)' : 'alcista (compra en su D′)';
+  const bl = [[0.382,'Bat'],[0.5,'Bat'],[0.618,'Gartley o Crab'],[0.786,'Butterfly'],[0.886,'Deep Crab']]
+    .map(([q,n]) => `<span class="chip no" style="cursor:default">B′ ${fr(q)} = <b class="num">${fmt(Ap + q * (Cp - Ap))}</b> → ${n}</span>`).join('');
+  const lateral = [];
+  if(g0.hasX && !g0.cBeyondA && !isF(Dr)) lateral.push('Si C todavía no está confirmado y termina superando A (' + fmt(sim.coords.A) + '), evalúa Cypher o Shark.');
+  if(!g0.hasX) lateral.push('Agrega X para evaluar los patrones XABCD además del AB=CD.');
+  box.innerHTML = `<h3 class="ptitle">Si el precio atraviesa D</h3>
+    <ol class="ladder">${li}
+      <li class="brk"><b>Ruptura</b> más allá de <b class="num">${fmt(Ap)}</b>: el patrón queda invalidado y el extremo que marque será el nuevo X.
+        Se arma un patrón ${newDir} con X′ = C (${fmt(Cp)}) y A′ en ese extremo (al menos ${fmt(Ap)}). Cuando rebote, su B′ decide el patrón:
+        <div class="cands" style="margin:.3rem 0">${bl}</div>
+        <button type="button" class="btn sm" id="mkNext">Crear el patrón de ruptura</button></li>
+    </ol>${lateral.map(t => `<p class="hint">${esc(t)}</p>`).join('')}`;
+  $('mkNext').onclick = () => {
+    const p = selectedPattern();
+    clearForm();
+    $('fLabel').value = (p ? p.label : 'Patrón') + ' · ruptura'; $('fTf').value = p ? p.tf : '';
+    $('fX').value = +Cp.toFixed(dec()); $('fA').value = +Ap.toFixed(dec());
+    $('fMsg').textContent = 'Ajusta A al extremo real y completa B y C cuando se formen.';
+    $('patrones').scrollIntoView({block:'start'}); $('fA').focus();
+  };
+}
+
+// Resultado real del patrón (cuando ya tiene D)
+function renderResultPanel(k){
+  const box = $('simResult'), p = selectedPattern();
+  if(!p || !sim.coords || !isF(sim.coords.D)){
+    box.innerHTML = `<div class="msg info">Cuando el movimiento termine, escribe el <b>D real</b> (donde giró el precio) y los <b>pivotes posteriores</b> (E, F…) y pulsa «Aplicar al patrón». Quedará registrado en el historial del activo.</div>`;
+    return;
+  }
+  const o = outcomeOf({...p, ...sim.coords});
+  if(!o.key){ box.innerHTML = ''; return; }
+  const cls = STATUS_CLS[o.status] || '';
+  const rows = [
+    ['Patrón esperado', SIM[o.key].name + (p.key ? '' : ' (automático)'), 'D teórico ' + fmt(o.Dp)],
+    ['D real', fmt(sim.coords.D), fr(o.realRatio) + ' ' + o.base + ' · desvío ' + (o.dev >= 0 ? '+' : '') + fr(o.dev) + ' ' + o.base + (o.dev >= 0 ? ' (fue más lejos)' : ' (se quedó corto)')],
+    ['PRZ', fmt(o.prz[0]) + ' – ' + fmt(o.prz[1]), o.reachedPRZ ? 'alcanzada' : 'no alcanzada'],
+    ['SL1 agresivo', fmt(o.SL1), o.hitSL1 ? 'tocado' : 'intacto'],
+    ['SL2 conservador', fmt(o.SL2), o.hitSL2 ? 'tocado: patrón invalidado' : 'intacto'],
+    ['Reacción', isF(o.E) ? fmt(o.E) : 'sin registrar', isF(o.reactFrac) ? fr(o.reactFrac) + ' de AD · ' + (o.tp2 ? 'TP1 y TP2 alcanzados' : o.tp1 ? 'TP1 alcanzado, TP2 no' : 'no llegó a TP1') : 'agrega el pivote E'],
+    ['Se completó como', o.completedAs ? SIM[o.completedAs].name : 'ningún patrón exacto', o.completedAs && o.completedAs !== o.key ? 'distinto del esperado' : '']
+  ];
+  const fixBtn = k !== p.key ? `<button type="button" class="btn sm" id="fixKey">Fijar ${esc(SIM[k].name)} como patrón esperado</button>` : '';
+  box.innerHTML = `<h3 class="ptitle">Resultado real <span class="tag ${cls}">${STATUS_TXT[o.status]}</span></h3>
+    ${sim.modified ? '<div class="msg fib">Pulsa «Aplicar al patrón» para guardar este resultado en el historial.</div>' : ''}
+    <div class="tablewrap"><table><tr><th>Dato</th><th>Precio</th><th>Lectura</th></tr>${rows.map(x => `<tr><td>${x[0]}</td><td class="num"><b>${x[1]}</b></td><td>${esc(x[2])}</td></tr>`).join('')}</table></div>${fixBtn}`;
+  if(fixBtn) $('fixKey').onclick = () => { p.key = k; sim.key = null; touch(); };
+}
+
+// Eventos del simulador
+$('simPick').addEventListener('change', e => selectPattern(e.target.value));
+$('simCands').addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  sim.key = b.dataset.key; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim(); renderConsolidated();
+});
+['X','A','B','C','D'].forEach(k => $('s' + k).addEventListener('input', e => {
+  if(!sim.coords) return; sim.coords[k] = num(e.target.value); sim.modified = true; sim.msg = ''; sim.broken = false;
+  renderSim(); renderConsolidated();
+}));
+$('sPost').addEventListener('input', e => {
+  if(!sim.coords) return; sim.coords.post = parsePivots(e.target.value); sim.modified = true; sim.msg = '';
+  renderSim(); renderConsolidated();
+});
+$('simLadder').addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  sim.key = b.dataset.key; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim(); renderConsolidated();
+});
+$('bR').addEventListener('input', e => {
+  const c = sim.coords; if(!c) return; const g = geom(c); if(!g.ok || !g.hasX) return;
+  const b = +e.target.value, cab = g.R.cab;
+  c.B = +(c.A - b * (c.A - c.X)).toFixed(dec() + 2);
+  c.C = +(c.B - cab * (c.B - c.A)).toFixed(dec() + 2);
+  sim.modified = true; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim(); renderConsolidated();
+});
+$('cR').addEventListener('input', e => {
+  const c = sim.coords; if(!c) return; const g = geom(c); if(!g.ok) return;
+  c.C = +(c.B - (+e.target.value) * (c.B - c.A)).toFixed(dec() + 2);
+  sim.modified = true; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim(); renderConsolidated();
+});
+document.querySelectorAll('input[name=sl]').forEach(i => i.addEventListener('change', e => { sim.slMode = e.target.value; renderSim(); renderConsolidated(); }));
+document.querySelectorAll('input[name=tp]').forEach(i => i.addEventListener('change', e => { sim.tpMode = e.target.value; renderSim(); }));
+$('simFail').addEventListener('click', () => {
+  const k = effectiveKey(); if(!k) return;
+  const P = SIM[k], g0 = geom(sim.coords);
+  const nx = nextOf(k, g0);
+  if(nx){
+    const g = geom(sim.coords), f = simFit(nx, g);
+    const crossX = P.base === 'XA' && P.d < 1 && SIM[nx].d > 1;
+    sim.msg = `El precio atravesó ${fr(P.d)} ${P.base}${crossX ? ' y rompió X' : ''}. Pasa a ${SIM[nx].name}, con D en ${fr(SIM[nx].d)} ${SIM[nx].base}.` + (f.fit || SIM[nx].hidden ? '' : ' Ojo: tus ratios actuales no lo validan del todo.');
+    sim.key = nx; sim.draw = true;
+  } else {
+    sim.msg = `Después de ${fr(P.d)} ${P.base} no queda otro patrón en la escalera de ${P.name}. Es una ruptura: el extremo que marque el precio será el nuevo X de una estructura en la dirección del movimiento.` + (P.fam === 'shark' ? ' Tras un Shark fallido es común que se forme un 5-0.' : '');
+    sim.broken = true;
+  }
+  renderSim(); renderConsolidated();
+});
+$('simApply').addEventListener('click', () => {
+  const p = selectedPattern(); if(!p || !sim.coords) return;
+  const g = geom(sim.coords); if(!g.ok){ alert(g.err); return; }
+  Object.assign(p, sim.coords); sim.modified = false; sim.msg = 'Coordenadas aplicadas al patrón.'; touch();
+});
+$('simReset').addEventListener('click', () => {
+  const p = selectedPattern(); if(!p) return;
+  sim.coords = coordsOf(p); sim.modified = false; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim(); renderConsolidated();
+});
+
+/* ============ Vista consolidada ============ */
+function renderConsolidated(){
+  const box = $('consChart');
+  const act = analyses.filter(a => a.ok && a.p.enabled);
+  const selId = state.selectedId;
+  const list = act.map(a => ({id:a.p.id, p:a.p, c:(a.p.id === selId && sim.coords) ? sim.coords : coordsOf(a.p), color:a.p.color, analysis:a}));
+  // incluir el seleccionado aunque esté oculto, si tiene simulación válida
+  if(selId && !list.find(q => q.id === selId)){
+    const p = selectedPattern(); if(p && sim.coords && geom(sim.coords).ok) list.push({id:p.id, p, c:sim.coords, color:p.color, hiddenSel:true});
+  }
+  $('consLegend').innerHTML = state.patterns.map(p =>
+    `<button type="button" class="chip${p.id === selId ? ' on' : ''}${p.enabled ? '' : ' no'}" data-id="${p.id}"><span class="dot" style="background:${p.color}"></span>${esc(p.label || 'Sin nombre')}${p.tf ? ' · ' + esc(p.tf) : ''}</button>`).join('');
+  if(!list.length){ box.innerHTML = '<div class="empty">Cuando agregues patrones, aparecerán aquí juntos sobre la misma escala.</div>'; return; }
+  const vz = visibleZones();
+  const selR = selId ? simResultFor() : null;
+  const W = 1180, H = 580, padL = 70, padR = 210, padT = 26, padB = 26, projW = 190;
+  const patRight = W - padR - projW, xEnd = W - padR;
+  const ptsOf = c => { const a = ['X','A','B','C','D'].filter(k => isF(c[k])).map(k => ({n:k, v:c[k]})); if(isF(c.D)) (c.post || []).forEach((v,i) => isF(v) && a.push({n:PIV[i], v})); return a; };
+  const sizeOf = c => { const v = ptsOf(c).map(p => p.v); return Math.max(...v) - Math.min(...v); };
+  const maxSize = Math.max(...list.map(q => sizeOf(q.c)));
+  const prices = [];
+  const selItem = list.find(q => q.id === selId);
+  if(consScale === 'sel' && selItem){
+    ptsOf(selItem.c).forEach(p => prices.push(p.v));
+    if(selR) prices.push(selR.Dp, selR.SL, selR.prz[0], selR.prz[1]);
+  } else {
+    list.forEach(q => ptsOf(q.c).forEach(p => prices.push(p.v)));
+    vz.forEach(z => prices.push(z.priceLo, z.priceHi));
+    if(selR){ prices.push(selR.Dp, selR.SL, selR.prz[0], selR.prz[1]); }
+    if(isF(state.asset.price)) prices.push(state.asset.price);
+  }
+  let mn = Math.min(...prices), mx = Math.max(...prices); const pad = (mx - mn) * 0.05 || 1; mn -= pad; mx += pad;
+  const y = v => padT + (mx - v) / (mx - mn) * (H - padT - padB);
+  const S = [], right = [];
+  const inView = v => v >= mn && v <= mx;
+  niceTicks(mn, mx, 8).forEach(v => { const yy = y(v);
+    S.push(`<line class="g-grid" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}"/><text class="g-lbl" x="${padL - 8}" y="${yy + 4}" text-anchor="end">${fmt(v)}</text>`); });
+  S.push(`<line class="g-grid" x1="${patRight}" x2="${patRight}" y1="${padT}" y2="${H - padB}" stroke-dasharray="3 4"/>`);
+  S.push(`<text class="g-lbl" x="${patRight + 8}" y="${padT - 8}">Proyección y zonas</text>`);
+  S.push(`<defs><clipPath id="consClip"><rect x="0" y="${padT - 20}" width="${xEnd + 1}" height="${H - padT - padB + 40}"/></clipPath></defs><g clip-path="url(#consClip)">`);
+  // zonas
+  const maxScore = Math.max(1, ...vz.map(z => z.score));
+  vz.forEach(z => {
+    if(z.priceHi < mn || z.priceLo > mx) return;
+    const t = z.score / maxScore;
+    const a = y(z.priceHi), b = y(z.priceLo);
+    S.push(`<rect class="g-prz" x="${patRight}" y="${a}" width="${xEnd - patRight}" height="${Math.max(2, b - a)}" opacity="${(0.35 + 0.65 * t).toFixed(2)}"/>`);
+    const ca = y(z.coreHi), cb = y(z.coreLo);
+    S.push(`<rect class="g-zband" data-rank="${z.rank}" x="${patRight}" y="${Math.min(ca, (ca + cb) / 2 - 2)}" width="${xEnd - patRight}" height="${Math.max(4, cb - ca)}" fill="var(--fib)" opacity="${(0.25 + 0.6 * t).toFixed(2)}"><title>Zona ${z.rank}: ${fmt(z.coreLo)} – ${fmt(z.coreHi)}</title></rect>`);
+    right.push({y:y(z.center), t:`Zona ${z.rank} · ${z.side > 0 ? 'compra' : 'venta'} ${fmt(z.center)}`, c:z.side > 0 ? 's-bull' : 's-bear', rank:z.rank});
+  });
+  // patrones
+  const marks = [];
+  const order = list.slice().sort((a,b) => (a.id === selId) - (b.id === selId));
+  order.forEach(q => {
+    const pts = ptsOf(q.c), sel = q.id === selId;
+    const span = (patRight - padL - 30) * (0.28 + 0.72 * Math.sqrt(sizeOf(q.c) / maxSize));
+    const xe = patRight - 14, xb = xe - span;
+    const xs = pts.map((_,i) => xb + span * i / (pts.length - 1));
+    const oc = hist.out.get(q.id), iDm = pts.findIndex(p => p.n === 'D');
+    if(oc && iDm >= 0 && oc.status !== 'pendiente' && STATUS_TXT[oc.status] && !(sel && sim.modified)){
+      const cx = xs[iDm], cy = y(pts[iDm].v);
+      if(oc.status === 'invalidado') marks.push(`<path class="g-xmark" d="M${cx - 6},${cy - 6}L${cx + 6},${cy + 6}M${cx + 6},${cy - 6}L${cx - 6},${cy + 6}"><title>${esc(q.p.label)}: invalidado</title></path>`);
+      else marks.push(`<circle cx="${cx}" cy="${cy}" r="${sel ? 6.5 : 4.5}" fill="${q.color}" stroke="var(--surface)" stroke-width="2"><title>${esc(q.p.label)}: ${STATUS_TXT[oc.status]}</title></circle>`);
+    }
+    const poly = pts.map((p,i) => `${xs[i].toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+    if(!sel){
+      S.push(`<polyline points="${poly}" fill="none" stroke="${q.color}" stroke-width="1.7" stroke-opacity=".55" stroke-linejoin="round"/>`);
+      pts.forEach((p,i) => S.push(`<circle cx="${xs[i]}" cy="${y(p.v)}" r="2.4" fill="${q.color}" fill-opacity=".7"/>`));
+      S.push(`<polyline class="g-hit" data-id="${q.id}" points="${poly}"><title>${esc(q.p.label)}</title></polyline>`);
+      return;
+    }
+    const g = geom(q.c);
+    if(pts.length >= 3){
+      const P = pts.map((p,i) => `${xs[i].toFixed(1)},${y(p.v).toFixed(1)}`);
+      if(pts.length >= 4 && g.hasX) S.push(`<polygon class="g-tri" points="${P[0]} ${P[1]} ${P[2]}"/>`);
+    }
+    // proyección del seleccionado
+    if(selR && !selR.hasD){
+      const xd = patRight + projW * 0.32, yd = y(selR.Dp), last = pts[pts.length - 1];
+      const iB = pts.findIndex(p => p.n === 'B');
+      S.push(`<polygon class="g-tri" points="${xs[iB]},${y(pts[iB].v)} ${xs[pts.length - 1]},${y(last.v)} ${xd},${yd}"/>`);
+      const a = y(selR.prz[1]), b = y(selR.prz[0]);
+      S.push(`<rect x="${xd - 26}" y="${a}" width="52" height="${Math.max(3, b - a)}" fill="none" stroke="${q.color}" stroke-width="1.5" rx="2"/>`);
+      S.push(`<polyline class="g-path fut" points="${xs[pts.length - 1]},${y(last.v)} ${xd},${yd}" style="stroke:${q.color}"/>`);
+      S.push(`<line class="g-trade l-bear" x1="${xd - 30}" x2="${xd + 30}" y1="${y(selR.SL)}" y2="${y(selR.SL)}"/>`);
+      S.push(`<circle class="g-pt fut" cx="${xd}" cy="${yd}" r="4.5" style="stroke:${q.color}"/><text class="g-letter" x="${xd}" y="${g.dir > 0 ? yd + 23 : yd - 12}" text-anchor="middle">D</text>`);
+      right.push({y:yd, t:`D ${SIM[selR.key].name} ${fmt(selR.Dp)}`, c:'s-ink'});
+      right.push({y:y(selR.SL), t:'SL ' + fmt(selR.SL), c:'s-bear'});
+    }
+    S.push(`<polyline class="g-path${sim.draw ? ' draw' : ''}" pathLength="1" points="${poly}" style="stroke:${q.color};stroke-width:3.2"/>`);
+    pts.forEach((p,i) => { const yy = y(p.v), high = p.v >= (i > 0 ? pts[i - 1].v : pts[i + 1].v);
+      S.push(`<circle class="g-pt" cx="${xs[i]}" cy="${yy}" r="4.5" style="stroke:${q.color}"/><text class="g-letter" x="${xs[i]}" y="${high ? yy - 12 : yy + 23}" text-anchor="middle">${p.n}</text>`); });
+    S.push(`<text class="g-rl s-ink" x="${xb}" y="${padT - 8}">${esc(q.p.label)}${q.p.tf ? ' · ' + esc(q.p.tf) : ''}${sim.modified ? ' (simulado)' : ''}</text>`);
+  });
+  S.push(...marks, '</g>');
+  if(isF(state.asset.price) && inView(state.asset.price)){
+    const yy = y(state.asset.price);
+    S.push(`<line class="g-price" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`);
+    right.push({y:yy, t:'Precio ' + fmt(state.asset.price), c:'s-ink'});
+  }
+  for(let i = right.length - 1; i >= 0; i--) if(right[i].y < padT - 4 || right[i].y > H - padB + 4) right.splice(i, 1);
+  if(right.length){
+    right.sort((a,b) => a.y - b.y); const gap = 16, ys = right.map(q => q.y);
+    for(let i = 1; i < ys.length; i++) if(ys[i] < ys[i - 1] + gap) ys[i] = ys[i - 1] + gap;
+    const over = ys[ys.length - 1] - (H - 6);
+    if(over > 0){ ys[ys.length - 1] -= over; for(let i = ys.length - 2; i >= 0; i--) if(ys[i] > ys[i + 1] - gap) ys[i] = ys[i + 1] - gap; }
+    right.forEach((it, i) => S.push(`<line class="g-lead" x1="${xEnd + 2}" y1="${it.y}" x2="${xEnd + 12}" y2="${ys[i]}"/><text class="g-rl ${it.c}${it.rank ? ' g-zband' : ''}"${it.rank ? ` data-rank="${it.rank}"` : ''} x="${xEnd + 16}" y="${ys[i] + 4}">${esc(it.t)}</text>`));
+  }
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vista consolidada de patrones">${S.join('')}</svg>`;
+}
+let consScale = 'all';
+$('consScale').addEventListener('click', e => {
+  const b = e.target.closest('[data-scale]'); if(!b) return;
+  consScale = b.dataset.scale;
+  document.querySelectorAll('#consScale .chip').forEach(c => c.classList.toggle('on', c === b));
+  renderConsolidated();
+});
+$('consLegend').addEventListener('click', e => { const b = e.target.closest('[data-id]'); if(b) selectPattern(b.dataset.id); });
+$('consChart').addEventListener('click', e => {
+  const hit = e.target.closest('.g-hit'); if(hit){ selectPattern(hit.dataset.id); return; }
+  const z = e.target.closest('.g-zband'); if(!z) return;
+  const row = $('zone-' + z.dataset.rank); if(!row) return;
+  row.scrollIntoView({block:'center'}); row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash');
+});
+
+/* ============ Recalcular y pintar ============ */
+function recompute(){
+  hist = computeHistory();
+  analyses = state.patterns.map(analyze);
+  const levels = [];
+  analyses.forEach(a => { if(a.ok && a.p.enabled) levels.push(...a.levels); });
+  zones = buildZones(levels);
+  planZones();
+  ensureSelection();
+  syncSimInputs();
+  renderPatterns(); renderSim(); renderConsolidated(); renderZones(); renderSummary(levels); renderHistory();
+  $('dirty').hidden = !dirty;
+  try { localStorage.setItem('confluencias-armonicas:sesion', JSON.stringify(state)); } catch(e) {}
+}
+function touch(){ dirty = true; recompute(); }
+
+function visibleZones(){
+  const S = state.settings;
+  let list = zones.slice(0, Math.max(1, S.maxZones));
+  if(S.sort === 'dist' && isF(state.asset.price)){ const P = state.asset.price; list = list.slice().sort((a,b) => Math.abs(a.center - P) - Math.abs(b.center - P)); }
+  return list;
+}
+function niceTicks(lo, hi, n){
+  const span = hi - lo; if(!(span > 0)) return [lo];
+  const s0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(s0))), f = s0 / mag;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * mag;
+  const out = []; for(let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v);
+  return out;
+}
+function renderSummary(levels){
+  const act = analyses.filter(a => a.ok && a.p.enabled).length;
+  $('summary').innerHTML = `<span><b>${act}</b> patrones activos</span><span><b>${levels.length}</b> niveles</span><span><b>${zones.length}</b> zonas</span><span><b>${zones.filter(z => z.nPat >= 2).length}</b> con varios patrones</span>`;
+}
+
+function renderPatterns(){
+  const box = $('plist');
+  if(!state.patterns.length){ box.innerHTML = '<div class="empty">Aún no hay patrones para este activo. Empieza por la estructura más grande del movimiento.</div>'; return; }
+  box.innerHTML = analyses.map(a => {
+    const p = a.p, sel = p.id === state.selectedId;
+    let body, tagP = '';
+    if(!a.ok) body = `<p class="err">${esc(a.errors[0])}</p>`;
+    else {
+      const R = a.ratios, rc = [];
+      if(isF(R.bxa)) rc.push('B ' + fr(R.bxa) + ' XA'); rc.push('C ' + fr(R.cab) + ' AB'); if(isF(R.dxa)) rc.push('D ' + fr(R.dxa) + ' XA');
+      const rk = rankCands(noD(p)), best = rk.find(x => x.fit > 0);
+      const k = (p.key && SIM[p.key]) ? p.key : best ? best.key : (rk.find(x => simCompute(coordsOf(p), x.key, 'cons', 'AD').ok) || {}).key;
+      if(k) tagP = `<span class="tag fib">${SIM[k].name}${p.key ? ' · esperado' : ''}</span>`;
+      const o = hist.out.get(p.id);
+      if(o && o.status !== 'pendiente' && STATUS_TXT[o.status]) tagP += `<span class="tag ${STATUS_CLS[o.status]}">${STATUS_TXT[o.status]}</span>`;
+      const r = k ? simCompute(coordsOf(p), k, 'cons', 'AD') : null;
+      body = `<p>${rc.join(' · ')} · ${a.dir > 0 ? '<span class="t-bull">compra</span>' : '<span class="t-bear">venta</span>'}</p>` +
+             (r && r.ok ? patternChart(r, {compact:true, W:260, H:140, color:p.color, label:p.label}) : '');
+    }
+    return `<div class="mini${sel ? ' sel' : ''}${p.enabled ? '' : ' off'}" style="--c:${p.color}" data-id="${p.id}" tabindex="0" role="button" aria-pressed="${sel}">
+      <h4>${esc(p.label || 'Sin nombre')}${p.tf ? `<span class="tag">${esc(p.tf)}</span>` : ''}${tagP}${sel ? '<span class="tag acc">en simulador</span>' : ''}</h4>
+      ${body}
+      <div class="pbtns">
+        <button class="btn sm" data-act="edit" data-id="${p.id}" type="button">Editar</button>
+        <button class="btn sm" data-act="toggle" data-id="${p.id}" type="button">${p.enabled ? 'Ocultar' : 'Mostrar'}</button>
+        <button class="btn sm" data-act="dup" data-id="${p.id}" type="button">Duplicar</button>
+        <button class="btn sm" data-act="del" data-id="${p.id}" type="button">Eliminar</button>
+      </div></div>`;
+  }).join('');
+}
+
+function renderZones(){
+  const body = $('zbody'), vz = visibleZones();
+  if(!state.patterns.length){ body.innerHTML = '<tr><td colspan="6" class="zsub">Las zonas aparecen cuando agregas patrones.</td></tr>'; return; }
+  if(!vz.length){ body.innerHTML = '<tr><td colspan="6" class="zsub">Ningún grupo de niveles cumple los mínimos. Baja «Mínimo de patrones por zona» o sube la precisión en los ajustes.</td></tr>'; return; }
+  const maxScore = Math.max(1, ...zones.map(z => z.score)), P = state.asset.price;
+  body.innerHTML = vz.map(z => {
+    const byPat = new Map();
+    z.members.forEach(m => { if(!byPat.has(m.patId)) byPat.set(m.patId, []); byPat.get(m.patId).push(m); });
+    const groups = [...byPat.entries()].map(([pid, ms]) =>
+      `<div class="mgroup"><span class="dot" style="background:${colorOf(pid)}"></span><b>${esc(labelOf(pid))}</b>: ${ms.sort((a,b) => b.w - a.w).map(m => `${esc(m.labels.join(' / '))} <span class="num zsub">${fmt(m.price)}</span>`).join('; ')}</div>`).join('');
+    const tags = [];
+    if(z.inside) tags.push('<span class="ztag in">precio dentro</span>');
+    if(z.spike === 'with') tags.push('<span class="ztag good">a favor del pico</span>');
+    if(z.spike === 'against') tags.push('<span class="ztag bad">contra el pico: salida rápida</span>');
+    if(z.against > 0 && z.against >= z.agree) tags.push('<span class="ztag bad">patrones en contra</span>');
+    else if(z.agree > 0) tags.push(`<span class="ztag good">${z.agree} coherente${z.agree > 1 ? 's' : ''}</span>`);
+    return `<tr id="zone-${z.rank}">
+      <td><span class="rank">${z.rank}</span></td>
+      <td><div class="zprice num">${fmt(z.center)}</div><div class="zsub">Núcleo <span class="num">${fmt(z.coreLo)} – ${fmt(z.coreHi)}</span></div>
+        <div class="zsub">Niveles <span class="num">${fmt(z.priceLo)} – ${fmt(z.priceHi)}</span></div>
+        ${isF(P) ? `<div class="zsub">A <span class="num">${fmt(Math.abs(z.center - P))}</span> pts del precio</div>` : ''}</td>
+      <td><div class="side ${z.side > 0 ? 't-bull' : 't-bear'}">${z.side > 0 ? 'Compra' : 'Venta'}</div><div class="ztags">${tags.join('')}</div></td>
+      <td><b>${strengthOf(z.score)}</b><div class="bar"><i style="width:${Math.round(z.score / maxScore * 100)}%"></i></div>
+        <div class="zsub">${z.nPat} patr${z.nPat > 1 ? 'ones' : 'ón'} · ${z.members.length} niveles</div></td>
+      <td><div class="plan num"><span>Entrada</span><b>${fmt(z.entry)}</b><span>SL</span><b class="t-bear">${fmt(z.sl)}</b>
+        <span>TP1</span><b class="t-bull">${fmt(z.tp1)}</b><span>TP2</span><b class="t-bull">${fmt(z.tp2)}</b>
+        <span>R:R</span><b>${isF(z.rr) ? '1:' + z.rr.toFixed(1) + ' / 1:' + z.rr2.toFixed(1) : '–'}</b></div>
+        ${z.tpRef ? `<div class="zsub">TP sobre el ${esc(z.tpRef)}</div>` : ''}</td>
+      <td>${groups}</td></tr>`;
+  }).join('');
+}
+
+/* ============ Historial: pintar ============ */
+let lastFuture = [];
+const pct = x => isF(x) ? Math.round(x * 100) + '%' : '–';
+function renderHistory(){
+  const reg = state.patterns.map(p => ({p, o:hist.out.get(p.id)})).filter(x => x.o && x.o.key && STATUS_TXT[x.o.status] && x.o.status !== 'pendiente');
+  $('histSummary').innerHTML = `<span><b>${reg.length}</b> con D real</span><span><b>${reg.filter(x => x.o.reacted && !x.o.hitSL2).length}</b> reaccionaron</span>` +
+    `<span><b>${reg.filter(x => x.o.hitSL2).length}</b> invalidados</span><span><b>${hist.total}</b> tramos confirmados</span>`;
+
+  // patrones futuros
+  lastFuture = futureCandidates();
+  $('histFuture').innerHTML = lastFuture.length ? lastFuture.map((F, i) => {
+    const map = F.win.map((w, j) => (F.win.length === 4 ? ['X′','A′','B′','C′'] : ['A′','B′','C′'])[j] + ' = ' + w.n).join(', ');
+    if(!F.key || !F.r || !F.r.ok){
+      return `<div class="fcard" style="--c:${F.p.color}"><h4>Después de ${esc(F.p.label)}</h4><p class="zsub">${map}</p>
+        <div class="msg info">${esc(F.why || 'Sin proyección posible.')} Registra el siguiente pivote cuando se confirme.</div></div>`;
+    }
+    const r = F.r, tz = zonesTouching(r.prz[0], r.prz[1], r.leg);
+    const names = [...F.win.map(w => w.n), 'D′'];
+    return `<div class="fcard" style="--c:${F.p.color}">
+      <h4>Después de ${esc(F.p.label)}: ${SIM[F.key].name} <span class="tag fib">${pct(F.fit)} de encaje</span></h4>
+      <p class="zsub">${map} · ${r.dir > 0 ? '<span class="t-bull">compra en D′</span>' : '<span class="t-bear">venta en D′</span>'}</p>
+      <div class="chartbox">${patternChart(r, {W:720, H:360, prefix:F.prefix, rename:names, color:F.p.color, zones:tz, label:"Proyección futura"})}</div>
+      <div class="plan num"><span>D′</span><b>${fmt(r.Dp)}</b><span>PRZ</span><b>${fmt(r.prz[0])} – ${fmt(r.prz[1])}</b>
+        <span>SL2</span><b class="t-bear">${fmt(r.SL)}</b><span>TP1</span><b class="t-bull">${fmt(r.TP1)}</b></div>
+      ${tz.length ? `<div class="msg ok">D′ coincide con la zona ${tz.map(z => z.rank).join(' y ')}.</div>` : ''}
+      <button type="button" class="btn sm" data-fi="${i}">Agregar como patrón y simular</button></div>`;
+  }).join('') : '<div class="empty">Registra el D real y al menos un pivote posterior (E) en algún patrón. Con esos movimientos confirmados se arma el siguiente patrón.</div>';
+
+  // resultados por tipo
+  const by = {};
+  reg.forEach(x => { (by[x.o.key] = by[x.o.key] || []).push(x.o); });
+  const kk = Object.keys(by);
+  $('histTypes').innerHTML = kk.length ? '<tr><th>Patrón esperado</th><th>Con D real</th><th>Giró antes</th><th>En PRZ</th><th>Tocó SL1</th><th>Invalidado</th><th>Desvío medio de D</th><th>Reacción media</th><th>TP1 / TP2</th><th>Se completó como</th></tr>' +
+    kk.map(k => {
+      const L = by[k], st = hist.byKey[k] || {}, n = L.length, cnt = t => L.filter(o => o.status === t).length;
+      const ca = Object.entries(st.completedAs || {}).map(([c, v]) => (SIM[c] ? SIM[c].name : c) + ' (' + v + ')').join(', ');
+      const rN = (st.reacts || []).length;
+      return `<tr><td><b>${SIM[k].name}</b></td><td class="num">${n}</td><td class="num">${cnt('giró antes')}</td><td class="num">${cnt('en PRZ')}</td><td class="num">${cnt('tocó SL1')}</td><td class="num">${cnt('invalidado')}</td>
+        <td class="num">${st.devN ? (st.devMean >= 0 ? '+' : '') + fr(st.devMean) + ' ' + SIM[k].base : '–'}${st.devN >= 2 ? ' <span class="tag acc">calibra D</span>' : ''}</td>
+        <td class="num">${isF(st.reactMean) ? fr(st.reactMean) + ' AD' : '–'}</td><td class="num">${rN ? pct(st.tp1 / rN) + ' / ' + pct(st.tp2 / rN) : '–'}</td><td>${esc(ca)}</td></tr>`;
+    }).join('') : '<tr><td class="zsub">Todavía no hay resultados. Cuando un patrón termine, registra su D real en el simulador o al editarlo.</td></tr>';
+
+  // ratios
+  const bins = hist.bins, W = 840, H = 240, padL = 34, padR = 12, padT = 22, padB = 40;
+  const mx = Math.max(1, ...bins.map(b => b.n)), bw = (W - padL - padR) / bins.length;
+  const S = [`<line class="g-grid" x1="${padL}" x2="${W - padR}" y1="${H - padB}" y2="${H - padB}"/>`];
+  bins.forEach((b, i) => {
+    const h = b.n / mx * (H - padT - padB), x = padL + i * bw + 5, yy = H - padB - h, pref = hist.pref.has(b.f);
+    if(b.n) S.push(`<rect x="${x}" y="${yy}" width="${bw - 10}" height="${h}" rx="3" style="fill:${pref ? 'var(--fib)' : 'var(--accent)'};opacity:${pref ? 1 : .55}"><title>${fr(b.f)}: ${b.n}</title></rect><text class="g-rl s-ink" x="${x + (bw - 10) / 2}" y="${yy - 5}" text-anchor="middle">${b.n}</text>`);
+    S.push(`<text class="g-lbl" x="${x + (bw - 10) / 2}" y="${H - padB + 16}" text-anchor="middle">${fr(b.f)}</text>`);
+  });
+  S.push(`<text class="g-lbl" x="${W - padR}" y="${H - 6}" text-anchor="end">tramo / tramo anterior</text>`);
+  $('histRatios').innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Frecuencia de ratios">${S.join('')}</svg>`;
+  let txt;
+  if(!hist.total) txt = 'Aún no hay tramos para medir. Cada patrón aporta sus tramos confirmados (AB/XA, BC/AB, CD/BC, DE/CD…).';
+  else {
+    const on = hist.onFib / hist.total;
+    txt = `${pct(on)} de los ${hist.total} tramos cayeron a ±3% de un nivel Fibonacci; por azar se esperaría cerca de ${pct(hist.chance)}. `;
+    if(hist.total < 20) txt += 'La muestra todavía es pequeña: tómalo como orientación, no como evidencia. ';
+    else txt += on > hist.chance + 0.15 ? 'El activo está respetando los niveles más de lo que daría el azar. ' : 'Por ahora no hay evidencia de que el activo respete los niveles más que el azar. ';
+    txt += hist.pref.size ? `Ratios frecuentes (en dorado), que refuerzan las zonas: ${[...hist.pref].map(fr).join(', ')}.` : 'Con 10 tramos o más, los ratios que se repitan reforzarán las zonas.';
+  }
+  $('histRatiosTxt').textContent = txt;
+
+  // registro
+  $('histLog').innerHTML = reg.length ? '<tr><th>Patrón</th><th>Esperado</th><th>D teórico</th><th>D real</th><th>Resultado</th><th>Reacción</th><th>Se completó como</th><th></th></tr>' +
+    reg.map(({p, o}) => `<tr><td><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${p.color};margin-right:6px"></span>${esc(p.label)}${p.tf ? ' <span class="zsub">' + esc(p.tf) + '</span>' : ''}</td>
+      <td>${SIM[o.key].name}</td><td class="num">${fmt(o.Dp)}</td><td class="num">${fmt(p.D)} <span class="zsub">${fr(o.realRatio)} ${o.base}</span></td>
+      <td><span class="tag ${STATUS_CLS[o.status]}" style="margin-left:0">${STATUS_TXT[o.status]}</span></td>
+      <td class="num">${isF(o.reactFrac) ? fr(o.reactFrac) + ' AD' : '–'}</td><td>${o.completedAs ? SIM[o.completedAs].name : '–'}</td>
+      <td><button type="button" class="btn sm" data-sel="${p.id}">Simular</button></td></tr>`).join('')
+    : '<tr><td class="zsub">Sin resultados registrados.</td></tr>';
+}
+$('histFuture').addEventListener('click', e => {
+  const b = e.target.closest('[data-fi]'); if(!b) return;
+  const F = lastFuture[+b.dataset.fi]; if(!F || !F.key) return;
+  const used = new Set(state.patterns.map(p => p.color));
+  const np = {id:uid(), label:F.p.label + ' → ' + SIM[F.key].name, tf:F.p.tf, X:F.coords.X, A:F.coords.A, B:F.coords.B, C:F.coords.C, D:NaN, post:[], key:null, enabled:true,
+              color:COLORS.find(c => !used.has(c)) || COLORS[state.patterns.length % COLORS.length]};
+  state.patterns.push(np);
+  state.selectedId = np.id; sim.coords = coordsOf(np); sim.key = null; sim.modified = false; sim.msg = 'Patrón armado con pivotes confirmados de ' + F.p.label + '.'; sim.broken = false; sim.draw = true;
+  touch(); $('simulador').scrollIntoView({block:'start'});
+});
+$('histLog').addEventListener('click', e => { const b = e.target.closest('[data-sel]'); if(b){ selectPattern(b.dataset.sel); $('simulador').scrollIntoView({block:'start'}); } });
+
+/* ============ Formulario de patrones ============ */
+const fIds = ['fLabel','fTf','fX','fA','fB','fC','fD','fPost'];
+$('fKey').innerHTML = '<option value="">Automático (el más probable)</option>' + Object.keys(SIM).map(k => `<option value="${k}">${SIM[k].name}</option>`).join('');
+const readForm = () => ({label:$('fLabel').value.trim(), tf:$('fTf').value.trim(), X:num($('fX').value), A:num($('fA').value), B:num($('fB').value), C:num($('fC').value), D:num($('fD').value), post:parsePivots($('fPost').value), key:$('fKey').value || null});
+function clearForm(){ fIds.forEach(id => $(id).value = ''); $('fKey').value = ''; editingId = null; $('fSubmit').textContent = 'Agregar patrón'; $('formTitle').textContent = 'Nuevo patrón'; $('fCancel').hidden = true; $('fMsg').textContent = ''; }
+function submitForm(){
+  const f = readForm();
+  if(![f.A, f.B, f.C].every(isF)){ $('fMsg').textContent = 'Ingresa al menos A, B y C.'; return; }
+  const g = geom(f); if(!g.ok){ $('fMsg').textContent = g.err; return; }
+  if(editingId){
+    const p = state.patterns.find(q => q.id === editingId);
+    Object.assign(p, f, {label:f.label || p.label});
+    if(p.id === state.selectedId){ sim.coords = coordsOf(p); sim.modified = false; sim.key = null; }
+  } else {
+    const used = new Set(state.patterns.map(p => p.color));
+    const color = COLORS.find(c => !used.has(c)) || COLORS[state.patterns.length % COLORS.length];
+    const np = {id:uid(), ...f, label:f.label || ('Patrón ' + (state.patterns.length + 1)), enabled:true, color};
+    state.patterns.push(np);
+    state.selectedId = np.id; sim.coords = coordsOf(np); sim.key = null; sim.modified = false; sim.msg = ''; sim.broken = false; sim.draw = true;
+  }
+  clearForm(); touch();
+}
+$('fSubmit').addEventListener('click', submitForm);
+$('fCancel').addEventListener('click', clearForm);
+fIds.forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') submitForm(); }));
+
+// El toque se resuelve con pointerdown/pointerup: si un campo pierde el foco y la lista se redibuja
+// en medio del clic, la acción no se pierde.
+const plistKey = t => { const b = t.closest('button[data-act]'); if(b) return b.dataset.act + '|' + b.dataset.id; const c = t.closest('.mini[data-id]'); return c ? 'card|' + c.dataset.id : null; };
+let plistDown = null;
+$('plist').addEventListener('pointerdown', e => { plistDown = plistKey(e.target); });
+$('plist').addEventListener('pointerup', e => { const k = plistKey(e.target); if(k && k === plistDown) plistAction(k); plistDown = null; });
+$('plist').addEventListener('click', e => { if(e.detail === 0){ const k = plistKey(e.target); if(k) plistAction(k); } });
+function plistAction(key){
+  const [act, id] = key.split('|');
+  if(act === 'card'){ selectPattern(id); return; }
+  const p = state.patterns.find(q => q.id === id); if(!p) return;
+  if(act === 'edit'){
+    editingId = p.id; $('fLabel').value = p.label || ''; $('fTf').value = p.tf || '';
+    ['X','A','B','C','D'].forEach(k => $('f' + k).value = isF(p[k]) ? p[k] : '');
+    $('fPost').value = (p.post || []).join('; '); $('fKey').value = p.key || '';
+    $('fSubmit').textContent = 'Guardar cambios'; $('formTitle').textContent = 'Editando ' + (p.label || 'patrón'); $('fCancel').hidden = false; $('fMsg').textContent = '';
+    $('fLabel').focus(); return;
+  }
+  if(act === 'toggle') p.enabled = !p.enabled;
+  if(act === 'dup'){ const used = new Set(state.patterns.map(q => q.color)); state.patterns.push({...clone(p), id:uid(), label:p.label + ' (copia)', color:COLORS.find(c => !used.has(c)) || p.color}); }
+  if(act === 'del'){
+    if(!confirm('¿Eliminar «' + (p.label || 'patrón') + '»?')) return;
+    state.patterns = state.patterns.filter(q => q.id !== p.id);
+    if(editingId === p.id) clearForm();
+    if(state.selectedId === p.id){ state.selectedId = null; sim.coords = null; }
+  }
+  touch();
+}
+$('plist').addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && e.target.matches('.mini[data-id]')){ e.preventDefault(); selectPattern(e.target.dataset.id); } });
+
+/* ============ Activo, ajustes y tema ============ */
+function syncInputs(){
+  const a = state.asset, S = state.settings;
+  $('assetName').value = a.name || ''; $('assetType').value = a.type; $('assetDec').value = String(a.decimals);
+  $('assetPrice').value = isF(a.price) ? a.price : '';
+  $('sBand').value = S.bandPct; $('sSl').value = S.slPct; $('sMinPts').value = S.minPts; $('sSlack').value = S.ratioSlack; $('sExtra').value = S.extra;
+  $('sMinLev').value = S.minLevels; $('sMinPat').value = S.minPatterns; $('sMax').value = S.maxZones; $('sSort').value = S.sort;
+  $('sHist').checked = S.useHistory !== false; $('gXA').checked = S.grid.xa; $('gBC').checked = S.grid.bc; $('gABCD').checked = S.grid.abcd; $('gST').checked = S.grid.struct; $('gPassed').checked = S.grid.passed;
+  document.title = (a.name ? a.name + ' · ' : '') + 'Confluencias armónicas';
+}
+$('assetName').addEventListener('input', e => { state.asset.name = e.target.value; dirty = true; $('dirty').hidden = false; document.title = (e.target.value ? e.target.value + ' · ' : '') + 'Confluencias armónicas'; });
+$('assetType').addEventListener('change', e => { state.asset.type = e.target.value; touch(); });
+$('assetDec').addEventListener('change', e => { state.asset.decimals = +e.target.value; touch(); });
+$('assetPrice').addEventListener('change', e => { const v = num(e.target.value), nv = isF(v) ? v : null; if(nv === state.asset.price) return; state.asset.price = nv; touch(); });
+const numSetting = (id, key, min, int) => $(id).addEventListener('change', e => {
+  let v = num(e.target.value); if(!isF(v) || v < min) v = DEFAULT_SETTINGS[key]; if(int) v = Math.round(v);
+  state.settings[key] = v; e.target.value = v; touch(); });
+numSetting('sBand','bandPct',0.01); numSetting('sSl','slPct',0); numSetting('sMinPts','minPts',0); numSetting('sSlack','ratioSlack',0);
+numSetting('sMinLev','minLevels',1,true); numSetting('sMinPat','minPatterns',1,true); numSetting('sMax','maxZones',1,true);
+$('sExtra').addEventListener('change', e => { state.settings.extra = e.target.value; touch(); });
+$('sSort').addEventListener('change', e => { state.settings.sort = e.target.value; touch(); });
+$('sHist').addEventListener('change', e => { state.settings.useHistory = e.target.checked; touch(); });
+[['gXA','xa'],['gBC','bc'],['gABCD','abcd'],['gST','struct'],['gPassed','passed']].forEach(([id,k]) => $(id).addEventListener('change', e => { state.settings.grid[k] = e.target.checked; touch(); }));
+
+const THEMES = ['system','light','dark'], THEME_TXT = {system:'Tema: sistema', light:'Tema: claro', dark:'Tema: oscuro'};
+function applyTheme(t){
+  if(t === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  $('btnTheme').textContent = THEME_TXT[t];
+  try { localStorage.setItem('confluencias-armonicas:tema', t); } catch(e) {}
+}
+let theme = 'system'; try { theme = localStorage.getItem('confluencias-armonicas:tema') || 'system'; } catch(e) {}
+applyTheme(theme);
+$('btnTheme').addEventListener('click', () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(theme); });
+
+/* ============ Guardar / cargar ============ */
+const slug = s => (s || 'activo').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'activo';
+let lastFileBase = '';
+const cleanFileName = s => String(s || '').replace(/\.json$/i, '').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim();
+const today = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+function finalFileName(){
+  let base = cleanFileName($('svFile').value) || ('armonico_' + slug($('svAsset').value));
+  base = base.replace(/_\d{4}-\d{2}-\d{2}$/, '');
+  return base + ($('svDate').checked ? '_' + today() : '') + '.json';
+}
+function updateSavePreview(){ $('svPreview').textContent = finalFileName(); }
+$('btnSave').addEventListener('click', () => {
+  $('svAsset').value = state.asset.name || '';
+  $('svFile').value = lastFileBase || ('armonico_' + slug(state.asset.name));
+  $('svWhere').textContent = window.showSaveFilePicker
+    ? 'Al pulsar Guardar podrás elegir la carpeta; conviene una carpeta por activo para ir acumulando su historial.'
+    : 'Tu navegador lo guardará en la carpeta de descargas. Luego puedes moverlo a una carpeta por activo.';
+  updateSavePreview();
+  $('saveDlg').showModal(); $('svAsset').focus();
+});
+$('svAsset').addEventListener('input', e => {
+  const prevAuto = 'armonico_' + slug(state.asset.name);
+  if(!cleanFileName($('svFile').value) || cleanFileName($('svFile').value) === prevAuto) $('svFile').value = 'armonico_' + slug(e.target.value);
+  state.asset.name = e.target.value; $('assetName').value = e.target.value;
+  document.title = (e.target.value ? e.target.value + ' · ' : '') + 'Confluencias armónicas';
+  dirty = true; $('dirty').hidden = false; updateSavePreview();
+});
+$('svFile').addEventListener('input', updateSavePreview);
+$('svDate').addEventListener('change', updateSavePreview);
+$('svOk').addEventListener('click', async () => {
+  const name = finalFileName();
+  const data = {format:'confluencias-armonicas', version:2, savedAt:new Date().toISOString(), asset:state.asset, settings:state.settings, selectedId:state.selectedId, patterns:state.patterns};
+  const json = JSON.stringify(data, null, 2);
+  try {
+    if(window.showSaveFilePicker){
+      const h = await window.showSaveFilePicker({suggestedName:name, types:[{description:'Activo de confluencias armónicas', accept:{'application/json':['.json']}}]});
+      const w = await h.createWritable(); await w.write(json); await w.close();
+      lastFileBase = cleanFileName(h.name).replace(/_\d{4}-\d{2}-\d{2}$/, '');
+    } else {
+      const blob = new Blob([json], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      lastFileBase = cleanFileName(name).replace(/_\d{4}-\d{2}-\d{2}$/, '');
+    }
+  } catch(err){ if(err && err.name === 'AbortError') return; alert('No se pudo guardar el archivo: ' + (err && err.message ? err.message : err)); return; }
+  $('saveDlg').close();
+  dirty = false; $('dirty').hidden = true;
+});
+$('btnLoad').addEventListener('click', () => {
+  if(dirty && state.patterns.length && !confirm('Hay cambios sin guardar en este activo. ¿Cargar otro de todos modos?')) return;
+  $('fileIn').value = ''; $('fileIn').click();
+});
+$('btnNew').addEventListener('click', () => {
+  if(dirty && state.patterns.length && !confirm('Hay cambios sin guardar. ¿Empezar un activo nuevo?')) return;
+  state = blankState(); dirty = false; sim.coords = null; lastFileBase = ''; clearForm(); syncInputs(); recompute(); $('assetName').focus();
+});
+$('fileIn').addEventListener('change', e => {
+  const file = e.target.files[0]; if(!file) return;
+  lastFileBase = cleanFileName(file.name).replace(/\.csv$/i, '').replace(/_\d{4}-\d{2}-\d{2}$/, '');
+  const rd = new FileReader();
+  rd.onload = () => {
+    const text = String(rd.result).replace(/^\ufeff/, '');
+    try { const d = JSON.parse(text); if(d.format !== 'confluencias-armonicas' || !Array.isArray(d.patterns)) throw 0; loadData(d); }
+    catch(err){ if(!importLegacyCSV(text, file.name)) alert('No se pudo leer el archivo. Usa un .json guardado con «Guardar activo» o el CSV del asistente anterior.'); }
+  };
+  rd.readAsText(file);
+});
+function cleanPattern(p, i){
+  const n = v => { const x = num(v); return isF(x) ? x : NaN; };
+  return {id:String(p.id || uid()), label:String(p.label || ('Patrón ' + (i + 1))), tf:String(p.tf || ''),
+    X:n(p.X), A:n(p.A), B:n(p.B), C:n(p.C), D:n(p.D), post:(Array.isArray(p.post) ? p.post : parsePivots(p.post)).map(num).filter(isF),
+    key:(p.key && SIM[p.key]) ? p.key : null, enabled:p.enabled !== false, color:COLORS.includes(p.color) ? p.color : COLORS[i % COLORS.length]};
+}
+function loadData(d){
+  const s = blankState();
+  s.asset = Object.assign(s.asset, d.asset || {});
+  s.asset.price = isF(num(s.asset.price)) ? num(s.asset.price) : null;
+  s.asset.decimals = Math.min(5, Math.max(0, parseInt(s.asset.decimals, 10) || 2));
+  s.settings = Object.assign(s.settings, d.settings || {});
+  s.settings.grid = Object.assign(clone(DEFAULT_SETTINGS.grid), (d.settings || {}).grid || {});
+  s.patterns = d.patterns.map(cleanPattern);
+  s.selectedId = d.selectedId || null;
+  state = s; dirty = false; sim.coords = null; sim.key = null; sim.modified = false; sim.msg = ''; clearForm(); syncInputs(); recompute();
+}
+function importLegacyCSV(text, fname){
+  const lines = text.split(/\r?\n/), rows = [];
+  const parse = line => { const out = []; let cur = '', q = false;
+    for(let i = 0; i < line.length; i++){ const ch = line[i];
+      if(q){ if(ch === '"'){ if(line[i + 1] === '"'){ cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if(ch === '"') q = true; else if(ch === ';' || ch === ','){ out.push(cur); cur = ''; } else cur += ch; }
+    out.push(cur); return out; };
+  const start = lines.findIndex(l => l.trim().toUpperCase() === '#PATRONES');
+  const slice = start >= 0 ? lines.slice(start + 2) : lines;
+  for(const line of slice){
+    const t = line.trim(); if(start >= 0 && (t === '' || t.startsWith('#'))) break;
+    if(!t || t.startsWith('#') || t.toLowerCase().startsWith('sep=')) continue;
+    const c = parse(t); if(c.length < 6) continue;
+    const [label, tf, x, a, b, cc] = c;
+    if([x,a,b,cc].map(num).every(isF)) rows.push({label, tf, X:x, A:a, B:b, C:cc});
+  }
+  if(!rows.length) return false;
+  const imported = rows.map((r,i) => cleanPattern(r, state.patterns.length + i));
+  if(state.patterns.length && confirm('Se encontraron ' + imported.length + ' patrones.\nAceptar = reemplazar los actuales · Cancelar = agregarlos.')) state.patterns = [];
+  const used = new Set(state.patterns.map(p => p.color));
+  imported.forEach(p => { const c = COLORS.find(k => !used.has(k)); if(c){ p.color = c; used.add(c); } });
+  state.patterns.push(...imported);
+  if(!state.asset.name) state.asset.name = fname.replace(/\.[^.]+$/, '');
+  syncInputs(); touch(); return true;
+}
+
+/* ============ Inicio ============ */
+try {
+  const saved = JSON.parse(localStorage.getItem('confluencias-armonicas:sesion') || 'null');
+  if(saved && Array.isArray(saved.patterns)) loadData({...saved, format:'confluencias-armonicas'});
+} catch(e) {}
+syncInputs(); recompute();
+})();
+</script>
+</body>
+</html>
