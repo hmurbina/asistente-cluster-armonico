@@ -1,0 +1,2461 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confluencias armónicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=STIX+Two+Text:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4; --surface:#FFFFFF; --ink:#16233A; --muted:#5A6678; --grid:#DDE3EA; --line:#CCD4DE;
+  --accent:#3446C4; --tri:rgba(52,70,196,.09); --fib:#A97A12; --prz:rgba(201,148,32,.17);
+  --bull:#157455; --bear:#B3303D;
+  --tint-bear:rgba(179,48,61,.08); --tint-acc:rgba(52,70,196,.08); --tint-bull:rgba(21,116,85,.09); --tint-fib:rgba(201,148,32,.10);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+    --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+    --bull:#4FC79C; --bear:#FF6F7C;
+    --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+  --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+  --bull:#4FC79C; --bear:#FF6F7C;
+  --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+details *,details *::before,details *::after{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1260px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+svg{max-width:100%}
+.m{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.08em}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* hero */
+.hero{padding:44px 0 22px}
+.hero .kicker{color:var(--fib);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.15rem;margin:0 0 4px}
+.hero input.title{display:block;width:100%;background:transparent;border:0;border-bottom:2px dashed transparent;color:var(--ink);
+  font:800 clamp(2.4rem,7vw,4.8rem)/1 "Schibsted Grotesk",system-ui,sans-serif;letter-spacing:-.025em;padding:0 0 6px;margin:0 0 12px}
+.hero input.title::placeholder{color:var(--line)}
+.hero input.title:hover{border-bottom-color:var(--line)}
+.hero input.title:focus{outline:none;border-bottom-color:var(--accent)}
+.hero .lead{font-size:1.12rem;max-width:680px;color:var(--muted);margin:0 0 20px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.toolbar .fieldset-inline{display:flex;flex-direction:column;gap:3px;font-size:.86rem;font-weight:600;color:var(--muted)}
+.toolbar select,.toolbar input{padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400;font-size:.95rem}
+.toolbar .spacer{flex:1}
+.dirty{font-size:.86rem;color:var(--bear);font-weight:600}
+
+/* toc */
+.toc{margin:18px 0 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.toc ol{margin:0;padding-left:1.3rem;display:flex;flex-wrap:wrap;gap:4px 34px}
+.toc li::marker{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib)}
+
+h2{font-size:clamp(1.5rem,3.2vw,2rem);line-height:1.15;letter-spacing:-.01em;margin:3.2rem 0 .5rem;font-weight:800}
+h2 .n{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:600;color:var(--fib);margin-right:.35em}
+.intro{max-width:760px;color:var(--muted);margin:.2rem 0 1rem}
+
+/* botones */
+.btn{display:inline-block;padding:.5rem .85rem;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;font-size:.95rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sm{padding:.2rem .55rem;font-size:.84rem;font-weight:500}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.controls .btn.block{display:block;width:100%;margin:.45rem 0;text-align:left}
+
+/* lab */
+.lab{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;margin:1rem 0}
+@media (max-width:900px){.lab{grid-template-columns:1fr}}
+.controls{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;align-self:start}
+.controls h3{margin:0 0 .4rem;font-size:1.05rem}
+.controls label{display:block;margin:.6rem 0;font-weight:600;font-size:.92rem}
+.controls label .opt{font-weight:400;color:var(--muted)}
+.controls output{float:right;font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.1rem;color:var(--accent)}
+.controls select,.controls input[type=text],.controls input[type=number]{width:100%;margin-top:.25rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.controls input[type=range]{width:100%;accent-color:var(--accent);margin-top:.35rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2 label{margin:.35rem 0}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:.7rem 0;padding:.35rem .8rem .55rem}
+legend{font-weight:600;font-size:.92rem;padding:0 .3rem}
+fieldset label{display:inline-flex !important;align-items:center;gap:.35rem;margin:.2rem 1rem .2rem 0 !important;font-weight:400 !important}
+.dir{font-size:.88rem;color:var(--muted);margin:.2rem 0 0}
+.formmsg{font-size:.9rem;color:var(--bear);min-height:1.3em;margin:.3rem 0}
+.labout{min-width:0}
+.chartbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;overflow-x:auto}
+.chartbox svg{display:block;width:100%;height:auto;min-width:620px}
+.cands{margin:.8rem 0 .3rem;font-size:.93rem;line-height:2}
+.chip{display:inline-block;padding:1px 10px;border-radius:999px;border:1px solid var(--line);margin:2px 3px;font-size:.85rem;background:var(--surface);color:var(--ink);font-family:inherit;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip.no{color:var(--muted);border-style:dashed}
+.chip.taken{text-decoration:line-through;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700;border-style:solid}
+.chip .best{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);margin-left:4px}
+.chip.on .best{color:var(--surface)}
+.chip .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.msg{padding:.5rem .85rem;border-radius:6px;margin:.4rem 0;font-size:.93rem}
+.msg.warn{background:var(--tint-bear);border-left:3px solid var(--bear)}
+.msg.info{background:var(--tint-acc);border-left:3px solid var(--accent)}
+.msg.ok{background:var(--tint-bull);border-left:3px solid var(--bull)}
+.msg.fib{background:var(--tint-fib);border-left:3px solid var(--fib)}
+.ptitle{font-size:1.1rem;margin:1.4rem 0 .4rem}
+ol.ladder{margin:.3rem 0;padding-left:1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem .6rem 2.2rem}
+ol.ladder li{margin:.35rem 0;font-size:.93rem}
+ol.ladder li::marker{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib)}
+ol.ladder li.cur{font-weight:600}
+ol.ladder li.brk{list-style:none;margin-left:-1.2rem;margin-top:.6rem;padding-top:.6rem;border-top:1px dashed var(--line);font-weight:400}
+
+/* tablas */
+.tablewrap{overflow-x:auto;margin:1rem 0 1.2rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.94rem}
+th,td{padding:.55rem .8rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-weight:700;color:var(--muted);font-size:.85rem;background:var(--tint-acc)}
+td.num{white-space:nowrap}
+tr.flash td{animation:flash 1.4s ease-out}
+@keyframes flash{from{background:var(--prz)}to{background:transparent}}
+
+/* tarjetas de patrón */
+.minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start}
+.mini{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:12px;background:var(--surface);cursor:pointer}
+.mini:hover{border-color:var(--accent);border-left-color:var(--c)}
+.mini.sel{box-shadow:0 0 0 2px var(--accent)}
+.mini.off{opacity:.5}
+.mini h4{margin:0;font-size:1.05rem;line-height:1.3}
+.mini p{margin:.15rem 0 .35rem;font-size:.86rem;color:var(--muted)}
+.mini p.err{color:var(--bear)}
+.mini svg{display:block;width:100%;height:auto}
+.mini .pbtns{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{white-space:nowrap;display:inline-block;margin-top:2px;font-size:.74rem;padding:1px 8px;border-radius:999px;border:1px solid currentColor;margin-left:6px;vertical-align:2px;font-weight:500;color:var(--muted)}
+.tag.fib{color:var(--fib)} .tag.acc{color:var(--accent)} .tag.bull{color:var(--bull)} .tag.bear{color:var(--bear)}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:var(--surface)}
+
+figure{margin:1rem 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+figure .scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;min-width:720px}
+figcaption{color:var(--muted);font-size:.92rem;margin-top:.6rem;max-width:760px}
+.legend{margin-top:.5rem}
+.summary{display:flex;flex-wrap:wrap;gap:4px 22px;color:var(--muted);font-size:.93rem;margin:.2rem 0 .6rem}
+.summary b{color:var(--ink);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.2rem;font-weight:600}
+
+/* etiquetas */
+.zsub{font-size:.85rem;color:var(--muted)}
+.t-bull{color:var(--bull)} .t-bear{color:var(--bear)}
+.plan{display:grid;grid-template-columns:auto auto;gap:1px 12px;font-size:.92rem}
+.plan span{color:var(--muted)}
+.ztags{margin-top:4px}
+.ztag{display:inline-block;font-size:.76rem;border-radius:999px;padding:0 8px;margin:2px 4px 0 0;border:1px solid var(--line);color:var(--muted)}
+.ztag.good{border-color:var(--bull);color:var(--bull)} .ztag.bad{border-color:var(--bear);color:var(--bear)} .ztag.in{border-color:var(--fib);color:var(--fib)}
+details.settings{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:1rem 0}
+details.settings summary{cursor:pointer;font-weight:700}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px}
+@media (max-width:560px){.fgrid{grid-template-columns:1fr}}
+@media (max-width:640px){
+  #simTable tr:not(.grp){display:grid;grid-template-columns:minmax(0,1fr) auto;border-bottom:1px solid var(--line)}
+  #simTable tr:not(.grp) td{border:none;padding:.45rem .8rem .1rem}
+  #simTable tr:not(.grp) td:nth-child(2){text-align:right}
+  #simTable tr:not(.grp) td:nth-child(3){grid-column:1 / -1;padding:0 .8rem .5rem;font-size:.86rem;color:var(--muted)}
+  #simTable tr.grp td{display:block}
+  #simTable, #liveTable, #simTable tbody, #liveTable tbody{display:block;width:100%}
+  #liveTable tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid var(--line)}
+  #liveTable td, #liveTable .num{min-width:0;white-space:normal;overflow-wrap:anywhere}
+  #liveTable td{border:none;padding:.4rem .7rem}
+  #liveTable td:nth-child(4){grid-column:1 / -1;padding-top:0}
+  .tablewrap:has(#simTable), .tablewrap:has(#liveTable){overflow-x:visible}
+  #simTable tr:first-child, #liveTable tr:first-child{display:none}
+  #simTable tr.grp{display:block}
+  #liveTable tr.sel td{background:transparent}
+  #liveTable tr.sel{background:var(--tint-acc)}
+}
+.fcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:12px 14px}
+.fcard h4{margin:0 0 .15rem;font-size:1.05rem}
+.fcard .chartbox{padding:4px;border:0;margin:.3rem 0}
+.fcard .chartbox svg{min-width:0}
+.fcard .plan{grid-template-columns:auto auto auto auto}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;max-width:min(520px,92vw);width:100%}
+dialog::backdrop{background:rgba(10,15,25,.45)}
+.dlg{padding:18px 20px}
+.dlg h3{margin:0 0 .6rem;font-size:1.2rem}
+.dlg label{display:block;font-weight:600;font-size:.92rem;margin:.6rem 0}
+.dlg label.inline{display:flex;gap:8px;align-items:flex-start;font-weight:400}
+.dlg input[type=text]{width:100%;margin-top:.25rem;padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.dlgbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:1rem}
+#slTable tr.cur td{background:var(--tint-fib);font-weight:600}
+details.times{margin:.4rem 0 .2rem;border:1px solid var(--line);border-radius:8px;padding:.4rem .7rem}
+details.times summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details.times input[type=datetime-local]{font-size:.85rem}
+ul.check{list-style:none;margin:.3rem 0;padding:.6rem .9rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+ul.check li{display:grid;grid-template-columns:1.6rem 1fr;gap:.2rem;margin:.28rem 0;font-size:.93rem}
+ul.check li .ic{font-weight:800;text-align:center}
+ul.check li.ok .ic{color:var(--bull)} ul.check li.no .ic{color:var(--bear)} ul.check li.wa .ic{color:var(--fib)} ul.check li.na .ic{color:var(--muted)}
+ul.check li.step{display:block;margin-top:.55rem;font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);font-size:1rem}
+ul.check li.step:first-child{margin-top:0}
+.jform{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.6rem .9rem;margin:.4rem 0}
+.jform label{display:flex;flex-direction:column;font-size:.86rem;font-weight:600;color:var(--muted);gap:3px}
+.jform select,.jform input[type=text]{padding:.35rem .5rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-size:.9rem}
+.jform label.inl{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-weight:400}
+.msg.sig{margin:.5rem 0}
+.msg.sig ul{margin:.3rem 0 0 1.1rem;padding:0}
+.msg.sig li{margin:.25rem 0}
+.guide{margin:1rem 0}
+.guide .gt{margin:1rem 0 .35rem;font-size:.98rem}
+details.times label{margin:.45rem 0}
+details.times .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.controls .pricebox{margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--line)}
+.livebar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 6px;font-size:.92rem}
+.livebar .tag{margin-left:0;font-size:.82rem;padding:2px 10px;white-space:normal}
+.tag.solid-bull{background:var(--bull);border-color:var(--bull);color:var(--surface)}
+.tag.solid-bear{background:var(--bear);border-color:var(--bear);color:var(--surface)}
+#liveTable tr.sel td{background:var(--tint-acc)}
+#allPrz svg{display:block;width:100%;height:auto;min-width:640px}
+#allPrz .bar-fit{fill:var(--prz);stroke:var(--fib);stroke-width:1.2}
+#allPrz .bar-sel{fill:rgba(52,70,196,.18);stroke:var(--accent);stroke-width:2}
+#allPrz .bar-no{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:4 3}
+#allPrz .clu{fill:var(--tint-bull)}
+#allPrz .ext{stroke:var(--bear);stroke-width:1;stroke-dasharray:3 4}
+#allPrz .px{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3}
+#allPrz .rowname{font-size:12px;fill:var(--ink);cursor:pointer}
+#allPrz .rowname.no{fill:var(--muted)}
+#allPrz .ax{font-size:11px;fill:var(--muted);font-variant-numeric:tabular-nums}
+#allPrzTable tr.sel td{background:var(--tint-acc)}
+#allPrzTable tr.no td{color:var(--muted)}
+#allPrzTable tr.taken td{color:var(--muted)}
+#allPrzTable tr.taken td .chip{text-decoration:line-through}
+#allPrz .bar-taken{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:1 3}
+#allPrz .rowname.taken{fill:var(--muted);text-decoration:line-through}
+.takebox{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap}
+.takebox input{width:1.05rem;height:1.05rem;accent-color:var(--bull);cursor:pointer}
+.przbar{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;margin:.3rem 0}
+.przbar label{display:inline-flex;gap:.4rem;align-items:center;font-size:.9rem}
+/* resumen */
+#sumTable{font-size:.9rem}
+#sumTable th,#sumTable td{white-space:nowrap}
+#sumTable th:first-child,#sumTable td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
+#sumTable th:first-child{background:var(--tint-acc);background-image:linear-gradient(var(--tint-acc),var(--tint-acc)),linear-gradient(var(--surface),var(--surface))}
+#sumTable tr.grp-start td{border-top:2px solid var(--line)}
+#sumTable tr.sel td{background:var(--tint-acc)}
+#sumTable tr.sel td:first-child{background-image:linear-gradient(var(--tint-acc),var(--tint-acc));background-color:var(--surface)}
+#sumTable tr.off td{opacity:.6}
+#sumTable .gname{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+#sumTable .gname:hover{color:var(--accent);text-decoration:underline}
+#sumTable .gname .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+#sumTable td.pc{min-width:140px}
+#sumTable .pc .pn{font-weight:600}
+#sumTable th{text-align:left}
+#sumTable .pc .pz{display:block;font-size:.84rem;color:var(--muted);margin-left:1.45rem}
+#sumTable .pc.taken .pn,#sumTable .pc.taken .pz{text-decoration:line-through;color:var(--muted);font-weight:400}
+#sumTable .pc.next{background:var(--tint-fib);box-shadow:inset 3px 0 0 var(--fib)}
+#sumTable .pc .crossed{display:block;margin-left:1.45rem;font-size:.78rem;color:var(--bear)}
+#sumTable .pc label{color:var(--ink);font-size:.9rem}
+#simTable tr.grp td{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);font-size:1rem;background:var(--paper);padding-top:.55rem}
+#notesSimple tr.cur td{background:var(--tint-acc)}
+#notesSimple td:first-child{white-space:nowrap}
+#notesSimple th:nth-child(2){width:40%}
+#notesSimple td:nth-child(3),#notesSimple td:nth-child(4){min-width:190px;line-height:1.5}
+#notesCompare{min-width:1320px;font-size:.87rem;table-layout:fixed}
+#notesCompare th:nth-child(1){width:105px} #notesCompare th:nth-child(2){width:135px} #notesCompare th:nth-child(3){width:120px}
+#notesCompare th:nth-child(4){width:170px} #notesCompare th:nth-child(5){width:125px} #notesCompare th:nth-child(6){width:110px}
+#notesCompare th:nth-child(7){width:140px} #notesCompare th:nth-child(8){width:125px} #notesCompare th:nth-child(9){width:290px}
+#notesCompare td{vertical-align:top}
+#notesCompare tr.cur td{background:var(--tint-fib)}
+#notesCompare tr.you td{background:var(--tint-acc);font-weight:600}
+#notesCompare .ok{color:var(--bull);font-weight:800} #notesCompare .no{color:var(--bear);font-weight:800}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ccard.cur{box-shadow:0 0 0 2px var(--accent)}
+.ccard h4{margin:0 0 .3rem;font-size:1.05rem}
+.ccard h4 .m{color:var(--fib);font-size:1.3rem;margin-right:.3rem}
+.ccard ul{margin:.2rem 0 0 1.1rem;padding:0;font-size:.92rem}
+.ccard li{margin:.22rem 0}
+.ccard .mine{margin-top:.5rem;border-top:1px dashed var(--line);padding-top:.4rem;font-size:.9rem}
+.src{color:var(--muted);font-size:.82rem}
+#notesMatrix td.cur,#notesMatrix th.cur{background:var(--tint-acc)}
+#notesMatrix td.both{background:var(--tint-fib)}
+.nlist{list-style:none;margin:.4rem 0;padding:0}
+.nlist li{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:.45rem .7rem;margin:.35rem 0;font-size:.93rem}
+.nlist li .tagc{flex:0 0 auto}
+.nlist li .tx{flex:1}
+.favcard{border-left:3px solid var(--fib);padding:.2rem 0 .2rem .8rem;margin:.9rem 0}
+.favcard h4{margin:0 0 .2rem;font-size:1rem}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 16px;margin-top:8px}
+.sgrid label{display:block;font-weight:600;font-size:.9rem;margin:.4rem 0}
+.sgrid input,.sgrid select{width:100%;margin-top:.25rem;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.checks{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:.93rem}
+.checks label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.hint{font-size:.88rem;color:var(--muted);margin:.4rem 0 0;max-width:760px}
+
+/* SVG */
+.g-grid{stroke:var(--grid);stroke-width:1}
+.g-lbl{fill:var(--muted);font-size:12px;font-family:"Schibsted Grotesk",sans-serif}
+.g-xline{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.2;opacity:.8}
+.g-prz{fill:var(--prz)}
+.g-zone{fill:var(--tint-fib);stroke:var(--fib);stroke-width:1;stroke-dasharray:2 3}
+.g-tri{fill:var(--tri);stroke:none}
+.g-conn{stroke:var(--accent);stroke-dasharray:5 4;stroke-width:1.2;fill:none;opacity:.85}
+.g-ratio{fill:var(--accent);font-size:12.5px;font-weight:700;paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;font-family:"Schibsted Grotesk",sans-serif}
+.g-proj{stroke:var(--fib);stroke-width:2.2}
+.g-proj.off{stroke-dasharray:3 3;opacity:.6}
+.g-path{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.g-path.fut{stroke-dasharray:7 6;opacity:.7}
+.g-pt{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.g-pt.fut{stroke-dasharray:2 2}
+.g-letter{fill:var(--ink);font-weight:800;font-size:15px;font-family:"Schibsted Grotesk",sans-serif}
+.g-letter.sm{font-size:11px}
+.g-trade{stroke-width:1.8}
+.l-bear{stroke:var(--bear)} .l-bull{stroke:var(--bull)} .l-ink{stroke:var(--ink)}
+.g-lead{stroke:var(--line);stroke-width:1}
+.g-rl{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;font-family:"Schibsted Grotesk",sans-serif}
+.s-bear{fill:var(--bear)} .s-bull{fill:var(--bull)} .s-ink{fill:var(--ink)} .s-fib{fill:var(--fib)} .s-muted{fill:var(--muted)} .s-acc{fill:var(--accent)}
+.g-price{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:6 4}
+.g-path.pre{opacity:.45;stroke-width:2}
+.g-pt.pre{opacity:.6} .g-letter.pre{fill:var(--muted);font-weight:600}
+.g-proj.hist{stroke:var(--accent);stroke-dasharray:6 3}
+.g-trade.dash{stroke-dasharray:6 4}
+.g-xmark{stroke:var(--bear);stroke-width:2.6;stroke-linecap:round}
+.g-hit{stroke:transparent;stroke-width:14;fill:none;cursor:pointer}
+.g-zband{cursor:pointer}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.draw{animation:none;stroke-dashoffset:0}html{scroll-behavior:auto}tr.flash td{animation:none}}
+
+footer{margin:4rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header class="wrap hero">
+  <p class="kicker">Confluencias armónicas · toca el título para nombrar el activo</p>
+  <input id="assetName" class="title" type="text" placeholder="Nombre del activo" aria-label="Nombre del activo" autocomplete="off">
+  <p class="lead">Registra cada patrón del movimiento, grande o pequeño. El simulador lee el patrón seleccionado, arma su plan y te dice en qué se convierte si falla; con el precio actual ves qué patrones siguen vigentes.</p>
+  <div class="toolbar">
+    <label class="fieldset-inline">Tipo de activo
+      <select id="assetType"><option value="boom">Boom (picos al alza)</option><option value="crash">Crash (picos a la baja)</option><option value="other">Otro sintético o mercado</option></select></label>
+    <label class="fieldset-inline">Decimales
+      <select id="assetDec"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select></label>
+    <label class="fieldset-inline">Precio actual
+      <input id="assetPrice" type="text" inputmode="decimal" placeholder="opcional" style="width:130px"></label>
+    <label class="fieldset-inline">Tendencia del gráfico
+      <select id="assetTrend"><option value="auto">Automática (patrón mayor)</option><option value="up">Alcista</option><option value="down">Bajista</option><option value="range">Lateral</option></select></label>
+    <label class="fieldset-inline">Capital
+      <input id="rkCap" type="text" inputmode="decimal" placeholder="ej. 500" style="width:100px"></label>
+    <label class="fieldset-inline">Riesgo por operación (%)
+      <input id="rkPct" type="text" inputmode="decimal" style="width:80px"></label>
+    <label class="fieldset-inline">Valor de 1 punto con 1 lote
+      <input id="rkPv" type="text" inputmode="decimal" style="width:90px"></label>
+    <label class="fieldset-inline">Lote mínimo
+      <input id="rkMin" type="text" inputmode="decimal" style="width:80px"></label>
+    <span class="spacer"></span>
+    <span id="dirty" class="dirty" hidden>Cambios sin guardar</span>
+    <button class="btn primary" id="btnSave" type="button">Guardar activo</button>
+    <button class="btn" id="btnLoad" type="button">Cargar activo</button>
+    <button class="btn" id="btnNew" type="button">Nuevo activo</button>
+    <button class="btn" id="btnTheme" type="button" aria-label="Cambiar tema">Tema: sistema</button>
+    <input type="file" id="fileIn" accept=".json,.csv,application/json,text/csv" hidden>
+  </div>
+  <dialog id="saveDlg" aria-labelledby="saveTitle">
+    <form method="dialog" class="dlg">
+      <h3 id="saveTitle">Guardar activo</h3>
+      <label>Nombre del activo<input id="svAsset" type="text" placeholder="ej. Boom 1000 Index" autocomplete="off"></label>
+      <label>Nombre del archivo<input id="svFile" type="text" autocomplete="off"></label>
+      <label class="inline"><input type="checkbox" id="svDate" checked> Agregar la fecha al nombre (para guardar versiones)</label>
+      <p class="hint">Se guardará como <b id="svPreview"></b></p>
+      <p class="hint" id="svWhere"></p>
+      <div class="dlgbtns">
+        <button class="btn" value="cancel" type="submit">Cancelar</button>
+        <button class="btn primary" id="svOk" type="button">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+  <div hidden>
+  </div>
+  <nav class="toc" aria-label="Secciones">
+    <ol>
+      <li><a href="#patrones">Patrones del movimiento</a></li>
+      <li><a href="#resumen">Resumen</a></li>
+      <li><a href="#simulador">Simulador</a></li>
+      <li><a href="#notas">Notas</a></li>
+    </ol>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- 1 -->
+<section id="patrones">
+  <h2><span class="n">1</span>Patrones del movimiento</h2>
+  <p class="intro">Empieza por la estructura mayor y sigue con las internas, de cualquier temporalidad. Sin X se trata como AB=CD; con D, como patrón completado. Toca una tarjeta para llevarla al simulador.</p>
+  <div class="lab">
+    <div class="controls">
+      <h3 id="formTitle">Nuevo patrón</h3>
+      <div class="row2">
+        <label>Etiqueta<input id="fLabel" type="text" placeholder="Estructura mayor"></label>
+        <label>Temporalidad<input id="fTf" type="text" list="tfList" placeholder="H1"></label>
+      </div>
+      <datalist id="tfList"><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option></datalist>
+      <div class="row2">
+        <label>X <span class="opt">opcional</span><input id="fX" type="text" inputmode="decimal"></label>
+        <label>A<input id="fA" type="text" inputmode="decimal"></label>
+        <label>B<input id="fB" type="text" inputmode="decimal"></label>
+        <label>C<input id="fC" type="text" inputmode="decimal"></label>
+        <label>D <span class="opt">real, si ya giró</span><input id="fD" type="text" inputmode="decimal"></label>
+        <label>Pivotes tras D<input id="fPost" type="text" placeholder="E; F… (10420; 10180)"></label>
+      </div>
+      <label>Patrón esperado<select id="fKey"></select></label>
+      <div class="formmsg" id="fMsg" role="status"></div>
+      <button class="btn primary block" id="fSubmit" type="button">Agregar patrón</button>
+      <button class="btn block" id="fCancel" type="button" hidden>Cancelar edición</button>
+    </div>
+    <div class="minis" id="plist"></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="resumen">
+  <h2><span class="n">2</span>Resumen de gráficos</h2>
+  <p class="intro">Cada fila es un gráfico, ordenado por nombre y luego por temporalidad. Cada columna es un patrón, con la PRZ que tendría en ese gráfico (los mismos de «Proyectar como» en el simulador); vacía si no se puede proyectar ahí. Marca «superado» aquí o en el simulador cuando el precio ya atravesó un patrón: la casilla es la misma en los dos lugares. La celda resaltada es el siguiente patrón pendiente.</p>
+  <div class="przbar">
+    <label><input type="checkbox" id="sumHideTaken" checked> Ocultar los patrones superados</label>
+    <label><input type="checkbox" id="sumHidePts" checked> Ocultar X, A, B y C</label>
+    <span class="zsub" id="sumCount"></span>
+  </div>
+  <div class="tablewrap"><table id="sumTable"></table></div>
+</section>
+
+<!-- 3 -->
+<section id="simulador">
+  <h2><span class="n">3</span>Simulador</h2>
+  <p class="intro">Muestra el patrón seleccionado con su proyección más probable. Toca otro patrón en la fila de candidatos para ver cómo quedaría si se convierte en él, o mueve las coordenadas: nada se guarda hasta que pulses «Aplicar al patrón».</p>
+  <div class="lab">
+    <div class="controls">
+      <label>Patrón del listado<select id="simPick"></select></label>
+      <div class="row2">
+        <label>X<input id="sX" type="text" inputmode="decimal"></label>
+        <label>A<input id="sA" type="text" inputmode="decimal"></label>
+        <label>B<input id="sB" type="text" inputmode="decimal"></label>
+        <label>C<input id="sC" type="text" inputmode="decimal"></label>
+        <label>D <span class="opt">real</span><input id="sD" type="text" inputmode="decimal"></label>
+        <label>Pivotes tras D<input id="sPost" type="text" placeholder="E; F…"></label>
+      </div>
+      <p class="dir" id="simDir"></p>
+      <label>B = AB / XA <output id="bOut"></output><input id="bR" type="range" min="0.2" max="1.7" step="0.001"></label>
+      <label>C = BC / AB <output id="cOut"></output><input id="cR" type="range" min="0.2" max="2.3" step="0.001"></label>
+      <fieldset><legend>Stop loss</legend>
+        <label><input type="radio" name="sl" value="agr"> SL1 agresivo</label>
+        <label><input type="radio" name="sl" value="cons" checked> SL2 conservador</label>
+      </fieldset>
+      <fieldset><legend>Entrada</legend>
+        <label><input type="radio" name="entry" value="D" checked> En D</label>
+        <label><input type="radio" name="entry" value="conf"> Confirmada</label>
+        <label><input type="radio" name="entry" value="prz"> Operar la PRZ</label>
+      </fieldset>
+      <fieldset><legend>Objetivos medidos sobre</legend>
+        <label><input type="radio" name="tp" value="AD" checked> AD</label>
+        <label><input type="radio" name="tp" value="CD"> CD</label>
+      </fieldset>
+      <button class="btn primary block" id="simFail" type="button">Simular: el precio atraviesa D</button>
+      <button class="btn block" id="simApply" type="button" disabled>Aplicar al patrón</button>
+      <button class="btn block" id="simReset" type="button" disabled>Restablecer coordenadas</button>
+      <label class="pricebox">Precio actual<input id="sPrice" type="text" inputmode="decimal" placeholder="el mismo de la barra superior"></label>
+      <p class="hint" style="margin-top:0">Con él se marca qué patrones siguen vigentes. Se guarda al momento.</p>
+    </div>
+    <div class="labout">
+      <div class="chartbox" id="simChart"></div>
+      <div class="cands" id="simCands"></div>
+      <div id="simMsgs" aria-live="polite"></div>
+
+      <h3 class="ptitle">Todas las PRZ</h3>
+      <div id="allPrz"></div>
+
+      <h3 class="ptitle">Validez con el precio actual</h3>
+      <div class="tablewrap"><table id="liveTable"></table></div>
+
+      <h3 class="ptitle">Lectura del patrón</h3>
+      <div id="notesLive"></div>
+      <div id="simNotes"></div>
+      <div id="simTF"></div>
+
+      <div id="przPlan"></div>
+      <h3 class="ptitle" id="planTitle">Plan de la operación</h3>
+      <div class="tablewrap"><table id="simTable"></table></div>
+
+      <div id="simSignals"></div>
+      <div id="simFav"></div>
+      <div id="simLadder"></div>
+      <div id="simResult"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="notas">
+  <h2><span class="n">4</span>Notas</h2>
+  <p class="intro">Referencia de Carney que no cambia con el patrón. Lo que corresponde a tu patrón seleccionado aparece resaltado; su lectura concreta está en el simulador.</p>
+
+  <h3 class="ptitle">Comparación de patrones armónicos</h3>
+  <p class="hint" style="margin:0 0 .4rem">Valores de las tablas estandarizadas de Carney (Vol. 3) y de la plantilla. La fila «Tus puntos» muestra dónde cayó cada ratio de tu patrón seleccionado: ✓ dentro del rango del patrón resaltado, ✗ fuera.</p>
+  <div class="tablewrap"><table id="notesCompare"></table></div>
+
+  <h3 class="ptitle">El punto C</h3>
+  <div class="tablewrap"><table id="notesSimple"></table></div>
+  <details class="settings" style="margin-top:.6rem">
+    <summary>Notas detalladas por retroceso, con fuentes y cálculo</summary>
+    <div class="cgrid" id="notesC" style="margin-top:.6rem"></div>
+    <p class="hint" style="margin:.8rem 0 .4rem">Cálculo exacto con el B ideal de cada patrón: <b>D / XA = B × (1 + C × (BC − 1))</b>. En cada celda, primero la BC recíproca de Carney y luego la BC del rango del patrón que mejor converge con su D. ✓ = a 0.05 XA o menos del D del patrón.</p>
+    <div class="tablewrap"><table id="notesMatrix"></table></div>
+  </details>
+
+  <h3 class="ptitle" id="notas-bc">Qué significan las etiquetas de la BC</h3>
+  <div id="notesBC"></div>
+  <p class="hint">La lectura de la BC es una inferencia de la plantilla a partir de las reglas de Carney: la BC del patrón debe converger con su D y el stop va más allá de 2.0 XA. El umbral de «cerca» es 0.05 XA.</p>
+
+  <h3 class="ptitle">Si la reacción llega al 38.2% pero no al 61.8%</h3>
+  <div id="notesCase1"></div>
+
+  <details class="settings" id="slRef">
+    <summary>Cómo se calculan los SL de cada patrón</summary>
+    <p class="hint">El SL2 es el stop estándar de Carney (Vol. 3) para cada patrón, medido sobre el mismo tramo que D, más un colchón del 2% de ese tramo. SL1 es el primer nivel siguiente; SL2 es donde el patrón queda roto y suele empezar el siguiente de la escalera. La fila resaltada es el patrón que estás simulando.</p>
+    <div class="tablewrap"><table id="slTable"></table></div>
+    <p class="hint">Ejemplo: Bat alcista con X = 10000 y A = 11000. XA = 1000, así que SL2 = 1.13 XA bajo A = 9870, menos 20 pts de colchón (2% de XA) = <b>9850</b>. Los SL1 marcados con * no son ratios canónicos: son puntos intermedios entre D y el stop de Carney. En Gartley, Bat, Butterfly, Crab y Deep Crab la tabla de Carney añade «depende del AB=CD»: si el AB=CD de la PRZ completa más allá del stop estándar, el stop se coloca detrás del AB=CD.</p>
+  </details>
+
+  <h3 class="ptitle">Tus observaciones</h3>
+  <div class="jform">
+    <label>Tema<select id="noteTag"></select></label>
+    <label style="flex:1;min-width:240px">Observación<input type="text" id="noteText" placeholder="ej. con C en 0.382 y B 0.886 el precio llegó hasta 1.902 antes de girar"></label>
+    <button type="button" class="btn primary" id="noteAdd">Agregar</button>
+  </div>
+  <div id="notesMine"></div>
+</section>
+
+<footer>
+  Herramienta de apoyo basada en los ratios estándar de Scott Carney. Ubica zonas de probable reacción, pero no garantiza que el precio reaccione: confirma con tu gatillo de entrada y gestiona el riesgo. No es asesoramiento financiero.
+</footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const isF = Number.isFinite;
+const num = v => { if(v == null) return NaN; const s = String(v).trim().replace(/\s/g,'').replace(',', '.'); return s === '' ? NaN : Number(s); };
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fr = r => (+r).toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+
+/* ============ Teoría ============ */
+const FIB_RET = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886];
+const FIB_EXT = [1.13, 1.272, 1.414, 1.618, 2.0, 2.24, 2.618, 3.14, 3.618];
+const ABCD_SET = [0.618, 0.786, 1, 1.272, 1.618, 2.0, 2.618];
+const KEY_XA = new Set([0.618, 0.786, 0.886, 1.13, 1.272, 1.618, 2.618]);
+const KEY_BC = new Set([1.272, 1.618, 2.0, 2.24, 2.618, 3.618]);
+const KEY_AB = new Set([1, 1.272, 1.618]);
+const COLORS = ['#3F7FD6','#8E5CCB','#C28A16','#C9507F','#1E9C84','#D8702C','#6E9B2A','#5A66D9','#C94545','#2A9DC0'];
+
+// Patrones clásicos (Carney). b: rango B/XA · d: retroceso/extensión XA (el primero es el principal)
+// bc: rango de proyección CD/BC · abcd: variantes AB=CD. C siempre 0.382–0.886 de AB.
+const HARM = [
+  // Tablas estandarizadas de Carney, Harmonic Trading Vol. 3. tol: tolerancia del punto B (±3% Gartley/Butterfly, ±5% el resto)
+  // extra: niveles que Carney incluye en la PRZ (mínimos o capas de tolerancia)
+  {key:'gartley',  name:'Gartley',     b:[0.618,0.618], tol:0.03, d:[0.786], bc:[1.13,1.618],  abcd:[1,1.272]},
+  {key:'bat',      name:'Bat',         b:[0.382,0.5],   tol:0.05, d:[0.886], bc:[1.618,2.618], abcd:[1,1.272,1.618]},
+  {key:'altbat',   name:'Bat alterno', b:[0.236,0.382], tol:0.03, d:[1.13],  bc:[2.0,3.618],   abcd:[1,1.272,1.618], extra:[[0.886,'mínimo 0.886 XA'],[1,'debe incluir 1.0 XA']]},
+  {key:'butterfly',name:'Butterfly',   b:[0.786,0.786], tol:0.03, d:[1.272], bc:[1.618,2.24],  abcd:[1,1.272]},
+  {key:'crab',     name:'Crab',        b:[0.382,0.618], tol:0.05, d:[1.618], bc:[2.618,3.618], abcd:[1,1.272,1.618], extra:[[1.902,'tolerancia 1.902 XA']]},
+  {key:'deepcrab', name:'Deep Crab',   b:[0.886,0.936], tol:0.02, d:[1.618], bc:[2.0,3.618],   abcd:[1,1.272,1.618], extra:[[1.902,'tolerancia 1.902 XA']]}
+];
+const FAM_RANK = {pat:6, post:5, xa:4, bc:3, abcd:2, st:1};
+// Encaje de B con rango preferido (Carney: el Bat admite B < 0.618, pero prefiere 0.382–0.50)
+// Encaje con tolerancia (Carney Vol. 3): 1 dentro del ideal; baja hasta 0.7 en el borde de la tolerancia; 0 fuera
+function fitTol(v, lo, hi, tol){
+  if(!isF(v)) return 0;
+  if(v >= lo - 1e-9 && v <= hi + 1e-9) return 1;
+  const dev = v < lo ? lo - v : v - hi;
+  return dev <= tol + 1e-9 ? 1 - 0.3 * dev / tol : 0;
+}
+const fitB = (v, h, slack) => fitTol(v, h.b[0], h.b[1], isF(h.tol) ? h.tol : slack);
+// Tabla recíproca de Carney: retroceso de C → proyección BC
+const RECIP = [[0.382, [2.24, 2.618, 3.14, 3.618]], [0.5, [2.0]], [0.618, [1.618]], [0.707, [1.414]], [0.786, [1.272]], [0.886, [1.13]], [1, [2.0]]];
+const recipOf = cab => RECIP.reduce((a, r) => Math.abs(r[0] - cab) < Math.abs(a[0] - cab) ? r : a);
+
+// Encaje de un ratio en un rango: 1 dentro, decae hasta 0.5 en el borde de la tolerancia, 0 fuera
+function fitR(v, lo, hi, slack){
+  if(!isF(v)) return 0;
+  if(v >= lo - 1e-9 && v <= hi + 1e-9) return 1;
+  const dev = v < lo ? lo - v : v - hi;
+  return dev <= slack ? 1 - 0.5 * dev / slack : 0;
+}
+const parseExtra = s => String(s || '').split(/[;\s]+|,(?=\s)|,(?=\d+\.)/).map(num).filter(v => isF(v) && v > 0 && v < 10);
+
+/* ============ Estado ============ */
+const DEFAULT_SETTINGS = {fav:['crab','deepcrab','butterfly2'], timeTol:0, bandPct:1.5, minPts:0, ratioSlack:0.03, slPct:10, useHistory:true, minLevels:3, minLevelsV:3, minPatterns:1, maxZones:12, sort:'score', extra:'',
+  grid:{xa:true, bc:true, abcd:true, struct:true, passed:false}, sum:{hideTaken:true, hidePts:true}};
+const blankState = () => ({notes:[], asset:{name:'', type:'boom', trend:'auto', decimals:2, price:null, capital:null, riskPct:2, pointValue:1, minLot:0.01}, settings:clone(DEFAULT_SETTINGS), patterns:[], selectedId:null});
+let state = blankState();
+let dirty = false, editingId = null;
+let analyses = [];
+let hist = {out:new Map(), byKey:{}, legs:[], bins:[], pref:new Set(), total:0, onFib:0, chance:0};
+const PIV = ['E','F','G','H','I','J','K','L'];
+
+const dec = () => state.asset.decimals;
+const fmt = n => isF(n) ? n.toFixed(dec()) : '–';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const colorOf = id => { const p = state.patterns.find(q => q.id === id); return p ? p.color : '#888'; };
+const labelOf = id => { const p = state.patterns.find(q => q.id === id); return p ? (p.label || 'Sin nombre') : '?'; };
+
+/* ============ Análisis de un patrón ============ */
+function analyze(p){
+  const S = state.settings, G = S.grid;
+  const {X, A, B, C, D} = p;
+  const hasX = isF(X), hasD = isF(D);
+  const r = {p, ok:false, errors:[], matches:[], levels:[], dir:0, ratios:{}};
+  if(![A,B,C].every(isF)){ r.errors.push('Faltan A, B o C.'); return r; }
+  const AB = Math.abs(B - A), BC = Math.abs(C - B);
+  if(!AB || !BC){ r.errors.push('A, B y C no pueden repetirse.'); return r; }
+  if(Math.sign(B - A) !== -Math.sign(C - B)){ r.errors.push('B y C deben alternar (zigzag).'); return r; }
+  let dir, XA = null;
+  if(hasX){
+    XA = Math.abs(A - X);
+    if(!XA || Math.sign(A - X) !== -Math.sign(B - A)){ r.errors.push('X→A debe ir contra A→B.'); return r; }
+    dir = Math.sign(A - X);
+  } else dir = Math.sign(C - B);
+  if(hasD && Math.sign(D - C) !== -dir){ r.errors.push('C→D debe ir contra B→C.'); return r; }
+  const post = Array.isArray(p.post) ? p.post.filter(isF) : [];
+  if(post.length){
+    if(!hasD){ r.errors.push('Registra D antes de los pivotes posteriores.'); return r; }
+    let prev = C, cur = D;
+    for(const q of post){ if(q === cur || Math.sign(q - cur) !== -Math.sign(cur - prev)){ r.errors.push('Los pivotes después de D deben alternar (zigzag).'); return r; } prev = cur; cur = q; }
+  }
+
+  r.ok = true; r.dir = dir;          // dir>0: CD cae y la reacción esperada en D es alcista
+  const R = r.ratios;
+  if(hasX) R.bxa = AB / XA;
+  R.cab = BC / AB;
+  const cBeyondA = (C - A) * dir > 0;
+  const bBeyondX = hasX && (B - X) * dir < 0;
+  if(hasX && cBeyondA) R.cx = Math.abs(C - X) / XA;
+  if(hasD){ if(hasX) R.dxa = Math.abs(D - A) / XA; R.dbc = Math.abs(D - C) / BC; R.dab = Math.abs(D - C) / AB; }
+  const legRef = hasD ? Math.abs(A - D) : (hasX ? XA : AB);
+
+  const L = [];
+  const add = (price, w, fam, label, react, anchor) => {
+    if(isF(price)) L.push({price, w, fam, labels:[label], react, anchorDist:Math.abs(price - anchor), patId:p.id, legRef});
+  };
+  const xaP = k => A - dir * k * XA;
+  const bcP = k => C - dir * k * BC;
+  const abP = k => C - dir * k * AB;
+  const sl = S.ratioSlack;
+  const extra = parseExtra(S.extra);
+
+  if(!hasD){
+    const cRet = fitR(R.cab, 0.382, 0.886, sl);
+    // Patrones clásicos XABCD
+    if(hasX && !cBeyondA && !bBeyondX && cRet > 0){
+      HARM.forEach(h => {
+        const bf = fitB(R.bxa, h, sl);
+        if(bf <= 0) return;
+        r.matches.push({name:h.name, fit:Math.min(bf, cRet), info:'D ' + h.d.map(fr).join(' / ') + ' XA'});
+        h.d.forEach((k,i) => add(xaP(k), i ? 3 : 5, 'pat', h.name + ': D ' + fr(k) + ' XA', dir, A));
+        (h.extra || []).forEach(([k, t]) => add(xaP(k), 2.5, 'pat', h.name + ': ' + t, dir, A));
+        if(h.key === 'gartley' && R.cab <= 0.64) add(xaP(0.886), 3, 'pat', 'Gartley: variante 0.886 XA (BC 1.618–2.618)', dir, A);
+        if(perfectOf(h.key, p)){ add(xaP(h.d[0]), 6, 'pat', h.name + ' perfecto', dir, A); r.matches[r.matches.length - 1].info += ' · perfecto'; }
+        FIB_EXT.filter(k => k >= h.bc[0] - 1e-9 && k <= h.bc[1] + 1e-9)
+          .forEach(k => add(bcP(k), 2, 'pat', h.name + ': CD ' + fr(k) + '×BC', dir, C));
+        h.abcd.forEach(k => add(abP(k), 2.5, 'pat', h.name + ': AB=CD' + (k === 1 ? '' : ' ' + fr(k)), dir, C));
+      });
+    }
+    // Shark y Cypher (C supera a A)
+    if(hasX && cBeyondA && !bBeyondX){
+      const cf = fitR(R.cab, 1.13, 1.618, sl);
+      if(cf > 0 && R.bxa < 1){
+        r.matches.push({name:'Shark', fit:cf, info:'D 0.886 / 1.13 XA'});
+        add(xaP(0.886), 5, 'pat', 'Shark: D 0.886 XA', dir, A);
+        add(xaP(1.13), 4, 'pat', 'Shark: D 1.13 XA', dir, A);
+        FIB_EXT.filter(k => k >= 1.618 - 1e-9 && k <= 2.24 + 1e-9).forEach(k => add(bcP(k), 2, 'pat', 'Shark: CD ' + fr(k) + '×BC', dir, C));
+      }
+      const bf = fitR(R.bxa, 0.382, 0.618, sl), xf = fitR(R.cx, 1.13, 1.414, sl);
+      if(bf > 0 && xf > 0){
+        const XC = Math.abs(C - X);
+        r.matches.push({name:'Cypher', fit:Math.min(bf, xf), info:'D 0.786 XC'});
+        add(C - dir * 0.786 * XC, 5, 'pat', 'Cypher: D 0.786 XC', dir, C);
+      }
+      const nb = fitR(R.bxa, 0.382, 0.618, sl), nc = fitR(R.cab, 1.13, 2.14, sl);
+      if(nb > 0 && nc > 0){
+        r.matches.push({name:'Nen Star', fit:Math.min(nb, nc), info:'D 1.272 XA'});
+        add(xaP(1.272), 5, 'pat', 'Nen Star: D 1.272 XA', dir, A);
+      }
+    }
+    // Proyección recíproca de BC (C en .382 → CD 2.618 BC; .618 → 1.618; .886 → 1.13 …) y AB=CD puro
+    if(cRet > 0){
+      const rc = recipOf(R.cab);
+      rc[1].forEach(k => add(bcP(k), 3, 'pat', 'BC recíproco ' + fr(k) + ' (C ≈ ' + fr(rc[0]) + ')', dir, C));
+      if(!hasX){
+        r.matches.push({name:'AB=CD', fit:cRet, info:'CD 1 / 1.272 / 1.618 AB'});
+        add(abP(1), 4, 'pat', 'AB=CD 1:1', dir, C);
+        add(abP(1.272), 3, 'pat', 'AB=CD 1.272', dir, C);
+        add(abP(1.618), 3, 'pat', 'AB=CD 1.618', dir, C);
+      }
+    }
+    // Grilla Fibonacci del patrón
+    if(hasX && G.xa){
+      [...FIB_RET, 1, ...FIB_EXT].forEach(k => add(xaP(k), KEY_XA.has(k) ? 1.5 : 1, 'xa', fr(k) + ' XA', dir, A));
+      extra.forEach(k => add(xaP(k), 1, 'xa', fr(k) + ' XA (propio)', dir, A));
+    }
+    if(G.bc){
+      [...FIB_RET, 1, ...FIB_EXT].forEach(k => add(bcP(k), KEY_BC.has(k) ? 1.5 : 1, 'bc', fr(k) + ' BC', dir, C));
+      extra.forEach(k => add(bcP(k), 1, 'bc', fr(k) + ' BC (propio)', dir, C));
+    }
+    if(G.abcd) ABCD_SET.forEach(k => add(abP(k), KEY_AB.has(k) ? 1.5 : 1, 'abcd', 'AB=CD ' + fr(k), dir, C));
+    if(G.struct){ add(B, 0.75, 'st', 'Punto B', dir, B); if(hasX) add(X, 0.75, 'st', 'Punto X', dir, X); }
+    const cal = histCalibration(p);
+    if(cal) add(cal.price, 3.5, 'pat', cal.label, dir, C);
+    if(!G.passed){ for(let i = L.length - 1; i >= 0; i--) if((L[i].price - C) * -dir <= 0) L.splice(i, 1); }
+  } else {
+    // Patrón completado: identificar y proyectar objetivos desde D
+    if(hasX){
+      HARM.forEach(h => {
+        const bf = fitB(R.bxa, h, sl);
+        if(bf <= 0) return;
+        const near = h.d.find(k => Math.abs(R.dxa - k) <= Math.max(0.04, k * 0.04));
+        if(near) r.matches.push({name:h.name + ' completado', fit:bf, info:'D ≈ ' + fr(near) + ' XA'});
+      });
+    } else if(fitR(R.dab, 0.9, 1.1, 0) > 0 || Math.abs(R.dab - 1.272) < 0.05 || Math.abs(R.dab - 1.618) < 0.06){
+      r.matches.push({name:'AB=CD completado', fit:1, info:'CD ≈ ' + fr(R.dab) + ' AB'});
+    }
+    const AD = Math.abs(A - D), CD = Math.abs(C - D);
+    const cw = post.length ? 1.5 : 1;   // un D con reacción registrada es un pivote real: pesa más
+    [...FIB_RET, 1].forEach(k => add(D + dir * k * AD, ((k === 0.382 || k === 0.618) ? 2 : 1) * cw, 'post', fr(k) + ' AD (objetivo)', -dir, D));
+    FIB_RET.forEach(k => add(D + dir * k * CD, ((k === 0.382 || k === 0.618) ? 1.5 : 1) * cw, 'post', fr(k) + ' CD', -dir, D));
+    extra.forEach(k => add(D + dir * k * AD, 1, 'post', fr(k) + ' AD (propio)', -dir, D));
+    if(G.struct){ add(C, 0.75, 'st', 'Punto C', -dir, C); add(A, 0.75, 'st', 'Punto A', -dir, A); }
+    if(!G.passed){ for(let i = L.length - 1; i >= 0; i--) if((L[i].price - D) * dir <= 0) L.splice(i, 1); }
+    const oc = hist.out.get(p.id);
+    if(oc && oc.status === 'invalidado' && oc.prz){
+      const lo = oc.prz[0], hi = oc.prz[1], txt = 'PRZ violada del ' + SIM[oc.key].name + (dir > 0 ? ' (soporte roto, ahora resistencia)' : ' (resistencia rota, ahora soporte)');
+      [[lo, 2], [(lo + hi) / 2, 3], [hi, 2]].forEach(([v, w]) => add(v, w, 'pat', txt, -dir, v));
+    }
+    if(post.length){
+      const ch = [C, D, ...post], nm = ['C', 'D', ...post.map((_,i) => PIV[i])];
+      const L1 = ch[ch.length - 2], L2 = ch[ch.length - 1], legDir = Math.sign(L2 - L1), lg = Math.abs(L2 - L1);
+      const tn = nm[nm.length - 2] + nm[nm.length - 1];
+      FIB_RET.forEach(k => add(L2 - legDir * k * lg, (k === 0.382 || k === 0.618 || k === 0.786) ? 1.8 : 1.2, 'post', fr(k) + ' tramo ' + tn + ' (confirmado)', legDir, L2));
+      add(D, 1.5, 'st', 'D confirmado', 0, D);
+      post.forEach((q,i) => add(q, 1.5, 'st', 'Pivote ' + PIV[i] + ' confirmado', 0, q));
+    }
+  }
+
+  // Fusionar niveles idénticos del mismo patrón
+  L.sort((m,n) => m.price - n.price);
+  const merged = [];
+  L.forEach(l => {
+    const last = merged[merged.length - 1];
+    if(last && Math.abs(last.price - l.price) <= 1e-7 * Math.max(1, Math.abs(l.price))){
+      if(l.w > last.w){ last.w = l.w; last.anchorDist = l.anchorDist; last.react = l.react; }
+      if(FAM_RANK[l.fam] > FAM_RANK[last.fam]) last.fam = l.fam;
+      l.labels.forEach(t => { if(!last.labels.includes(t)) last.labels.push(t); });
+    } else merged.push(l);
+  });
+  merged.forEach((l,i) => {
+    if(S.useHistory && hist.pref.size){
+      const m = String(l.labels[0]).match(/(\d+(?:\.\d+)?)/);
+      if(m && [...hist.pref].some(f => Math.abs(+m[1] - f) < 0.002)){ l.w *= 1.25; l.labels.push('ratio frecuente del activo'); }
+    }
+    l.h = Math.max(S.minPts, S.bandPct / 100 * Math.max(l.anchorDist, 0.25 * legRef));
+    l.key = p.id + ':' + i;
+  });
+  r.levels = merged;
+  r.hasX = hasX; r.hasD = hasD; r.legRef = legRef;
+  return r;
+}
+
+
+/* ============ Simulador: definiciones ============ */
+// sl: [conservador, agresivo] en ratio de la misma base que D. next: a qué migra si el precio atraviesa D.
+const SIM = {
+  // sl: [SL2 conservador = stop estándar de Carney Vol. 3, SL1 agresivo]. slNote: SL1 que no es un ratio canónico
+  gartley:   {name:'Gartley',        fam:'xabcd', b:[.618,.618], tol:.03, d:.786,  base:'XA', bc:[1.13,1.618],  abcd:[1,1.272],       sl:[1,.886],        next:'crab', variant:.886, slAbcd:true},
+  bat:       {name:'Bat',            fam:'xabcd', b:[.382,.5],   tol:.05, d:.886,  base:'XA', bc:[1.618,2.618], abcd:[1,1.272,1.618], sl:[1.13,1],        next:'altbat', slAbcd:true},
+  altbat:    {name:'Bat alterno',    fam:'xabcd', b:[.236,.382], tol:.03, d:1.13,  base:'XA', bc:[2,3.618],     abcd:[1,1.272,1.618], sl:[1.272,1.2],     next:'crab', extra:[[.886,'mínimo 0.886 XA',true],[1,'1.0 XA',true]], slNote:true},
+  butterfly: {name:'Butterfly',      fam:'xabcd', b:[.786,.786], tol:.03, d:1.272, base:'XA', bc:[1.618,2.24],  abcd:[1,1.272],       sl:[1.414,1.343],   next:'butterfly2', slNote:true, slAbcd:true},
+  butterfly2:{name:'Extensión 1.618',fam:'xabcd', b:[.786,.786], tol:.03, d:1.618, base:'XA', bc:[2.24,2.618],  abcd:[1.618],         sl:[2,1.902],       next:null, hidden:true, slAbcd:true},
+  crab:      {name:'Crab',           fam:'xabcd', b:[.382,.618], tol:.05, d:1.618, base:'XA', bc:[2.618,3.618], abcd:[1,1.272,1.618], sl:[2,1.902],       next:null, extra:[[1.902,'tolerancia 1.902 XA',false]], slAbcd:true},
+  deepcrab:  {name:'Deep Crab',      fam:'xabcd', b:[.886,.936], tol:.02, d:1.618, base:'XA', bc:[2,3.618],     abcd:[1,1.272,1.618], sl:[2,1.902],       next:null, extra:[[1.902,'tolerancia 1.902 XA',false]], slAbcd:true},
+  shark:     {name:'Shark',          fam:'shark', d:.886,  base:'XA', bc:[1.618,2.24], sl:[1.272,1.2],  next:null, extra:[[1.13,'1.13 XA',true]], slNote:true},
+  shark2:    {name:'Shark 1.13',     fam:'shark', d:1.13,  base:'XA', bc:[1.618,2.24], sl:[1.272,1.2],  next:null, hidden:true, slNote:true},
+  cypher:    {name:'Cypher',         fam:'cypher',d:.786,  base:'XC', sl:[1,.886],     next:null},
+  nenstar:   {name:'Nen Star',       fam:'nenstar', d:1.272, base:'XA', bc:[1.272,2], sl:[1.414,1.343], next:null, slNote:true},
+  abcd:      {name:'AB=CD',          fam:'abcd',  d:1,     base:'AB', sl:[1.272,1.13], next:'abcd2'},
+  abcd2:     {name:'AB=CD 1.272',    fam:'abcd',  d:1.272, base:'AB', sl:[1.618,1.414],next:'abcd3', hidden:true},
+  abcd3:     {name:'AB=CD 1.618',    fam:'abcd',  d:1.618, base:'AB', sl:[2,1.8],      next:null, hidden:true, slNote:true}
+};
+
+const rangeTxt = b => b[0] === b[1] ? fr(b[0]) : fr(b[0]) + '–' + fr(b[1]);
+
+function geom(c){
+  const {X, A, B, C, D} = c, hasX = isF(X), hasD = isF(D);
+  if(![A,B,C].every(isF)) return {ok:false, err:'Faltan A, B o C.'};
+  const ab = Math.abs(B - A), bc = Math.abs(C - B);
+  if(!ab || !bc) return {ok:false, err:'A, B y C no pueden repetirse.'};
+  if(Math.sign(B - A) !== -Math.sign(C - B)) return {ok:false, err:'B y C deben alternar (zigzag).'};
+  let dir, xa = NaN;
+  if(hasX){ xa = Math.abs(A - X); if(!xa || Math.sign(A - X) !== -Math.sign(B - A)) return {ok:false, err:'X→A debe ir contra A→B.'}; dir = Math.sign(A - X); }
+  else dir = Math.sign(C - B);
+  if(hasD && Math.sign(D - C) !== -dir) return {ok:false, err:'C→D debe ir contra B→C.'};
+  const post = Array.isArray(c.post) ? c.post.filter(isF) : [];
+  if(post.length){
+    if(!hasD) return {ok:false, err:'Registra D antes de los pivotes posteriores.'};
+    let prev = C, cur = D;
+    for(const q of post){ if(q === cur || Math.sign(q - cur) !== -Math.sign(cur - prev)) return {ok:false, err:'Los pivotes después de D deben alternar (zigzag).'}; prev = cur; cur = q; }
+  }
+  const R = {cab: bc / ab};
+  if(hasX){ R.bxa = ab / xa; R.cx = Math.abs(C - X) / xa; }
+  return {ok:true, hasX, hasD, dir, xa, ab, bc, R, post, cBeyondA:(C - A) * dir > 0, bBeyondX: hasX && (B - X) * dir < 0};
+}
+
+function simFit(key, g){
+  const P = SIM[key], sl = state.settings.ratioSlack, R = g.R;
+  const no = why => ({fit:0, why});
+  if(P.fam === 'xabcd'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(g.cBeyondA) return no('C supera a A: mira Cypher o Shark.');
+    if(g.bBeyondX) return no('B supera a X: no es un XABCD clásico.');
+    const bf = fitB(R.bxa, P, sl), cf = fitR(R.cab, .382, .886, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y ${P.name} pide ${rangeTxt(P.b)}.`);
+    if(!cf) return no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(P.fam === 'shark'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Shark, C debe superar a A (1.13–1.618 de AB).');
+    const cf = fitR(R.cab, 1.13, 1.618, sl);
+    if(!cf || R.bxa >= 1) return no(`C está en ${fr(R.cab)} de AB y el Shark pide 1.13–1.618.`);
+    return {fit:cf};
+  }
+  if(P.fam === 'cypher'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Cypher, C debe superar a A (1.13–1.414 de XA).');
+    const bf = fitR(R.bxa, .382, .618, sl), xf = fitR(R.cx, 1.13, 1.414, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y el Cypher pide 0.382–0.618.`);
+    if(!xf) return no(`C extiende ${fr(R.cx)} de XA y el Cypher pide 1.13–1.414.`);
+    return {fit:Math.min(bf, xf)};
+  }
+  if(P.fam === 'nenstar'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Nen Star, C debe superar a A (1.13–2.14 de AB).');
+    if(g.bBeyondX) return no('En un Nen Star, B no debe superar a X.');
+    const bf = fitR(R.bxa, .382, .618, sl), cf = fitR(R.cab, 1.13, 2.14, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y el Nen Star pide 0.382–0.618.`);
+    if(!cf) return no(`C está en ${fr(R.cab)} de AB y el Nen Star pide 1.13–2.14.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(g.cBeyondA) return no('C supera a A: no es un AB=CD.');
+  const cf = fitR(R.cab, .382, .886, sl);
+  return cf ? {fit:cf} : no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+}
+
+function simCompute(c, key, slMode, tpMode, entryMode){
+  const g = geom(c); if(!g.ok) return {ok:false, err:g.err};
+  const P = SIM[key], {X, A, B, C} = c, dir = g.dir;
+  if((P.base === 'XA' || P.base === 'XC') && !g.hasX) return {ok:false, err:P.name + ' necesita el punto X.'};
+  const XC = g.hasX ? Math.abs(C - X) : NaN;
+  const at = {XA:k => A - dir * k * g.xa, XC:k => C - dir * k * XC, BC:k => C - dir * k * g.bc, AB:k => C - dir * k * g.ab}[P.base];
+  const bcP = k => C - dir * k * g.bc, abP = k => C - dir * k * g.ab;
+  const leg = g.hasX ? g.xa : g.ab;
+  const Dp = at(P.d);
+  const proj = [{label:fr(P.d) + ' ' + P.base, v:Dp, main:true, inPrz:true}];
+  let bcBest = null;
+  if(P.bc){
+    FIB_EXT.forEach(f => { if(f < P.bc[0] - 1e-9 || f > P.bc[1] + 1e-9) return; const v = bcP(f); if(!bcBest || Math.abs(v - Dp) < Math.abs(bcBest.v - Dp)) bcBest = {f, v}; });
+    if(bcBest){
+      proj.push({label:fr(bcBest.f) + ' BC', v:bcBest.v, inPrz:true, bc:true});
+      const f2 = FIB_EXT.find(q => q > bcBest.f + 1e-9);   // capa BC (Carney Vol. 3): tolerancia más allá del ideal
+      if(f2) proj.push({label:fr(f2) + ' BC (capa de tolerancia)', v:bcP(f2), inPrz:false, bc:true, layer:true});
+    }
+  }
+  let abcdPt = null;
+  if(P.abcd){
+    let best = null; P.abcd.forEach(f => { const v = abP(f); if(!best || Math.abs(v - Dp) < Math.abs(best.v - Dp)) best = {f, v}; });
+    const near = Math.abs(best.v - Dp) <= 0.10 * leg;
+    proj.push({label:(best.f === 1 ? 'AB=CD' : 'AB=CD ' + fr(best.f)) + (near ? '' : ' (lejos)'), v:best.v, inPrz:near});
+    abcdPt = {v:best.v, f:best.f};
+  }
+  if(P.base === 'AB' && fitR(g.R.cab, .382, .886, .03) > 0){
+    const rc = recipOf(g.R.cab), k = rc[1].reduce((a, q) => Math.abs(bcP(q) - Dp) < Math.abs(bcP(a) - Dp) ? q : a), v = bcP(k), near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'BC recíproco ' + fr(k) + (near ? '' : ' (lejos)'), v, inPrz:near, bc:true});
+  }
+  (P.extra || []).forEach(([k, t, inP]) => proj.push({label:t, v:at(k), inPrz:inP, layer:!inP}));
+  if(P.variant && g.R.cab <= 0.64) proj.push({label:'variante ' + fr(P.variant) + ' XA (BC ≥ 1.618)', v:at(P.variant), inPrz:true});
+  const hs = state.settings.useHistory && hist.byKey[key];
+  if(hs && hs.devN >= 2){
+    const v = Dp - dir * hs.devMean * leg, near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'D según historial (' + hs.devN + ')', v, inPrz:near, hist:true});
+  }
+  const pz = proj.filter(p => p.inPrz).map(p => p.v);
+  const prz = [Math.min(...pz), Math.max(...pz)];
+  const E = g.hasD ? c.D : Dp;
+  let slR = slMode === 'agr' ? P.sl[1] : P.sl[0];
+  if(slR <= P.d + 1e-9) slR = P.d * 1.15;
+  const baseLeg = {XA:g.xa, XC:XC, BC:g.bc, AB:g.ab}[P.base];
+  // Carney: el stop "depende del AB=CD". Si el AB=CD de la PRZ completa más allá del stop estándar, el stop va detrás del AB=CD
+  let SL = at(slR) - dir * 0.02 * baseLeg, slByAbcd = null, abcdFar = null;
+  if(P.slAbcd && abcdPt && (abcdPt.v - at(slR)) * dir < 0){
+    const past = Math.abs(abcdPt.v - at(slR));
+    if(past <= 0.25 * baseLeg){ SL = abcdPt.v - dir * 0.02 * baseLeg; slByAbcd = abcdPt; }   // hasta 0.25 del tramo: el stop va detrás del AB=CD
+    else abcdFar = abcdPt;                                                                   // más lejos: PRZ incoherente
+  }
+  const refAD = (P.fam === 'cypher' || P.fam === 'shark' || P.fam === 'nenstar') ? C : A;
+  const ref = tpMode === 'CD' ? C : refAD;
+  const tpLbl = (tpMode === 'CD' || ref === C) ? 'CD' : 'AD';
+  const tpR = P.fam === 'shark' ? [0.5, 0.618] : [0.382, 0.618];   // Shark: objetivo en el 50% del último tramo (Carney Vol. 3)
+  const TP1 = E + tpR[0] * (ref - E), TP2 = E + tpR[1] * (ref - E);
+  // Entrada: en D (orden límite) o confirmada (T-Bar + 1: el precio prueba la PRZ y vuelve a su borde cercano)
+  const nearEdge = dir > 0 ? prz[1] : prz[0];
+  const plan = !g.hasD && entryMode === 'prz' ? przPlanOf(prz, dir, baseLeg) : null;
+  const entry = g.hasD ? c.D : entryMode === 'conf' ? nearEdge : plan ? plan.orders[0].v : Dp;
+  const risk = plan ? plan.orders[0].risk : Math.abs(entry - SL);
+  const pts = [];
+  if(g.hasX) pts.push({n:'X', v:X});
+  pts.push({n:'A', v:A}, {n:'B', v:B}, {n:'C', v:C}, {n:'D', v:g.hasD ? c.D : Dp, fut:!g.hasD});
+  const iD = pts.length - 1;
+  if(g.hasD) g.post.forEach((v,i) => pts.push({n:PIV[i], v}));
+  const iOf = n => pts.findIndex(p => p.n === n);
+  const conns = [];
+  if(g.hasX){
+    conns.push([iOf('X'), iOf('B'), 'B ' + fr(g.R.bxa)]);
+    if(P.fam === 'cypher') conns.push([iOf('X'), iOf('C'), 'C ' + fr(g.R.cx) + ' XA']);
+    else conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    if(bcBest) conns.push([iOf('B'), iOf('D'), fr(bcBest.f) + ' BC']);
+    conns.push([iOf('X'), iOf('D'), fr(P.d) + ' ' + P.base]);
+  } else {
+    conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    conns.push([iOf('B'), iOf('D'), 'CD ' + fr(P.d) + ' AB']);
+  }
+  const breached = g.hasD && (c.D - SL) * dir < 0;
+  return {ok:true, g, P, key, pts, iD, tpR, slByAbcd, abcdFar, conns, proj, prz, Dp, E, SL, slR, TP1, TP2, tpLbl, risk,
+          rr1:Math.abs(TP1 - entry) / risk, rr2:Math.abs(TP2 - entry) / risk, entry, nearEdge, plan, baseLeg, entryMode:g.hasD ? 'real' : entryMode === 'conf' ? 'conf' : plan ? 'prz' : 'D', hasD:g.hasD, hasX:g.hasX, dir, leg, breached, C};
+}
+
+// Operar la PRZ: una sola orden límite según el ancho de la PRZ (en % del tramo base)
+//  < 3%: en la mitad · 3% o más: al 90% de la PRZ (cerca del borde lejano)
+//  stop: más allá del borde lejano (+2% del tramo)
+//  objetivo: el borde cercano de la PRZ (el precio sale de la zona) o 1R, el que quede más lejos
+const PRZ_NARROW = 0.03, PRZ_WIDE = 0.05, PRZ_DEEP = 0.9;
+function przPlanOf(prz, dir, legBase){
+  const w = prz[1] - prz[0], pct = legBase ? w / legBase : NaN;
+  const near = dir > 0 ? prz[1] : prz[0], far = dir > 0 ? prz[0] : prz[1], mid = (prz[0] + prz[1]) / 2;
+  const SL = far - dir * 0.02 * legBase;
+  const type = pct < PRZ_NARROW ? 'una' : pct <= PRZ_WIDE ? 'bordes' : 'ancha';
+  const v = type === 'una' ? mid : near + PRZ_DEEP * (far - near);
+  const n = type === 'una' ? 'Orden (mitad de la PRZ)' : 'Orden al 90% de la PRZ';
+  const t1R = v + (v - SL), useEdge = Math.abs(near - v) >= Math.abs(t1R - v);
+  const T = useEdge ? near : t1R, tKind = useEdge ? 'edge' : '1R';
+  const o = {n, v, risk:Math.abs(v - SL), gain:Math.abs(T - v)}; o.rr = o.gain / o.risk;
+  const orders = [o], sumRisk = o.risk;
+  const a = state.asset, step = a.minLot > 0 ? a.minLot : 0.01, dp = Math.max(0, (String(step).split('.')[1] || '').length);
+  let lots = null;
+  if(isF(a.capital) && a.capital && a.pointValue && sumRisk){
+    const money = a.capital * (a.riskPct || 0) / 100, raw = money / (sumRisk * a.pointValue), l = Math.floor(raw / step + 1e-9) * step;
+    lots = {each:+l.toFixed(dp), money, real:l * sumRisk * a.pointValue, below:l < step - 1e-12, dp};
+  }
+  return {w, pct, type, near, far, mid, SL, T, tKind, orders, sumRisk, lots, avg:v};
+}
+const PRZ_TYPE_TXT = {una:'estrecha (< 3%): orden en la mitad', bordes:'normal (3–5%): orden al 90%', ancha:'ancha (> 5%): orden al 90%'};
+
+// Encajes buenos (≥65%) cuentan igual: entre ellos gana la PRZ que el precio tocaría primero, como en la escalera
+const tier = f => f >= 0.65 ? 2 : f > 0 ? 1 : 0;
+// Ranking: compatibles primero, luego mejor encaje, luego el que el precio tocaría primero (o el más cercano a D real)
+function rankCands(c){
+  const g = geom(c); if(!g.ok) return [];
+  return Object.keys(SIM).filter(k => !SIM[k].hidden).map(k => {
+    const f = simFit(k, g);
+    const r = simCompute(c, k, 'cons', 'AD');
+    const dist = r.ok ? Math.abs(r.Dp - (g.hasD ? c.D : c.C)) : Infinity;
+    // con X, un patrón XABCD es más específico que un AB=CD suelto
+    const spec = g.hasX && SIM[k].fam !== 'abcd' ? 1 : 0;
+    return {key:k, fit:f.fit, why:f.why || '', dist, spec};
+  }).sort((a,b) => ((b.fit > 0) - (a.fit > 0)) || (b.spec - a.spec) || (g.hasD ? a.dist - b.dist : (tier(b.fit) - tier(a.fit)) || (a.dist - b.dist)));
+}
+
+/* ============ Tiempo: ventana de D (Carney) ============ */
+// Fechas: 'YYYY-MM-DDTHH:MM' (datetime-local) o 'YYYY-MM-DD HH:MM' o 'DD/MM/YYYY HH:MM'
+function tParse(v){
+  if(!v) return NaN; let s0 = String(v).trim();
+  const m = s0.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[ T]+(\d{1,2}):(\d{2})$/);
+  if(m) s0 = `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}T${m[4].padStart(2,'0')}:${m[5]}`;
+  s0 = s0.replace(' ', 'T');
+  if(!/^\d{4}-\d{2}-\d{2}T\d{1,2}:\d{2}/.test(s0)) return NaN;
+  const t = Date.parse(s0); return isF(t) ? t : NaN;
+}
+const z2 = n => String(n).padStart(2, '0');
+function normT(v){ const t = tParse(v); if(!isF(t)) return ''; const d = new Date(t); return `${d.getFullYear()}-${z2(d.getMonth() + 1)}-${z2(d.getDate())}T${z2(d.getHours())}:${z2(d.getMinutes())}`; }
+const parseTimes = s0 => String(s0 || '').split(';').map(x => x.trim()).filter(Boolean).map(normT).filter(Boolean);
+const fmtT = t => { if(!isF(t)) return '–'; const d = new Date(t); return `${z2(d.getDate())}/${z2(d.getMonth() + 1)} ${z2(d.getHours())}:${z2(d.getMinutes())}`; };
+function fmtDur(ms){
+  if(!isF(ms)) return '–'; const m = Math.round(Math.abs(ms) / 60000);
+  if(m < 60) return m + ' min'; const h = Math.floor(m / 60), mm = m % 60;
+  if(h < 48) return h + ' h' + (mm ? ' ' + mm + ' min' : ''); const d = Math.floor(h / 24), hh = h % 24;
+  return d + ' d' + (hh ? ' ' + hh + ' h' : '');
+}
+const tOf = (p, n) => { const i = PIV.indexOf(n); return tParse(i >= 0 ? (p.tpost || [])[i] : (p.t || {})[n]); };
+// Pivotes de la cadena con su tiempo (solo los que tienen fecha)
+const chainT = p => chainOf(p).map(q => ({...q, t:tOf(p, q.n)})).filter(q => isF(q.t));
+function timeError(p){
+  const ch = chainOf(p).map(q => ({...q, t:tOf(p, q.n)})).filter(q => isF(q.t));
+  for(let i = 1; i < ch.length; i++) if(ch[i].t <= ch[i - 1].t) return `La fecha de ${ch[i].n} debe ser posterior a la de ${ch[i - 1].n}.`;
+  if(parseTimes(p.tpost).length > (p.post || []).length) return 'Hay más fechas que pivotes después de D.';
+  return '';
+}
+// Ventana de D (Carney, Vol. 1 cap. 11)
+function timeWindowOf(p){
+  const tX = tOf(p, 'X'), tA = tOf(p, 'A'), tB = tOf(p, 'B'), tC = tOf(p, 'C'), tD = tOf(p, 'D');
+  let base, from, kind;
+  if(isF(p.X) && isF(tX) && isF(tB) && tB > tX){ base = tB - tX; from = tB; kind = 'X→B desde B'; }
+  else if(isF(tA) && isF(tB) && isF(tC) && tB > tA && tC > tB){ base = tB - tA; from = tC; kind = 'A→B desde C'; }
+  else return null;
+  const w = {kind, base, from, min:from + 0.382 * base, eq:from + base, max:from + 1.618 * base, cLo:from + 0.618 * base, cHi:from + 1.272 * base};
+  if(isF(tD)){ w.tD = tD; w.ratio = (tD - from) / base; }
+  w.hasD = isF(p.D);
+  return w;
+}
+const winVerdict = w => !w ? '' : (w.hasD && !isF(w.ratio)) ? 'D registrado sin fecha: agrégala para medir su tiempo' : isF(w.ratio) ? (w.ratio < 0.382 ? 'D llegó demasiado rápido (' + fr(w.ratio) + '): Carney lo considera sospechoso' : w.ratio > 1.618 ? 'D llegó tarde (' + fr(w.ratio) + ')' : 'D llegó dentro de la ventana (' + fr(w.ratio) + ')') :
+  (Date.now() < w.min ? 'la ventana abre en ' + fmtDur(w.min - Date.now()) : Date.now() <= w.max ? 'ventana abierta ahora' : 'ventana vencida hace ' + fmtDur(Date.now() - w.max));
+/* ============ Notas de Carney por patrón (Vol. 1–3) ============ */
+const NOTES = {
+  gartley:['B debe estar a ±3% del 0.618; por debajo de 0.588 pasa a ser Bat.', 'D en 0.786 XA; con BC de 1.618 a 2.618 puede llegar a 0.886.', 'Stop más allá de 1.0 XA (X), o detrás del AB=CD si completa más lejos.'],
+  bat:['B entre 0.382 y 0.50 (±5%); 0.886 XA es el número decisivo de la PRZ.', 'BC al menos 1.618; el AB=CD 1.27 es el más común.', 'Si el tramo CD cruza B, el precio suele ir "atraído" hasta el 0.886 (BAMM).', 'Stop más allá de 1.13 XA: pasarlo suele llevar a 1.27 o 1.618.'],
+  altbat:['B en 0.382 o menos; la PRZ va de 0.886 a 1.13 XA e incluye 1.0 (X).', 'Debe revertir de inmediato tras pasar X.', 'Stop más allá de 1.27 XA.'],
+  butterfly:['B debe estar a ±3% del 0.786; fuera de eso la estructura suele formar un Crab en 1.618.', '1.27 XA es el número crítico; el precio debe revertir de inmediato tras pasarlo.', '1.414 XA es el límite de "hacer o romper" del stop, sobre todo si el AB=CD pasa de 1.27.'],
+  butterfly2:['Carney no la considera Butterfly: con B en 0.786, una extensión a 1.618 se comporta como un Crab.', 'Espera acción volátil al pasar 1.618 XA y reversión inmediata después.', '1.902 XA es la tolerancia extra; más allá de 2.0 XA (o del AB=CD si completa más lejos) el patrón es inválido.'],
+  crab:['Espera que el precio supere 1.618 XA con acción volátil: es un patrón extremo y sus reversiones son agudas.', 'El precio debe revertir de inmediato después de pasar 1.618 XA; si se queda ahí sin girar, es una advertencia.', '1.902 XA es la tolerancia extra para Crabs con acción muy violenta (Carney la toma de Bryce Gilmore).', 'Más allá de 2.0 XA (o del AB=CD si completa más lejos) el patrón es inválido: se asume la pérdida.', 'Si se rompe, la tendencia es fuerte: se puede operar a favor, y la PRZ rota pasa a ser el nivel contrario.'],
+  deepcrab:['B en 0.886 XA como mínimo (+5%), sin romper X.', 'Al romper B y X, el precio suele correr rápido hasta 1.618 XA.', 'Debe revertir de inmediato tras pasar 1.618 XA; 1.902 es la tolerancia extra.', '2.0 XA es el límite de "hacer o romper" del stop (o el AB=CD si completa más lejos).'],
+  shark:['No es un patrón M o W: es un impulso extremo (1.618 a 2.24) que vuelve a probar 0.886–1.13.', 'Gestión activa: objetivo en el 50% del último tramo.', 'Stop más allá de 1.27 XA.'],
+  cypher:['El Cypher no es un patrón de Carney: la plantilla lo incluye por su uso habitual.'],
+  nenstar:['No es un patrón de Carney: es uno de los patrones «exóticos», y sus ratios varían según la fuente.', 'Como el Shark, C supera a A; pero D llega a 1.272 XA, más allá de X: es su escalón siguiente.', 'El stop en 1.414 XA es criterio de la plantilla, no un estándar publicado.'],
+  abcd:['Es la estructura mínima de todos los patrones armónicos.', 'El punto exacto del AB=CD es el más importante; la proyección BC recíproca lo confirma.']
+};
+NOTES.shark2 = NOTES.shark; NOTES.abcd2 = NOTES.abcd; NOTES.abcd3 = NOTES.abcd;
+const notesHtml = (k, title) => NOTES[k] ? `<div class="msg fib" style="margin:.5rem 0"><b>${title || (k === 'cypher' || k === 'nenstar' ? 'Notas · ' : 'Notas de Carney · ') + SIM[k].name}</b><ul style="margin:.25rem 0 0 1.1rem;padding:0">${NOTES[k].map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>` : '';
+
+/* ============ Señales en tiempo real: reacción frente a reversión (Carney Vol. 3) ============ */
+// Siempre visibles. Con una proyección, cada señal muestra sus precios; sin ella, el texto queda de guía.
+function signalsHtml(k, r, p){
+  const has = r && r.ok, A = has ? r.pts.find(q => q.n === 'A') : null, E = has ? r.E : NaN;
+  const ad382 = A ? E + 0.382 * (A.v - E) : NaN;
+  const tf = p ? tfMin(p.tf) : NaN, tD = p ? tOf(p, 'D') : NaN;
+  const bars = isF(tf) ? (isF(tD) ? ` (entre ${fmtT(tD + 3 * tf * 60000)} y ${fmtT(tD + 5 * tf * 60000)})` : ` (en ${esc(p.tf)}: de ${fmtDur(3 * tf * 60000)} a ${fmtDur(5 * tf * 60000)})`) : '';
+  const li = (t, d) => `<li><b>${t}</b> ${d}</li>`;
+  return `<h3 class="ptitle">Señales tras tocar la PRZ</h3><div class="msg info sig"><span class="zsub">No dan certeza, pero ayudan a distinguir una reacción de una reversión.</span>
+    <ul>
+      ${li('Velocidad y ángulo de la reacción.', 'Carney dice que una reversión real sale rápido y con ángulo pronunciado. Si el precio se queda de lado después de tocar la PRZ, es advertencia temprana.')}
+      ${li('Continuación en 3 a 5 velas después de la vela terminal' + bars + '.', 'Si no avanza en ese plazo, las probabilidades bajan.')}
+      ${li('Que no vuelva a probar toda la PRZ' + (has ? ` (${fmt(r.prz[0])} – ${fmt(r.prz[1])})` : '') + '.', `Un retest completo es bandera roja, aunque puede terminar en un Tipo II si aguanta el SL2${has ? ' (' + fmt(r.SL) + ')' : ''}.`)}
+      ${li('Que llegue pronto a TP1' + (isF(ad382) ? ` (${fmt(ad382)})` : '') + '.', 'El 0.382 de AD es la primera prueba de que la reacción tiene fuerza.')}
+    </ul></div>`;
+}
+// Cómo cambian las señales en los patrones de extensión: fijo en el panel «Tus patrones de extensión»
+function extSignalsHtml(p){
+  const g = p ? geom(noD(p)) : null, ok = !!(g && g.ok && g.hasX), dir = ok ? g.dir : 0;
+  const x16 = ok ? p.A - dir * 1.618 * g.xa : NaN, x19 = ok ? p.A - dir * 1.902 * g.xa : NaN;
+  const tr = ok ? trendRead('crab', dir) : null;
+  const li = (t, d) => `<li><b>${t}</b> ${d}</li>`;
+  return `<div class="msg fib sig"><b>Señales en Crab, Deep Crab y Extensión 1.618</b>
+    <span class="zsub">Las señales generales aplican igual (3 a 5 velas, sin retest completo); esto es lo que cambia.</span>
+    <ul>
+      ${li('La velocidad de la reversión es la señal principal.', `Carney insiste en que el precio debe revertir de inmediato después de pasar 1.618 XA${isF(x16) ? ' (' + fmt(x16) + ')' : ''}. En un Gartley, una reacción algo lenta todavía puede funcionar. En estos patrones, si el precio se queda dando vueltas más allá de 1.618, es mala señal.`)}
+      ${li('Espera una prueba violenta de la zona.', `Es normal que el precio pase 1.618 con fuerza y llegue a 1.902${isF(x19) ? ' (' + fmt(x19) + ')' : ''}, así que la vela terminal suele ser más extrema. Por eso entrar con orden límite justo en 1.618 es más arriesgado que en otros patrones. Esperar la vela de giro te protege de esa sobreextensión.`)}
+      ${li('La tendencia se lee al revés.', `Carney dice que los patrones de extensión aparecen en los extremos de los movimientos, así que normalmente son contra tendencia. No es malo, pero Beck pide que el XA sea más grande, en precio y tiempo, que los tramos anteriores para considerarlo una reversión real.${tr && tr.ok !== null ? ' <i>Con tu tendencia actual (' + esc(tr.tr.src) + '): ' + (tr.ok ? 'va a favor de la tendencia.' : 'va contra la tendencia.') + '</i>' : ''}`)}
+    </ul></div>`;
+}
+
+/* ============ Tus patrones de extensión: siempre visibles ============ */
+const FAV_OPTS = ['crab','deepcrab','butterfly2','butterfly','altbat'];
+const favList = () => (Array.isArray(state.settings.fav) ? state.settings.fav : ['crab','deepcrab','butterfly2']).filter(k => SIM[k]);
+// Estado de una zona favorita frente al precio actual
+// Estado de una proyección frente al precio actual.
+// r: simCompute con SL2 (conservador) · c: coordenadas (para A)
+function liveStatus(r, c){
+  const P = state.asset.price;
+  if(!isF(P)) return {code:'sin', t:'indica el precio actual', c:'', valid:null};
+  const dir = r.dir, near = dir > 0 ? r.prz[1] : r.prz[0], far = dir > 0 ? r.prz[0] : r.prz[1];
+  const l382 = P + dir * 0.382 * Math.abs(c.A - P);
+  if((near - P) * dir < 0) return {code:'espera', c:'acc', valid:true, t:`esperando: faltan ${fmt(Math.abs(P - near))} pts para la PRZ`};
+  if((r.SL - P) * dir >= 0) return {code:'stop', c:'solid-bear', valid:false, t:`invalidado: el precio pasó el SL2 (${fmt(r.SL)})`};
+  if((far - P) * dir > 0) return {code:'sobre', c:'solid-bear', valid:false, t:`PRZ sobrepasada: patrón invalidado (SL2 en ${fmt(r.SL)})`};
+  return {code:'prz', c:'bull', valid:true, t:`en la PRZ: espera la vela terminal · 38.2% en ${fmt(l382)}`};
+}
+// Estado del patrón (proyección esperada) con el precio actual
+function patternLive(p){
+  if(isF(p.D)){ const o = hist.out.get(p.id); return o && STATUS_TXT[o.status] ? {t:'D real: ' + STATUS_TXT[o.status].toLowerCase(), c:STATUS_CLS[o.status], valid:o.status !== 'invalidado', code:'real'} : null; }
+  const k = expectedKeyOf(p); if(!k) return null;
+  const r = simCompute(noD(p), k, 'cons', 'AD'); if(!r.ok) return null;
+  return {...liveStatus(r, p), k, r};
+}
+// Lectura de la BC (inferencia de la plantilla a partir de las reglas de Carney):
+// ¿alguna BC del rango del patrón converge con su D? ¿o todas caen más allá del stop?
+function bcRead(r, k){
+  const P = SIM[k], g = r.g; if(!P.bc || !g || !g.hasX) return null;
+  const C = r.C, dir = r.dir, xa = g.xa, A = C - (C - r.pts[1].v), D = r.Dp;
+  const slStd = r.pts[1].v - dir * P.sl[0] * xa;   // stop estándar sin colchón
+  const lv = FIB_EXT.filter(q => q >= P.bc[0] - 1e-9 && q <= P.bc[1] + 1e-9).map(q => ({f:q, v:C - dir * q * g.bc}));
+  if(!lv.length) return null;
+  const beyond = lv.filter(l => (l.v - slStd) * dir < 0), near = lv.reduce((a, b) => Math.abs(b.v - D) < Math.abs(a.v - D) ? b : a);
+  const dist = Math.abs(near.v - D) / xa, list = L => L.map(l => fr(l.f) + ' BC (' + fmt(l.v) + ')').join(', ');
+  const tail = beyond.length ? ` La ${list(beyond)} queda más allá del stop: si el patrón falla, es el siguiente nivel de la estructura.` : '';
+  if(dist <= 0.05) return {cls:'ok', beyond, near, txt:`La ${fr(near.f)} BC (${fmt(near.v)}) converge con ${fr(P.d)} XA: PRZ estrecha y confiable.` + tail};
+  if(beyond.length) return {cls:'warn', beyond, near, txt:`Ninguna BC converge con ${fr(P.d)} XA (la más cercana, ${fr(near.f)} BC, está a ${fr(dist)} XA de D) y la ${list(beyond)} cae más allá del stop (${fr(P.sl[0])} XA): la estructura pide ir más lejos y es probable que el precio sobrepase tu stop.`};
+  return {cls:'info', beyond, near, txt:`La BC más cercana (${fr(near.f)} en ${fmt(near.v)}) está a ${fr(dist)} XA de D: PRZ ancha, la convergencia es débil.`};
+}
+function favRows(p){
+  const c0 = noD(p), g0 = geom(c0); if(!g0.ok || !g0.hasX) return [];
+  return favList().map(k => {
+    const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return null;
+    const ra = simCompute(c0, k, 'agr', 'AD'), f = simFit(PARENT[k] || k, g0);
+    return {k, r, SL1:ra.SL, fit:f.fit, why:f.why, st:liveStatus(r, p), lot:lotFor(r.Dp, r.SL), bc:bcRead(r, k)};
+  }).filter(Boolean);
+}
+function renderFav(){
+  const box = $('simFav'), p = selectedPattern();
+  const chips = FAV_OPTS.map(k => `<button type="button" class="chip${favList().includes(k) ? ' on' : ''}" data-fav="${k}">${SIM[k].name}</button>`).join('');
+  const head = `<h3 class="ptitle">Tus patrones de extensión <span class="zsub" style="font-weight:400">(siempre visibles, sin importar cuál sea el más probable)</span></h3><div class="cands" style="margin:0 0 .4rem">Mostrar: ${chips}</div>` + extSignalsHtml(p && sim.coords ? {...p, ...sim.coords} : null);
+  if(!p || !sim.coords){ box.innerHTML = head; return; }
+  if(isF(sim.coords.D)){ box.innerHTML = head + '<p class="hint">Este patrón ya tiene D real: mira el resultado real más abajo.</p>'; return; }
+  const rows = favRows({...p, ...sim.coords});
+  if(!rows.length){ box.innerHTML = head + '<p class="hint">Hace falta el punto X para proyectar las extensiones sobre XA.</p>'; return; }
+  box.innerHTML = head + `<div class="tablewrap"><table><tr><th>Superado</th><th>Patrón</th><th>Zona (PRZ)</th><th>SL1 · SL2</th><th>TP1 · TP2</th><th>Ratios y estado</th></tr>` +
+    rows.map(x => `<tr${isTaken(p, x.k) ? ' style="opacity:.55"' : ''}><td><label class="takebox"><input type="checkbox" data-favtake="${x.k}"${isTaken(p, x.k) ? ' checked' : ''} aria-label="${esc(SIM[x.k].name)} superado"></label></td><td><b${isTaken(p, x.k) ? ' style="text-decoration:line-through"' : ''}>${SIM[x.k].name}</b><div class="zsub num">D ${fr(SIM[x.k].d)} XA · ${fmt(x.r.Dp)}</div></td>
+      <td class="num">${fmt(x.r.prz[0])} – ${fmt(x.r.prz[1])}${x.bc ? `<div style="margin-top:3px"><span class="tag ${x.bc.cls === 'ok' ? 'bull' : x.bc.cls === 'warn' ? 'bear' : 'acc'}" style="margin-left:0">${x.bc.cls === 'ok' ? 'BC converge' : x.bc.cls === 'warn' ? 'BC más allá del stop' : 'BC lejos de D'}</span></div>` : ''}</td>
+      <td class="num">${fmt(x.SL1)} · <b class="t-bear">${fmt(x.r.SL)}</b>${x.r.slByAbcd ? '<div class="zsub">SL2 detrás del AB=CD</div>' : ''}</td>
+      <td class="num">${fmt(x.r.TP1)} · ${fmt(x.r.TP2)}<div class="zsub">R:R ${x.r.rr1.toFixed(1)} / ${x.r.rr2.toFixed(1)}${x.lot && !x.lot.below ? ' · ' + x.lot.lots.toFixed(x.lot.dp) + ' lotes' : ''}</div></td>
+      <td>${x.fit ? `<span class="tag bull" style="margin-left:0">valida ${Math.round(x.fit * 100)}%</span>` : `<span class="tag" style="margin-left:0" title="${esc(x.why)}">no valida con tus ratios</span><div class="zsub">${esc(x.why)}</div>`}
+        <div style="margin-top:4px"><span class="tag ${x.st.c}" style="margin-left:0;white-space:normal;border-radius:8px">${esc(x.st.t)}</span></div></td></tr>`).join('') + '</table></div>' +
+    '<p class="hint">Las etiquetas de la BC se explican en <a href="#notas-bc">Notas</a>. Si el precio pasa el SL2 de cualquiera, mira «Si el precio atraviesa D».</p>' +
+    `<details class="settings" style="margin-top:.6rem"><summary>Proyección BC y notas de Carney de cada extensión</summary>` +
+    rows.map(x => `<div class="favcard"><h4>${SIM[x.k].name} · D ${fmt(x.r.Dp)}</h4>
+      ${x.bc ? `<div class="msg ${x.bc.cls}" style="margin:.3rem 0"><b>Proyección BC:</b> ${esc(x.bc.txt)}</div>` : ''}
+      ${notesHtml(x.k, 'Notas de Carney')}</div>`).join('') + '</details>';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fav]'); if(!b) return;
+  const k = b.dataset.fav, cur = favList();
+  state.settings.fav = cur.includes(k) ? cur.filter(q => q !== k) : [...cur, k]; touch();
+});
+
+/* ============ Ejecución y contexto (Carney Vol. 2 y 3, Beck) ============ */
+// Temporalidad en minutos a partir del texto: M15, H1, D1, 15m, 4h…
+function tfMin(tf){
+  const s0 = String(tf || '').trim().toUpperCase().replace(/\s+/g, ''), U = {M:1, MIN:1, H:60, D:1440, W:10080};
+  let m = s0.match(/^(M|H|D|W)(\d+)$/); if(m) return U[m[1]] * +m[2];
+  m = s0.match(/^(\d+)(M|MIN|H|D|W)$/); if(m) return U[m[2]] * +m[1];
+  return s0 === 'D' ? 1440 : NaN;
+}
+const TF_LIST = [[1,'M1'],[5,'M5'],[15,'M15'],[30,'M30'],[60,'H1'],[240,'H4'],[1440,'D1']];
+// Tamaño en velas (Carney Vol. 3: mínimo 30 velas en la temporalidad del patrón)
+function barsInfo(p){
+  const tf = tfMin(p.tf), ch = chainT(p).filter(q => q.n !== 'E' && PIV.indexOf(q.n) < 0);
+  if(ch.length < 2) return null;
+  const span = ch[ch.length - 1].t - ch[0].t; if(!(span > 0)) return null;
+  const sug = TF_LIST.filter(([m]) => span / (m * 60000) >= 30).pop();
+  return {tf, bars:isF(tf) ? span / (tf * 60000) : NaN, span, from:ch[0].n, to:ch[ch.length - 1].n, sug:sug ? sug[1] : null};
+}
+// Tendencia: manual o la del patrón mayor (su impulso XA; sin X, la dirección de AB)
+function trendInfo(){
+  const t = state.asset.trend || 'auto';
+  if(t !== 'auto') return {dir:t === 'up' ? 1 : t === 'down' ? -1 : 0, src:'manual'};
+  const act = analyses.filter(a => a.ok && a.p.enabled); if(!act.length) return {dir:0, src:'sin patrones'};
+  const big = act.reduce((a, b) => (b.legRef || 0) > (a.legRef || 0) ? b : a);
+  if(big.p.id === state.selectedId) return {dir:0, src:'self'};   // un patrón no puede confirmarse a sí mismo
+  return {dir:big.hasX ? big.dir : -big.dir, src:big.p.label};
+}
+const EXT_FAM = new Set(['altbat','butterfly','butterfly2','crab','deepcrab','shark','shark2','nenstar']);
+function trendRead(key, side){
+  const tr = trendInfo();
+  if(tr.src === 'self') return {cls:'info', ok:null, tr, txt:'Este es tu patrón más grande, así que no hay uno mayor que marque la tendencia. Indícala a mano en «Tendencia del gráfico» o registra la estructura mayor.'};
+  if(!tr.dir) return {cls:'info', txt:'Sin tendencia definida (lateral): no hay ventaja de continuación.', ok:null, tr};
+  const ext = EXT_FAM.has(key), withT = side === tr.dir;
+  if(withT) return {cls:'ok', ok:true, tr, txt:ext ? 'Patrón de extensión a favor de la tendencia: corrección profunda dentro del canal (Carney Vol. 2).' : 'Patrón de retroceso a favor de la tendencia: señal de continuación (Carney Vol. 2).'};
+  return {cls:ext ? 'info' : 'warn', ok:false, tr, txt:ext ? 'Patrón de extensión contra la tendencia: busca reversión en un extremo. Beck exige que el XA sea más grande, en precio y tiempo, que los tramos previos.' : 'Patrón de retroceso contra la tendencia: menor probabilidad; Carney los ve sobre todo como continuación.'};
+}
+// Temporalidades primaria, próxima y distal (Carney Vol. 3)
+function tfRoles(p){
+  const me = tfMin(p.tf), myA = analyses.find(a => a.p.id === p.id), myLeg = myA ? myA.legRef : NaN;
+  const out = {prox:[], dist:[], same:[]};
+  analyses.filter(a => a.ok && a.p.enabled && a.p.id !== p.id).forEach(a => {
+    const t = tfMin(a.p.tf);
+    if(isF(me) && isF(t) && t === me){ out.same.push(a); return; }
+    const smaller = isF(me) && isF(t) ? t < me : (a.legRef || 0) < (myLeg || 0);
+    (smaller ? out.prox : out.dist).push(a);
+  });
+  return out;
+}
+
+/* ============ Gestión de la operación ============ */
+// Tamaño de posición (Hobbs: arriesgar un porcentaje fijo del capital)
+function lotFor(entry, sl){
+  const a = state.asset, dist = Math.abs(entry - sl);
+  if(!isF(a.capital) || !a.capital || !isF(dist) || !dist || !a.pointValue) return null;
+  const money = a.capital * (a.riskPct || 0) / 100, step = a.minLot > 0 ? a.minLot : 0.01;
+  const raw = money / (dist * a.pointValue), lots = Math.floor(raw / step + 1e-9) * step;
+  const dp = Math.max(0, (String(step).split('.')[1] || '').length);
+  return {lots:+lots.toFixed(dp), money, real:lots * dist * a.pointValue, below:lots < step - 1e-12, dp};
+}
+const lotTxt = L => !L ? 'indica capital y valor por punto' : L.below ? `por debajo del lote mínimo (el riesgo de ${L.money.toFixed(2)} no alcanza)` : `${L.lots.toFixed(L.dp)} lotes · riesgo ${L.real.toFixed(2)} (${state.asset.riskPct}% = ${L.money.toFixed(2)})`;
+// Stop móvil 0.382 (Carney): 0.382 del tramo entre D y el extremo de la reacción
+const trail382 = (D, ext) => ext - 0.382 * (ext - D);
+
+// Versiones "perfectas" de Carney (Vol. 1): alineaciones ideales que suelen dar reversiones más limpias
+function perfectOf(key, c){
+  const c0 = noD(c), g = geom(c0); if(!g.ok || !g.hasX) return null;
+  const R = g.R, near = (a, b, t) => Math.abs(a - b) <= t;
+  const r = simCompute(c0, key, 'cons', 'AD'); if(!r.ok) return null;
+  const bcAt = k => c.C - g.dir * k * g.bc, abAt = k => c.C - g.dir * k * g.ab;
+  if(key === 'gartley' && near(R.bxa, .618, .02) && near(R.cab, .618, .03)) return 'B 0.618 y C 0.618: BC 1.618 y AB=CD 1:1 convergen en 0.786 XA';
+  if(key === 'bat' && near(R.bxa, .5, .02) && R.cab >= .48 && R.cab <= .64) return 'B 0.50 y C entre 0.50 y 0.618: BC 2.0 y AB=CD 1.27 en torno a 0.886 XA';
+  if(key === 'crab' && near(R.bxa, .618, .02) && R.cab >= .48 && R.cab <= .64 && near(bcAt(3.14), r.Dp, .08 * g.xa)) return 'B 0.618, BC 3.14 (pi) y 1.618 XA (phi)';
+  if(key === 'butterfly' && near(R.bxa, .786, .02) && near(bcAt(1.618), r.Dp, .06 * g.xa) && near(abAt(1.272), r.Dp, .06 * g.xa)) return 'B 0.786: 1.27 XA, BC 1.618 y AB=CD 1.27 convergen';
+  return null;
+}
+
+// Escalera: el siguiente patrón con D más profundo que tu B admite (Butterfly tiene su alterno en 1.618)
+function nextOf(k, g){
+  const P = SIM[k];
+  if(P.fam === 'shark') return g && g.ok && simFit('nenstar', g).fit > 0 ? 'nenstar' : null;   // escalera: Shark → Nen Star
+  if(P.fam !== 'xabcd') return P.next;
+  if(k === 'butterfly') return 'butterfly2';
+  if(!g || !g.ok) return null;
+  return Object.keys(SIM).filter(q => SIM[q].fam === 'xabcd' && !SIM[q].hidden && SIM[q].d > P.d + 1e-9 && simFit(q, g).fit > 0)
+    .sort((a,b) => SIM[a].d - SIM[b].d)[0] || null;
+}
+
+/* ============ Resultado real y calibración con los D reales ============ */
+const PARENT = {butterfly2:'butterfly', shark2:'shark', abcd2:'abcd', abcd3:'abcd'};
+const FIB_ALL = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886, 1, 1.13, 1.272, 1.414, 1.618, 2, 2.24, 2.618, 3.14, 3.618];
+const noD = c => ({X:c.X, A:c.A, B:c.B, C:c.C, D:NaN, post:[]});
+function bestKeyNoD(c){ const rk = rankCands(noD(c)); const b = rk.find(x => x.fit > 0); return b ? b.key : null; }
+const expectedKeyOf = p => (p.key && SIM[p.key]) ? p.key : bestKeyNoD(p);
+
+// Cadena de pivotes confirmados de un patrón: X, A, B, C, D, E, F…
+function chainOf(p){
+  const g = geom(coordsOf(p)); if(!g.ok) return [];
+  const ch = [];
+  if(isF(p.X)) ch.push({n:'X', v:p.X});
+  ch.push({n:'A', v:p.A}, {n:'B', v:p.B}, {n:'C', v:p.C});
+  if(isF(p.D)) ch.push({n:'D', v:p.D});
+  g.post.forEach((v,i) => ch.push({n:PIV[i], v}));
+  return ch;
+}
+
+// Qué pasó realmente: dónde giró D frente a la PRZ, SL1 (agresivo), SL2 (conservador) y hasta dónde reaccionó
+function outcomeOf(p){
+  const c = coordsOf(p);
+  if(!isF(c.D)) return {status:'pendiente'};
+  const c0 = noD(c), g0 = geom(c0), gf = geom(c);
+  if(!g0.ok || !gf.ok) return {status:'error'};
+  const key = expectedKeyOf(p);
+  if(!key) return {status:'sin patrón'};
+  const rc = simCompute(c0, key, 'cons', 'AD'), ra = simCompute(c0, key, 'agr', 'AD');
+  if(!rc.ok || !ra.ok) return {status:'error'};
+  const dir = g0.dir, D = c.D, leg = rc.leg;
+  const beyond = v => (v - D) * dir >= 0;
+  const przNear = dir > 0 ? rc.prz[1] : rc.prz[0];
+  const hitSL1 = beyond(ra.SL), hitSL2 = beyond(rc.SL), reachedPRZ = beyond(przNear);
+  const dev = (rc.Dp - D) * dir / leg;
+  const E = gf.post[0], AD = Math.abs(c.A - D);
+  const reactFrac = isF(E) ? Math.abs(E - D) / AD : NaN;
+  let best = null;
+  Object.keys(SIM).forEach(k => {
+    const f = simFit(PARENT[k] || k, g0); if(!f.fit) return;
+    const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return;
+    const d = Math.abs(r.Dp - D) / r.leg; if(!best || d < best.d) best = {k, d};
+  });
+  const baseLen = {XA:g0.xa, XC:isF(c.X) ? Math.abs(c.C - c.X) : NaN, BC:g0.bc, AB:g0.ab}[SIM[key].base];
+  const baseFrom = SIM[key].base === 'XA' ? c.A : c.C;
+  const realRatio = Math.abs(D - baseFrom) / baseLen;
+  const status = hitSL2 ? 'invalidado' : !reachedPRZ ? 'giró antes' : hitSL1 ? 'tocó SL1' : 'en PRZ';
+  // PEZ = PRZ + extremo de la vela terminal (Carney Vol. 3). Tipo II: el pivote F vuelve a probar la PRZ sin romper el SL2
+  const pez = [Math.min(rc.prz[0], D), Math.max(rc.prz[1], D)];
+  const F = gf.post[1], type2 = isF(F) && !hitSL2 && (F - przNear) * dir <= 0, type2Broke = type2 && (F - rc.SL) * dir < 0;
+  return {status, key, pez, F, type2:type2 && !type2Broke, type2Broke, Dp:rc.Dp, prz:rc.prz, SL1:ra.SL, SL2:rc.SL, hitSL1, hitSL2, reachedPRZ, dev, leg, E, reactFrac,
+          reacted:gf.post.length > 0, tp1:reactFrac >= 0.382, tp2:reactFrac >= 0.618,
+          completedAs:best && best.d <= 0.06 ? best.k : null, realRatio, base:SIM[key].base, dir};
+}
+const STATUS_TXT = {'invalidado':'Invalidado (SL2)', 'giró antes':'Giró antes de la PRZ', 'tocó SL1':'Tocó SL1 y aguantó', 'en PRZ':'Giró en la PRZ', 'pendiente':'Pendiente'};
+const STATUS_CLS = {'invalidado':'bear', 'giró antes':'acc', 'tocó SL1':'fib', 'en PRZ':'bull', 'pendiente':''};
+
+function computeHistory(){
+  const H = {out:new Map(), byKey:{}, legs:[], bins:FIB_ALL.map(f => ({f, n:0})), pref:new Set(), total:0, onFib:0, chance:0};
+  state.patterns.forEach(p => {
+    const o = outcomeOf(p); H.out.set(p.id, o);
+    if(!o.key || o.status === 'pendiente') return;
+    const s = H.byKey[o.key] || (H.byKey[o.key] = {n:0, reacted:0, invalid:0, sl1:0, before:0, devs:[], reacts:[], tp1:0, tp2:0, completedAs:{}});
+    s.n++;
+    if(o.hitSL2) s.invalid++; else if(o.hitSL1) s.sl1++;
+    if(!o.reachedPRZ) s.before++;
+    if(!o.hitSL2){ s.devs.push(o.dev); if(o.reacted) s.reacted++; }
+    if(isF(o.reactFrac)){ s.reacts.push(o.reactFrac); if(o.tp1) s.tp1++; if(o.tp2) s.tp2++; }
+    const ca = o.completedAs || 'ninguno exacto'; s.completedAs[ca] = (s.completedAs[ca] || 0) + 1;
+  });
+  Object.values(H.byKey).forEach(s => {
+    s.devN = s.devs.length; s.devMean = s.devN ? s.devs.reduce((a,b) => a + b, 0) / s.devN : 0;
+    s.reactMean = s.reacts.length ? s.reacts.reduce((a,b) => a + b, 0) / s.reacts.length : NaN;
+  });
+  // Tramos confirmados (sin duplicar los que comparten varios patrones)
+  const seen = new Set(), rd = v => (+v).toFixed(dec() + 1);
+  state.patterns.forEach(p => {
+    const ch = chainOf(p);
+    for(let i = 2; i < ch.length; i++){
+      const k = rd(ch[i - 2].v) + '|' + rd(ch[i - 1].v) + '|' + rd(ch[i].v); if(seen.has(k)) continue; seen.add(k);
+      const l1 = Math.abs(ch[i - 1].v - ch[i - 2].v), l2 = Math.abs(ch[i].v - ch[i - 1].v);
+      if(l1 > 0) H.legs.push({q:l2 / l1, name:ch[i - 1].n + ch[i].n + ' / ' + ch[i - 2].n + ch[i - 1].n, pid:p.id});
+    }
+  });
+  H.legs.forEach(l => {
+    let b = null; FIB_ALL.forEach(f => { const d = Math.abs(l.q - f) / f; if(d <= 0.03 && (!b || d < b.d)) b = {f, d}; });
+    l.fib = b ? b.f : null; if(b){ H.bins.find(x => x.f === b.f).n++; H.onFib++; }
+  });
+  H.total = H.legs.length;
+  if(H.total){
+    const qs = H.legs.map(l => l.q), lo = Math.max(0.2, Math.min(...qs)), hi = Math.min(3.8, Math.max(...qs));
+    if(hi > lo){ const cov = FIB_ALL.filter(f => f >= lo && f <= hi).reduce((a,f) => a + 0.06 * f, 0); H.chance = Math.min(1, cov / (hi - lo)); }
+  }
+  if(H.total >= 10) H.bins.filter(b => b.n >= 3 && b.n / H.total >= 0.1).sort((a,b) => b.n - a.n).slice(0, 3).forEach(b => H.pref.add(b.f));
+  return H;
+}
+
+// D calibrado con el desvío medio real de ese tipo de patrón en este activo
+function histCalibration(p){
+  if(!state.settings.useHistory || isF(p.D)) return null;
+  const key = expectedKeyOf(p); if(!key) return null;
+  const st = hist.byKey[key]; if(!st || st.devN < 2) return null;
+  const r = simCompute(noD(p), key, 'cons', 'AD'); if(!r.ok) return null;
+  return {price:r.Dp - r.dir * st.devMean * r.leg, label:SIM[key].name + ': D según historial (' + st.devN + ')'};
+}
+
+// Patrones futuros: con los últimos 4 (o 3) pivotes confirmados de cada cadena
+/* ============ Dibujo del patrón individual (estilo guía) ============ */
+function patternChart(r, o){
+  // o.prefix: pivotes anteriores (cadena confirmada) · o.rename: nombres para r.pts · o.extra: líneas adicionales
+  o = Object.assign({W:860, H:480, compact:false, color:null, prefix:[], rename:null, extra:[]}, o);
+  const W = o.W, H = o.H, cp = o.compact;
+  const padL = cp ? 8 : 66, padR = cp ? 8 : 240, padT = cp ? 18 : 28, padB = cp ? 18 : 28;
+  const own = r.pts.map((p,i) => ({...p, n:o.rename ? o.rename[i] : p.n}));
+  const off = o.prefix.length, pts = [...o.prefix.map(p => ({...p, pre:true})), ...own], n = pts.length;
+  const iD = off + (isF(r.iD) ? r.iD : r.pts.length - 1), iC = iD - 1;
+  const x0 = padL + (cp ? 8 : 16), x1 = W - padR - (cp ? 8 : 60);
+  const xs = pts.map((_,i) => x0 + (x1 - x0) * i / (n - 1));
+  const xEnd = W - padR;
+  const lines = cp ? [] : r.plan ? [
+    {v:r.plan.SL, t:'Stop de la PRZ ' + fmt(r.plan.SL), c:'bear'},
+    ...r.plan.orders.map(q => ({v:q.v, t:q.n + ' ' + fmt(q.v), c:'ink'})),
+    {v:r.plan.T, t:'Objetivo ' + fmt(r.plan.T), c:'bull'}, ...o.extra] : [
+    {v:r.SL, t:(o.slName || 'SL') + ' ' + fmt(r.SL), c:'bear'},
+    {v:r.entry, t:(r.hasD ? 'D real ' : 'Entrada ') + fmt(r.entry), c:'ink'},
+    ...(r.entryMode === 'conf' && Math.abs(r.entry - r.Dp) > 1e-9 ? [{v:r.Dp, t:'D ' + fmt(r.Dp), c:'muted'}] : []),
+    {v:r.TP1, t:'TP1 (' + r.tpLbl + ') ' + fmt(r.TP1), c:'bull'},
+    {v:r.TP2, t:'TP2 (' + r.tpLbl + ') ' + fmt(r.TP2), c:'bull'}, ...o.extra];
+  const all = [...pts.map(p => p.v), ...lines.map(l => l.v)];
+  if(!cp) all.push(...r.proj.map(p => p.v));
+  let mn = Math.min(...all), mx = Math.max(...all); const pad = (mx - mn) * 0.07 || 1; mn -= pad; mx += pad;
+  const y = v => padT + (mx - v) / (mx - mn) * (H - padT - padB);
+  const S = [], right = [];
+  if(!cp){
+    for(let i = 0; i <= 4; i++){ const v = mn + (mx - mn) * i / 4, yy = y(v);
+      S.push(`<line class="g-grid" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}"/><text class="g-lbl" x="${padL - 8}" y="${yy + 4}" text-anchor="end">${fmt(v)}</text>`); }
+    const a = y(r.prz[1]), b = y(r.prz[0]);
+    S.push(`<rect class="g-prz" x="${xs[iC]}" y="${a}" width="${xEnd - xs[iC]}" height="${Math.max(3, b - a)}"/>`);
+    right.push({y:(a + b) / 2, t:'PRZ ' + fmt(r.prz[0]) + ' – ' + fmt(r.prz[1]), c:'s-fib'});
+    if(r.hasX){ const yy = y(pts[off].v); S.push(`<line class="g-xline" x1="${xs[off]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`); right.push({y:yy, t:'Nivel ' + pts[off].n + ' ' + fmt(pts[off].v), c:'s-muted'}); }
+  }
+  const pt = i => `${xs[i].toFixed(1)},${y(pts[i].v).toFixed(1)}`;
+  if(r.hasX) S.push(`<polygon class="g-tri" points="${pt(off)} ${pt(off + 1)} ${pt(off + 2)}"/>`);
+  S.push(`<polygon class="g-tri" points="${pt(iD - 2)} ${pt(iD - 1)} ${pt(iD)}"/>`);
+  const conn = (i, j, t) => { i += off; j += off; const ax = xs[i], ay = y(pts[i].v), bx = xs[j], by = y(pts[j].v);
+    S.push(`<line class="g-conn" x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"/>`);
+    if(t) S.push(`<text class="g-ratio" x="${(ax + bx) / 2}" y="${(ay + by) / 2 + 4}" text-anchor="middle"${cp ? ' style="font-size:10.5px"' : ''}>${t}</text>`); };
+  if(cp){ const last = r.conns[r.conns.length - 1]; conn(last[0], last[1], last[2]); }
+  else r.conns.forEach(q => conn(q[0], q[1], q[2]));
+  if(!cp){
+    r.proj.forEach(p => { const yy = y(p.v);
+      S.push(`<line class="g-proj${p.inPrz ? '' : ' off'}${p.hist ? ' hist' : ''}" x1="${xs[iD] - 38}" x2="${xs[iD] + 38}" y1="${yy}" y2="${yy}"/>`);
+      if(!p.main) right.push({y:yy, t:p.label + ' ' + fmt(p.v), c:p.hist ? 's-acc' : 's-fib'}); });
+    lines.forEach(l => { const yy = y(l.v);
+      S.push(`<line class="g-trade l-${l.c}${l.dash ? ' dash' : ''}" x1="${xs[iD]}" x2="${xEnd}" y1="${yy}" y2="${yy}"/>`); right.push({y:yy, t:l.t, c:'s-' + l.c}); });
+    if(isF(state.asset.price) && state.asset.price > mn && state.asset.price < mx){
+      const yy = y(state.asset.price);
+      S.push(`<line class="g-price" x1="${padL}" x2="${xEnd}" y1="${yy}" y2="${yy}" opacity=".5"/>`); right.push({y:yy, t:'Precio ' + fmt(state.asset.price), c:'s-ink'}); }
+  }
+  const stroke = o.color ? ` style="stroke:${o.color}"` : '';
+  const realIdx = pts.map((p,i) => p.fut ? -1 : i).filter(i => i >= 0);
+  if(off) S.push(`<polyline class="g-path pre" points="${pts.slice(0, off + 1).map((_,i) => pt(i)).join(' ')}"${stroke}/>`);
+  S.push(`<polyline class="g-path${o.draw ? ' draw' : ''}" pathLength="1" points="${realIdx.filter(i => i >= off).map(pt).join(' ')}"${stroke}/>`);
+  pts.forEach((p,i) => { if(p.fut) S.push(`<polyline class="g-path fut" points="${pt(i - 1)} ${pt(i)}"${stroke}/>`); });
+  pts.forEach((p, i) => { const yy = y(p.v);
+    const nb = i > 0 ? pts[i - 1].v : pts[i + 1].v, high = p.v >= nb;
+    S.push(`<circle class="g-pt${p.fut ? ' fut' : ''}${p.pre ? ' pre' : ''}" cx="${xs[i]}" cy="${yy}" r="${cp ? 2.8 : 4.5}"/><text class="g-letter${cp ? ' sm' : ''}${p.pre ? ' pre' : ''}" x="${xs[i]}" y="${high ? yy - (cp ? 7 : 12) : yy + (cp ? 15 : 23)}" text-anchor="middle">${esc(p.n)}</text>`); });
+  if(!cp && right.length){
+    right.sort((a,b) => a.y - b.y); const gap = 16, ys = right.map(q => q.y);
+    for(let i = 1; i < ys.length; i++) if(ys[i] < ys[i - 1] + gap) ys[i] = ys[i - 1] + gap;
+    const over = ys[ys.length - 1] - (H - 6);
+    if(over > 0){ ys[ys.length - 1] -= over; for(let i = ys.length - 2; i >= 0; i--) if(ys[i] > ys[i + 1] - gap) ys[i] = ys[i + 1] - gap; }
+    right.forEach((it, i) => S.push(`<line class="g-lead" x1="${xEnd + 2}" y1="${it.y}" x2="${xEnd + 12}" y2="${ys[i]}"/><text class="g-rl ${it.c}" x="${xEnd + 16}" y="${ys[i] + 4}">${esc(it.t)}</text>`));
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(o.label || 'Patrón')}">${S.join('')}</svg>`;
+}
+
+/* ============ Estado del simulador ============ */
+const sim = {coords:null, key:null, slMode:'cons', tpMode:'AD', entryMode:'D', allPrz:false, showTaken:false, msg:'', modified:false, broken:false, draw:false};
+// Patrones ya superados por el precio, guardados por gráfico (p.taken = [claves de SIM])
+const takenOf = p => p && Array.isArray(p.taken) ? p.taken : [];
+const isTaken = (p, k) => takenOf(p).includes(k);
+function setTaken(id, keys, on){
+  const p = state.patterns.find(q => q.id === id); if(!p) return;
+  const t = new Set(takenOf(p));
+  (Array.isArray(keys) ? keys : [keys]).forEach(k => { if(SIM[k]) on ? t.add(k) : t.delete(k); });
+  p.taken = Object.keys(SIM).filter(k => t.has(k));
+  if(on && p.id === state.selectedId && sim.key && t.has(sim.key)) sim.key = null;   // el simulador pasa al siguiente pendiente
+  touch();
+}
+const selectedPattern = () => state.patterns.find(p => p.id === state.selectedId) || null;
+const coordsOf = p => ({X:p.X, A:p.A, B:p.B, C:p.C, D:p.D, post:Array.isArray(p.post) ? p.post.filter(isF) : []});
+const parsePivots = t => String(t || '').split(/[;\s]+|,(?=\s)/).map(num).filter(isF);
+
+function selectPattern(id, opts){
+  const p = state.patterns.find(q => q.id === id);
+  state.selectedId = p ? p.id : null;
+  sim.coords = p ? coordsOf(p) : null;
+  sim.key = null; sim.msg = ''; sim.modified = false; sim.broken = false; sim.draw = true;
+  syncSimInputs();
+  renderPatterns(); renderSim(); renderNotes();
+  if(opts && opts.scroll) $('simulador').scrollIntoView({block:'start'});
+}
+function ensureSelection(){
+  if(!selectedPattern()){
+    const first = state.patterns.find(p => p.enabled) || state.patterns[0];
+    state.selectedId = first ? first.id : null;
+    sim.coords = first ? coordsOf(first) : null; sim.key = null; sim.modified = false; sim.msg = ''; sim.broken = false;
+    syncSimInputs();
+  } else if(!sim.coords){ sim.coords = coordsOf(selectedPattern()); syncSimInputs(); }
+}
+function effectiveKey(){
+  if(!sim.coords) return null;
+  if(sim.key) return sim.key;
+  const p = selectedPattern();
+  if(p && p.key && SIM[p.key] && !isTaken(p, p.key) && simCompute(sim.coords, p.key, 'cons', 'AD').ok) return p.key;   // patrón esperado fijado
+  const rk = rankCands(noD(sim.coords)), pend = rk.filter(x => !isTaken(p, x.key));
+  const best = pend.find(x => x.fit > 0) || rk.find(x => x.fit > 0) || rk.find(x => simCompute(sim.coords, x.key, 'cons', 'AD').ok);
+  return best ? best.key : null;
+}
+function simResultFor(){
+  const k = effectiveKey(); if(!k) return null;
+  const r = simCompute(sim.coords, k, sim.slMode, sim.tpMode, sim.entryMode);
+  return r.ok ? r : null;
+}
+function syncSimInputs(){
+  const c = sim.coords || {};
+  ['X','A','B','C','D'].forEach(k => { $('s' + k).value = isF(c[k]) ? c[k] : ''; });
+  $('sPost').value = (c.post || []).join('; ');
+  const opts = state.patterns.map(p => `<option value="${p.id}">${esc(p.label || 'Sin nombre')}${p.tf ? ' · ' + esc(p.tf) : ''}</option>`).join('');
+  $('simPick').innerHTML = opts || '<option value="">Sin patrones</option>';
+  if(state.selectedId) $('simPick').value = state.selectedId;
+}
+function syncSliders(g){
+  const bR = $('bR'), cR = $('cR');
+  if(g && g.ok){
+    bR.disabled = !g.hasX;
+    if(g.hasX){ bR.value = g.R.bxa; $('bOut').textContent = fr(g.R.bxa); } else $('bOut').textContent = 'sin X';
+    cR.disabled = false; cR.value = g.R.cab; $('cOut').textContent = fr(g.R.cab);
+  } else { bR.disabled = cR.disabled = true; $('bOut').textContent = $('cOut').textContent = '–'; }
+}
+
+// Todas las PRZ: la de cada patrón posible con estas X, A, B y C, ordenadas por cercanía a C
+const XA_EXTREMES = [[2, '2.0 XA'], [2.24, '2.24 XA']];
+function allPrzData(c, taken){
+  const tk = new Set(taken || []);
+  const c0 = noD(c), g = geom(c0); if(!g.ok) return null;
+  const rows = Object.keys(SIM).filter(k => k !== 'shark2').map(k => {
+    const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return null;
+    const f = simFit(PARENT[k] && k !== 'butterfly2' ? PARENT[k] : k, g);
+    const dep = v => g.dir * (c.C - v);
+    const near = g.dir > 0 ? r.prz[1] : r.prz[0], far = g.dir > 0 ? r.prz[0] : r.prz[1];
+    return {k, r, fit:f.fit, why:f.why || '', near, far, dNear:dep(near), dFar:dep(far), dD:dep(r.Dp), dSL:dep(r.SL)};
+  }).filter(Boolean).sort((a, b) => a.dNear - b.dNear || a.dFar - b.dFar);
+  // confluencias: PRZ de patrones que encajan y se solapan o quedan a menos del 3% del tramo
+  // con X, el AB=CD ya forma parte de la PRZ de cada XABCD: no cuenta como patrón aparte en las confluencias
+  rows.forEach(x => { x.taken = tk.has(x.k); });
+  const fit = rows.filter(x => x.fit > 0 && !x.taken && !(g.hasX && SIM[x.k].fam === 'abcd')), tol = 0.03 * (g.hasX ? g.xa : g.ab), clusters = [];
+  fit.forEach(x => {
+    const cl = clusters.find(q => x.dNear <= q.hi + tol && x.dFar >= q.lo - tol);
+    if(cl){ cl.lo = Math.min(cl.lo, x.dNear); cl.hi = Math.max(cl.hi, x.dFar); cl.rows.push(x); }
+    else clusters.push({lo:x.dNear, hi:x.dFar, rows:[x]});
+  });
+  const ext = g.hasX ? XA_EXTREMES.map(([k, t]) => ({k, t, v:c.A - g.dir * k * g.xa, d:g.dir * (c.C - (c.A - g.dir * k * g.xa))})) : [];
+  return {g, rows, clusters:clusters.filter(q => q.rows.length > 1), ext, tol};
+}
+function renderAllPrz(kSel){
+  const box = $('allPrz'), c = sim.coords, pSel = selectedPattern(), D = c ? allPrzData(c, takenOf(pSel)) : null;
+  if(!D || !D.rows.length){ box.innerHTML = ''; return; }
+  const {g, clusters, ext} = D;
+  const P0 = state.asset.price, dP = isF(P0) ? g.dir * (c.C - P0) : NaN;
+  const nTaken = D.rows.filter(x => x.taken).length;
+  const favS = g.hasX ? new Set(favList()) : new Set();
+  const rows = D.rows.filter(x => (sim.allPrz || x.fit > 0 || favS.has(x.k) || x.k === kSel || x.taken) && (sim.showTaken || !x.taken || x.k === kSel));
+  // patrones que el precio ya atravesó (más allá del borde lejano de la PRZ) y aún no están marcados
+  const crossed = isF(dP) ? D.rows.filter(x => x.fit > 0 && !x.taken && dP > x.dFar) : [];
+  const sameCl = x => clusters.find(q => q.rows.includes(x));
+  // resumen
+  const sum = clusters.length
+    ? clusters.map(q => `<b>${q.rows.map(x => SIM[x.k].name).join(' + ')}</b> en <span class="num">${fmt(c.C - g.dir * q.lo)} – ${fmt(c.C - g.dir * q.hi)}</span>`).join('; ')
+    : 'ninguna: las PRZ de los patrones que encajan no se solapan';
+  // gráfico de rangos: una fila por patrón, el precio avanza hacia la derecha
+  const W = 760, L = 132, R = 728, top = 34, rh = 24, H = top + rows.length * rh + 30;
+  const lo = Math.min(...rows.map(x => x.dNear)), hi = Math.max(...rows.map(x => Math.max(x.dFar, x.dSL)), ...ext.map(e => e.d));
+  const pad = (hi - lo) * 0.04 || 1, d0 = lo - pad, d1 = hi + pad, X = d => L + (d - d0) / (d1 - d0) * (R - L);
+  const S = [];
+  clusters.forEach(q => S.push(`<rect class="clu" x="${X(q.lo)}" y="${top - 6}" width="${Math.max(3, X(q.hi) - X(q.lo))}" height="${rows.length * rh + 6}"/>`));
+  for(let t = 0; t <= 4; t++){ const d = d0 + (d1 - d0) * t / 4; S.push(`<text class="ax" x="${X(d)}" y="${H - 8}" text-anchor="middle">${fmt(c.C - g.dir * d)}</text>`); }
+  ext.forEach(e => { if(e.d >= d0 && e.d <= d1) S.push(`<line class="ext" x1="${X(e.d)}" x2="${X(e.d)}" y1="${top - 10}" y2="${top + rows.length * rh}"/><text class="ax" x="${X(e.d)}" y="${top - 14}" text-anchor="middle">${e.t}</text>`); });
+  if(isF(dP) && dP >= d0 && dP <= d1) S.push(`<line class="px" x1="${X(dP)}" x2="${X(dP)}" y1="${top - 10}" y2="${top + rows.length * rh}"/><text class="ax" x="${X(dP)}" y="${top - 14}" text-anchor="middle">precio</text>`);
+  rows.forEach((x, i) => {
+    const y = top + i * rh, cls = x.k === kSel ? 'bar-sel' : x.taken ? 'bar-taken' : x.fit > 0 ? 'bar-fit' : 'bar-no';
+    S.push(`<g data-prz="${x.k}" style="cursor:pointer"><text class="rowname${x.taken ? ' taken' : x.fit > 0 ? '' : ' no'}" x="${L - 8}" y="${y + 13}" text-anchor="end"${x.k === kSel ? ' font-weight="700"' : ''}>${esc(SIM[x.k].name)}</text>
+      <rect class="${cls}" x="${X(x.dNear)}" y="${y + 3}" width="${Math.max(3, X(x.dFar) - X(x.dNear))}" height="${rh - 8}" rx="3"/>
+      <circle cx="${X(x.dD)}" cy="${y + rh / 2 - 1}" r="3" class="s-ink"/>
+      <line x1="${X(x.dSL)}" x2="${X(x.dSL)}" y1="${y + 3}" y2="${y + rh - 5}" stroke="var(--bear)" stroke-width="2"/></g>`);
+  });
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PRZ de cada patrón posible">${S.join('')}</svg>`;
+  // tabla
+  const tbl = '<tr><th>Superado</th><th>Patrón</th><th>Encaja</th><th>PRZ</th><th>Ancho</th><th>D</th><th>SL2</th><th>Coincide con</th></tr>' + rows.map(x => {
+    const pl = przPlanOf(x.r.prz, x.r.dir, x.r.baseLeg), wTag = pl.type === 'una' ? 'orden en la mitad' : 'orden al 90%';
+    const cl = sameCl(x), with_ = cl ? cl.rows.filter(q => q !== x).map(q => SIM[q.k].name).join(', ') : '';
+    const tb = pSel ? `<label class="takebox" title="El precio ya superó este patrón"><input type="checkbox" data-take="${x.k}"${x.taken ? ' checked' : ''} aria-label="${esc(SIM[x.k].name)} superado">${x.taken ? 'sí' : ''}</label>` : '';
+    return `<tr class="${x.k === kSel ? 'sel' : ''}${x.fit > 0 ? '' : ' no'}${x.taken ? ' taken' : ''}"><td>${tb}</td><td><button type="button" class="chip${x.k === kSel ? ' on' : ''}" data-prz="${x.k}">${esc(SIM[x.k].name)}</button></td>
+      <td>${x.fit > 0 ? Math.round(x.fit * 100) + '%' : `<span class="zsub">${esc(x.why)}</span>`}</td>
+      <td class="num">${fmt(x.r.prz[0])} – ${fmt(x.r.prz[1])}</td><td class="num">${(pl.pct * 100).toFixed(1)}%<div class="zsub" style="font-family:inherit">${wTag}</div></td><td class="num">${fmt(x.r.Dp)}</td><td class="num t-bear">${fmt(x.r.SL)}</td>
+      <td>${with_ ? esc(with_) : '<span class="zsub">–</span>'}</td></tr>`;
+  }).join('') + ext.map(e => `<tr class="no"><td></td><td>Nivel extremo</td><td><span class="zsub">referencia, no es un patrón</span></td><td class="num">${fmt(e.v)}</td><td></td><td class="num">${e.t}</td><td></td><td><span class="zsub">${e.k === 2 ? 'stop del Crab y del Deep Crab' : 'proyección extrema; más allá del stop del Crab'}</span></td></tr>`).join('');
+  box.innerHTML = `<div class="msg ${clusters.length ? 'ok' : 'info'}"><b>Confluencias entre patrones:</b> ${sum}.</div>
+    <div class="chartbox" style="padding:10px 12px">${svg}<p class="hint" style="margin:.3rem 0 0">Cada barra es una PRZ (punto: D; raya roja: SL2). Franja verde: PRZ que se solapan o quedan a menos del 3% del tramo. Líneas rojas punteadas: 2.0 y 2.24 XA. Toca un patrón para proyectarlo.</p></div>
+    <div class="przbar">
+      <label><input type="checkbox" id="allPrzToggle"${sim.allPrz ? ' checked' : ''}> Mostrar también los patrones que no encajan</label>
+      <label><input type="checkbox" id="allPrzTaken"${sim.showTaken ? ' checked' : ''}${nTaken ? '' : ' disabled'}> Mostrar los superados (${nTaken})</label>
+      ${crossed.length ? `<button type="button" class="btn sm" id="allPrzCrossed">Marcar como superados los que el precio ya cruzó (${crossed.map(x => esc(SIM[x.k].name)).join(', ')})</button>` : ''}
+    </div>
+    <div class="tablewrap"><table id="allPrzTable">${tbl}</table></div>`;
+}
+$('allPrz').addEventListener('click', e => {
+  const b = e.target.closest('[data-prz]'); if(!b) return;
+  sim.key = b.dataset.prz; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim();
+});
+$('allPrz').addEventListener('change', e => {
+  if(e.target.id === 'allPrzToggle'){ sim.allPrz = e.target.checked; renderSim(); return; }
+  if(e.target.id === 'allPrzTaken'){ sim.showTaken = e.target.checked; renderSim(); return; }
+  const k = e.target.dataset.take; if(k && state.selectedId) setTaken(state.selectedId, k, e.target.checked);
+});
+$('allPrz').addEventListener('click', e => {
+  if(e.target.id !== 'allPrzCrossed') return;
+  const c = sim.coords, p = selectedPattern(), D = c && p ? allPrzData(c, takenOf(p)) : null, P0 = state.asset.price;
+  if(!D || !isF(P0)) return;
+  const dP = D.g.dir * (c.C - P0);
+  setTaken(p.id, D.rows.filter(x => x.fit > 0 && !x.taken && dP > x.dFar).map(x => x.k), true);
+});
+
+function renderPrzPlan(r, k){
+  const box = $('przPlan');
+  if(!r){ box.innerHTML = sim.entryMode === 'prz' && sim.coords && isF(sim.coords.D) ? '<div class="msg info">El patrón ya tiene D real: el modo «Operar la PRZ» planifica órdenes antes de que el precio llegue.</div>' : ''; return; }
+  const pl = r.plan, side = r.dir > 0 ? 'compra' : 'venta', L = pl.lots;
+  const lotCell = L ? (L.below ? '<span class="t-bear">bajo el lote mínimo</span>' : L.each.toFixed(L.dp)) : '<span class="zsub">indica capital</span>';
+  const rows = pl.orders.map(o => `<tr><td>${o.n}</td><td class="num"><b>${fmt(o.v)}</b></td><td class="num t-bear">${fmt(o.risk)}</td><td class="num t-bull">${fmt(o.gain)}</td><td class="num">${o.rr.toFixed(2)}</td><td class="num">${lotCell}</td></tr>`).join('');
+  const pv = L && !L.below ? L.each * state.asset.pointValue : null, money = v => pv ? ' · ' + (v * pv >= 0 ? '+' : '') + (v * pv).toFixed(2) + ' con tus lotes' : '';
+  const o = pl.orders[0], tp1Gain = (r.TP1 - o.v) * r.dir, tp1RR = tp1Gain / o.risk;
+  const sc = [['El precio reacciona antes de llegar a la orden', 0, 'no hay operación: puedes hacer scalping en la reacción'],
+    [pl.tKind === 'edge' ? 'Se llena y sale de la PRZ por el borde cercano' : 'Se llena y llega al objetivo (1R)', o.gain, ''],
+    ['Se llena y supera la PRZ', -o.risk, 'salta el stop']];
+  const scRows = sc.map(([t, v, note]) => `<tr><td>${t}${note ? `<div class="zsub">${note}</div>` : ''}</td><td class="num ${v > 0 ? 't-bull' : v < 0 ? 't-bear' : ''}"><b>${v > 0 ? '+' : ''}${fmt(v)}</b> pts por lote${v ? money(v) : ''}</td></tr>`).join('');
+  const warn = pl.type === 'ancha' ? `<div class="msg warn">PRZ ancha (${(pl.pct * 100).toFixed(1)}% del tramo): Carney la espera entre 3% y 5%, así que la convergencia es débil. La orden al 90% evita la parte débil de la zona.</div>` : '';
+  box.innerHTML = `<h3 class="ptitle">Operar la PRZ</h3>
+    <div class="msg info"><b>${SIM[k].name} · ${side}.</b> PRZ de ${fmt(r.prz[0])} a ${fmt(r.prz[1])}: mide ${fmt(pl.w)} pts, el <b>${(pl.pct * 100).toFixed(1)}%</b> del tramo ${r.P.base}. Es <b>${PRZ_TYPE_TXT[pl.type]}</b>.</div>${warn}
+    <div class="tablewrap"><table><tr><th>Orden límite</th><th>Precio</th><th>Riesgo hasta el stop</th><th>Ganancia al objetivo</th><th>R:R</th><th>Lotes</th></tr>${rows}
+      <tr><td>Stop de la PRZ</td><td class="num t-bear"><b>${fmt(pl.SL)}</b></td><td colspan="4" class="zsub">más allá del borde lejano (${fmt(pl.far)}) + 2% del tramo. Que sea una orden de stop real: un pico puede saltar la PRZ en una vela.</td></tr>
+      <tr><td>Objetivo</td><td class="num t-bull"><b>${fmt(pl.T)}</b></td><td colspan="4" class="zsub">${pl.tKind === 'edge' ? 'borde cercano de la PRZ: el precio sale de la zona.' : 'a 1R de la orden: en una PRZ tan estrecha, el borde cercano queda demasiado cerca.'}</td></tr>
+      ${tp1Gain > o.gain ? `<tr><td>Objetivo extendido</td><td class="num t-bull"><b>${fmt(r.TP1)}</b></td><td colspan="4" class="zsub">TP1 de Carney (0.382 de ${r.tpLbl}): R:R ${tp1RR.toFixed(2)} si dejas correr una parte.</td></tr>` : ''}</table></div>
+    <div class="tablewrap" style="margin-top:.6rem"><table><tr><th>Escenario</th><th>Resultado</th></tr>${scRows}</table></div>
+    <p class="hint">${L ? (L.below ? `Con tu riesgo de ${L.money.toFixed(2)} no alcanza el lote mínimo por orden.` : `${L.each.toFixed(L.dp)} lotes: si se llena y salta el stop, pierdes ${L.real.toFixed(2)} (tu ${state.asset.riskPct}% = ${L.money.toFixed(2)}).`) : 'Indica capital, riesgo y valor por punto en la barra superior para calcular los lotes.'} El tramo base es ${r.P.base}; el umbral se puede comparar con el panel «Todas las PRZ».</p>`;
+}
+
+/* ============ Resumen de gráficos ============ */
+const sumCmp = (a, b) => {
+  const n = (a.label || '').localeCompare(b.label || '', 'es', {numeric:true, sensitivity:'base'}); if(n) return n;
+  const ta = tfMin(a.tf), tb = tfMin(b.tf);
+  if(isF(ta) && isF(tb) && ta !== tb) return ta - tb;
+  if(isF(ta) !== isF(tb)) return isF(ta) ? -1 : 1;
+  return String(a.tf || '').localeCompare(String(b.tf || ''));
+};
+// Orden fijo de columnas: por profundidad de D (XABCD, Shark, Cypher, Nen Star) y al final las AB=CD
+const SUM_ORDER = Object.keys(SIM).filter(k => k !== 'shark2').sort((a, b) =>
+  ((SIM[a].fam === 'abcd') - (SIM[b].fam === 'abcd')) || (SIM[a].d - SIM[b].d) || (Object.keys(SIM).indexOf(a) - Object.keys(SIM).indexOf(b)));
+const sumOpt = () => state.settings.sum || (state.settings.sum = clone(DEFAULT_SETTINGS.sum));
+function summaryRowOf(p){
+  const c = coordsOf(p), D = allPrzData(c, takenOf(p));
+  if(!D) return {p, err:geom(c).err || 'Coordenadas incompletas.'};
+  const g = D.g, P0 = state.asset.price, dP = isF(P0) ? g.dir * (c.C - P0) : NaN;
+  // todos los patrones que el simulador puede proyectar con estos puntos (los de «Proyectar como»),
+  // encajen o no con los ratios, más las variantes que encajan, las extensiones favoritas, el esperado y los marcados
+  const fav = g.hasX ? new Set(favList()) : new Set(), byKey = {};
+  D.rows.filter(x => !SIM[x.k].hidden || x.fit > 0 || fav.has(x.k) || x.k === p.key || x.taken).forEach(x => {
+    byKey[x.k] = {k:x.k, prz:x.r.prz, taken:x.taken, ext:!(x.fit > 0), dNear:x.dNear, crossed:isF(dP) && dP > x.dFar};
+  });
+  const next = Object.values(byKey).filter(x => !x.taken).sort((a, b) => a.dNear - b.dNear)[0];
+  return {p, g, byKey, next};
+}
+function renderSummary(){
+  const box = $('sumTable'), O = sumOpt(), hide = O.hideTaken, hidePts = O.hidePts;
+  $('sumHideTaken').checked = hide; $('sumHidePts').checked = hidePts;
+  if(!state.patterns.length){ box.innerHTML = '<tr><td class="zsub">Agrega gráficos en la sección 1 para ver el resumen.</td></tr>'; $('sumCount').textContent = ''; return; }
+  const data = [...state.patterns].sort(sumCmp).map(summaryRowOf);
+  const vis = (d, k) => d.byKey && d.byKey[k] && !(hide && d.byKey[k].taken);
+  const cols = SUM_ORDER.filter(k => data.some(d => vis(d, k)));
+  const all = data.flatMap(d => d.byKey ? Object.values(d.byKey) : []), done = all.filter(x => x.taken).length;
+  $('sumCount').textContent = all.length ? `${done} de ${all.length} patrones superados${hide && done ? ' (ocultos)' : ''}` : '';
+  const head = '<tr><th>Gráfico</th><th>TF</th><th>Movimiento</th>' + (hidePts ? '' : '<th>X</th><th>A</th><th>B</th><th>C</th>') +
+    cols.map(k => `<th>${esc(SIM[k].name)}</th>`).join('') + '</tr>';
+  let prevLabel = null;
+  const body = data.map(d => {
+    const p = d.p, lbl = (p.label || '').trim().toLowerCase(), grp = prevLabel !== null && lbl !== prevLabel; prevLabel = lbl;
+    const cls = [p.id === state.selectedId ? 'sel' : '', p.enabled ? '' : 'off', grp ? 'grp-start' : ''].filter(Boolean).join(' ');
+    const name = `<button type="button" class="gname" data-sumsel="${p.id}" title="Abrir en el simulador"><span class="dot" style="background:${p.color}"></span>${esc(p.label || 'Sin nombre')}</button>`;
+    const pts = hidePts ? '' : ['X','A','B','C'].map(k => `<td class="num">${fmt(p[k])}</td>`).join('');
+    if(!d.byKey) return `<tr class="${cls}"><td>${name}</td><td>${esc(p.tf || '–')}</td><td>–</td>${pts}<td colspan="${Math.max(1, cols.length)}" class="t-bear">${esc(d.err)}</td></tr>`;
+    const mv = d.g.dir > 0 ? '<span class="t-bull">Compra</span>' : '<span class="t-bear">Venta</span>';
+    const cells = cols.map(k => {
+      if(!vis(d, k)) return '<td></td>';
+      const x = d.byKey[k], pc = ['pc', x.taken ? 'taken' : '', x === d.next ? 'next' : ''].filter(Boolean).join(' ');
+      return `<td class="${pc}"><label class="takebox"><input type="checkbox" data-sumtake="${p.id}|${k}"${x.taken ? ' checked' : ''} aria-label="${esc(SIM[k].name)} superado en ${esc(p.label || 'gráfico')}"><span class="pn num">${fmt(x.prz[0])} – ${fmt(x.prz[1])}</span></label>` +
+        `${x.ext ? '<span class="pz">no valida con tus ratios</span>' : ''}${x.crossed && !x.taken ? '<span class="crossed">el precio ya la cruzó</span>' : ''}</td>`;
+    }).join('');
+    const empty = cols.length ? '' : '<td class="zsub">sin patrones pendientes</td>';
+    return `<tr class="${cls}"><td>${name}</td><td>${esc(p.tf || '–')}</td><td>${mv}</td>${pts}${cells}${empty}</tr>`;
+  }).join('');
+  box.innerHTML = head + body;
+}
+const saveSession = () => { try { localStorage.setItem('confluencias-armonicas:sesion', JSON.stringify(state)); } catch(e) {} };
+$('sumTable').addEventListener('change', e => {
+  const v = e.target.dataset.sumtake; if(!v) return;
+  const [id, k] = v.split('|'); setTaken(id, k, e.target.checked);
+});
+$('sumTable').addEventListener('click', e => { const b = e.target.closest('[data-sumsel]'); if(b) selectPattern(b.dataset.sumsel, {scroll:true}); });
+$('sumHideTaken').addEventListener('change', e => { sumOpt().hideTaken = e.target.checked; saveSession(); renderSummary(); });
+$('sumHidePts').addEventListener('change', e => { sumOpt().hidePts = e.target.checked; saveSession(); renderSummary(); });
+
+function renderLive(){
+  const box = $('liveTable'), act = state.patterns.filter(p => p.enabled);
+  if(!act.length){ box.innerHTML = '<tr><td class="zsub">Agrega patrones para ver si siguen vigentes.</td></tr>'; return; }
+  box.innerHTML = '<tr><th>Patrón</th><th>Proyección</th><th>PRZ · SL2</th><th>Estado</th></tr>' + act.map(p => {
+    const L = patternLive(p);
+    return `<tr class="${p.id === state.selectedId ? 'sel' : ''}"><td><button type="button" class="chip${p.id === state.selectedId ? ' on' : ''}" data-live="${p.id}"><span class="dot" style="background:${p.color}"></span>${esc(p.label || 'Sin nombre')}${p.tf ? ' · ' + esc(p.tf) : ''}</button></td>
+      <td>${L && L.k ? SIM[L.k].name + ' <span class="zsub num">D ' + fmt(L.r.Dp) + '</span>' : L ? 'D real ' + fmt(p.D) : '–'}</td>
+      <td class="num">${L && L.r ? fmt(L.r.prz[0]) + ' – ' + fmt(L.r.prz[1]) + ' · <span class="t-bear">' + fmt(L.r.SL) + '</span>' : '–'}</td>
+      <td>${L ? `<span class="tag ${L.c}" style="margin-left:0;white-space:normal">${esc(L.t)}</span>` : '–'}</td></tr>`;
+  }).join('');
+}
+$('liveTable').addEventListener('click', e => { const b = e.target.closest('[data-live]'); if(b && b.dataset.live !== state.selectedId) selectPattern(b.dataset.live); });
+
+function renderSim(){
+  renderLive(); syncLiveInputs(); renderSummary();
+  const p = selectedPattern();
+  const has = !!(p && sim.coords);
+  ['simFail'].forEach(id => $(id).disabled = !has);
+  $('simApply').disabled = !(has && sim.modified);
+  $('simReset').disabled = !(has && sim.modified);
+  if(!has){
+    $('simChart').innerHTML = '<div class="empty">Agrega un patrón en la sección 1 para simularlo aquí.</div>';
+    $('simCands').innerHTML = ''; $('simMsgs').innerHTML = ''; $('simTable').innerHTML = ''; $('simDir').textContent = '';
+    syncSliders(null); renderSlTable(null); $('simNotes').innerHTML = ''; $('simSignals').innerHTML = signalsHtml(null, null, null); renderFav(); return;
+  }
+  const g = geom(sim.coords);
+  syncSliders(g);
+  if(!g.ok){
+    $('simChart').innerHTML = `<div class="empty">${esc(g.err)}</div>`;
+    $('simCands').innerHTML = ''; $('simTable').innerHTML = '';
+    $('simMsgs').innerHTML = `<div class="msg warn">${esc(g.err)} Corrige las coordenadas.</div>`; return;
+  }
+  $('simDir').textContent = g.hasD
+    ? (g.dir > 0 ? 'Completado abajo: la reacción esperada es alcista.' : 'Completado arriba: la reacción esperada es bajista.')
+    : (g.dir > 0 ? 'Alcista: D se forma abajo, compra en la PRZ.' : 'Bajista: D se forma arriba, venta en la PRZ.');
+  const rk = rankCands(noD(sim.coords));
+  const pSel = selectedPattern(), expKey = pSel && pSel.key;
+  const bestKey = (rk.find(x => x.fit > 0 && !isTaken(pSel, x.key)) || {}).key;
+  const k = effectiveKey();
+  const przMode = sim.entryMode === 'prz';
+  const r = k ? simCompute(sim.coords, k, sim.slMode, sim.tpMode, przMode ? 'D' : sim.entryMode) : null;
+  const rPlan = k && przMode ? simCompute(sim.coords, k, sim.slMode, sim.tpMode, 'prz') : null;
+  // candidatos
+  let chips = rk.map(x => {
+    const on = x.key === k || (SIM[k] && SIM[k].hidden && SIM[k].name.startsWith(SIM[x.key].name) && false);
+    return `<button type="button" class="chip${x.key === k ? ' on' : ''}${x.fit > 0 ? '' : ' no'}${isTaken(pSel, x.key) ? ' taken' : ''}" data-key="${x.key}" title="${esc(isTaken(pSel, x.key) ? 'Marcado como superado' : x.fit > 0 ? 'Encaje ' + Math.round(x.fit * 100) + '%' : x.why)}">${SIM[x.key].name}${x.fit > 0 ? ' ' + Math.round(x.fit * 100) + '%' : ''}${x.key === bestKey ? '<span class="best">más probable</span>' : ''}${x.key === expKey ? '<span class="best">esperado</span>' : ''}${x.fit > 0 && perfectOf(x.key, sim.coords) ? '<span class="best">perfecto</span>' : ''}</button>`;
+  }).join('');
+  if(k && SIM[k].hidden) chips += `<button type="button" class="chip on" data-key="${k}">${SIM[k].name}</button>`;
+  $('simCands').innerHTML = 'Proyectar como: ' + chips;
+  if(!r || !r.ok){
+    $('simChart').innerHTML = `<div class="empty">${esc(r ? r.err : 'Sin proyección posible con estas coordenadas.')}</div>`;
+    renderAllPrz(null);
+    $('simTable').innerHTML = ''; $('simLadder').innerHTML = ''; $('simResult').innerHTML = ''; $('simNotes').innerHTML = ''; $('simSignals').innerHTML = signalsHtml(null, null, selectedPattern()); renderFav(); $('simMsgs').innerHTML = `<div class="msg warn">${esc(r ? r.err : 'Sin proyección posible.')} Elige otro candidato.</div>`; return;
+  }
+  renderAllPrz(k);
+  const otherMode = sim.slMode === 'agr' ? 'cons' : 'agr', rO = simCompute(sim.coords, k, otherMode, sim.tpMode, przMode ? 'D' : sim.entryMode);
+  const slName = m => m === 'agr' ? 'SL1 agresivo' : 'SL2 conservador';
+  // estado con el precio actual y la vela que probó la PRZ (siempre con el SL2)
+  const lv = !r.hasD ? liveStatus(sim.slMode === 'cons' ? r : rO, sim.coords) : null;
+  const bar = lv ? `<div class="livebar"><span class="tag ${lv.c}">${SIM[k].name}: ${esc(lv.t)}</span>${isF(state.asset.price) ? `<span class="zsub">precio ${fmt(state.asset.price)}</span>` : ''}</div>` : '';
+  const usePlan = rPlan && rPlan.ok && rPlan.plan;
+  renderPrzPlan(usePlan ? rPlan : null, k);
+  $('planTitle').textContent = usePlan ? 'Plan de Carney (referencia, entrada en D)' : 'Plan de la operación';
+  $('simChart').innerHTML = bar + patternChart(usePlan ? rPlan : r, {draw:sim.draw, label:'Simulación ' + SIM[k].name, slName:slName(sim.slMode),
+    extra:usePlan ? [] : [...(rO.ok ? [{v:rO.SL, t:slName(otherMode) + ' ' + fmt(rO.SL), c:'bear', dash:true}] : []), {v:r.E + 1.272 * (sim.coords.C - r.E), t:'TP3 1.272 (Boroden) ' + fmt(r.E + 1.272 * (sim.coords.C - r.E)), c:'bull', dash:true}]});
+  sim.draw = false;
+  // mensajes
+  const m = [];
+  if(sim.msg) m.push(['info', sim.msg]);
+  if(sim.modified) m.push(['fib', 'Coordenadas simuladas: todavía no se aplican al patrón guardado.']);
+  const fitK = simFit(SIM[k].hidden ? k : k, g);
+  if(!fitK.fit){
+    const alts = rk.filter(x => x.fit > 0).map(x => SIM[x.key].name).join(', ');
+    m.push(['warn', `${fitK.why} Así, ${SIM[k].name} es solo un escenario de conversión.${alts ? ' Compatibles hoy: ' + alts + '.' : ''}`]);
+  }
+  const pf = fitK.fit ? perfectOf(k, sim.coords) : null;
+  if(pf) m.push(['ok', `${SIM[k].name} perfecto según Carney: ${pf}.`]);
+  if(fitK.fit && SIM[k].b && g.hasX && fitB(g.R.bxa, SIM[k], 0) < 1) m.push(['info', `B en ${fr(g.R.bxa)}: fuera del ideal ${rangeTxt(SIM[k].b)} pero dentro de la tolerancia de Carney (±${Math.round(SIM[k].tol * 100)}%). Encaje reducido.`]);
+  if(r.breached) m.push(['warn', 'El D real ya superó el stop de este patrón: queda invalidado. Prueba el siguiente de la escalera.']);
+  const w = (r.prz[1] - r.prz[0]) / r.leg;
+  if(w > .08) m.push(['warn', `PRZ ancha (${(w * 100).toFixed(0)}% del tramo): Carney la espera entre 3% y 5%; la confluencia interna es débil.`]);
+  const bcR = !r.hasD ? bcRead(r, k) : null;
+  if(bcR && EXT_FAM.has(k)) m.push([bcR.cls, 'Proyección BC: ' + bcR.txt]);
+  if(r.slByAbcd) m.push(['info', `El AB=CD ${r.slByAbcd.f === 1 ? '' : fr(r.slByAbcd.f) + ' '}completa en ${fmt(r.slByAbcd.v)}, más allá del stop estándar (${fr(r.slR)} ${SIM[k].base}): el stop pasa detrás del AB=CD, porque Carney dice que depende de él.`]);
+  if(r.abcdFar) m.push(['warn', `El AB=CD más cercano completa en ${fmt(r.abcdFar.v)}, muy por detrás del stop de Carney: la PRZ no converge. Carney descartaría la estructura o esperaría a que el AB=CD encaje.`]);
+  if(r.rr1 < 1) m.push(['warn', `R:R hasta TP1 de ${r.rr1.toFixed(2)}: el setup no compensa el riesgo.`]);
+  const trR = trendRead(k, r.dir);
+  if(trR.tr.src === 'self') m.push(['info', 'Tendencia: ' + trR.txt]);
+  else if(trR.ok !== null) m.push([trR.cls === 'warn' ? 'warn' : trR.ok ? 'ok' : 'info', 'Tendencia' + (trR.tr.src === 'manual' ? '' : ' (según ' + trR.tr.src + ')') + ': ' + trR.txt]);
+  $('simMsgs').innerHTML = m.map(x => `<div class="msg ${x[0]}">${esc(x[1])}</div>`).join('');
+  // tabla
+  const base = ' ' + SIM[k].base;
+  const rows = [];
+  rows.push([r.hasD ? 'D proyectado' : 'D', fmt(r.Dp), fr(SIM[k].d) + base + (r.entryMode === 'D' ? ' · aquí va la orden límite' : '')]);
+  if(r.entryMode === 'conf') rows.push(['Entrada confirmada', fmt(r.entry), 'borde cercano de la PRZ: entras cuando el precio la prueba y vuelve a cerrar en este nivel (T-Bar + 1). ' + (Math.abs(r.entry - r.Dp) < 1e-9 ? 'Aquí coincide con D.' : 'Pagas ' + fmt(Math.abs(r.entry - r.Dp)) + ' pts más que en D a cambio de la confirmación.')]);
+  if(r.hasD) rows.push(['D real', fmt(sim.coords.D), 'entrada tomada en el D real']);
+  r.proj.filter(q => !q.main).forEach(q => rows.push(['Proyección ' + q.label, fmt(q.v), q.inPrz ? 'dentro de la PRZ' : q.layer ? 'capa de tolerancia: hasta aquí se acepta que el precio pase la PRZ (Carney)' : 'demasiado lejos de D']));
+  rows.push(['PRZ', fmt(r.prz[0]) + ' – ' + fmt(r.prz[1]), (w * 100).toFixed(1) + '% del tramo']);
+  rows.push([sim.slMode === 'agr' ? 'SL1 agresivo' : 'SL2 conservador', fmt(r.SL), r.slByAbcd ? `detrás del AB=CD ${r.slByAbcd.f === 1 ? '' : fr(r.slByAbcd.f) + ' '}(${fmt(r.slByAbcd.v)}), que completa más allá de ${fr(r.slR)}${base}: Carney dice que el stop depende del AB=CD` : 'más allá de ' + fr(r.slR) + base + ' + colchón de 2%']);
+  if(rO.ok) rows.push([otherMode === 'agr' ? 'SL1 agresivo' : 'SL2 conservador', fmt(rO.SL), rO.slByAbcd ? `detrás del AB=CD (${fmt(rO.slByAbcd.v)}), que completa más allá de ${fr(rO.slR)}${base}` : 'más allá de ' + fr(rO.slR) + base]);
+  rows.push(['TP1', fmt(r.TP1), fr(r.tpR[0]) + ' de ' + r.tpLbl + (SIM[k].fam === 'shark' ? ' (Carney: el 50% es el objetivo del Shark)' : '')]);
+  rows.push(['TP2', fmt(r.TP2), fr(r.tpR[1]) + ' de ' + r.tpLbl]);
+  rows.push(['R:R', r.rr1.toFixed(2) + ' / ' + r.rr2.toFixed(2), 'hasta TP1 / TP2']);
+  const cdLeg = sim.coords.C - r.E, tp3 = r.E + 1.272 * cdLeg, tp4 = r.E + 1.618 * cdLeg;
+  rows.push(['TP3 extendido', fmt(tp3), '1.272 del tramo que llegó a D (Boroden); para operar a favor de la tendencia']);
+  rows.push(['TP4 extendido', fmt(tp4), '1.618 del mismo tramo (Boroden)']);
+  rows.push(['Proteger ganancia', fmt(r.entry + 0.5 * (r.TP1 - r.entry)), 'al llegar aquí (mitad del camino a TP1), mover el SL a la entrada: nunca dejar que una ganancia se vuelva pérdida (Carney). La distancia es sugerencia de la plantilla']);
+  const post0 = (sim.coords.post || []).filter(isF);
+  if(r.hasD && post0.length){
+    const tr = trail382(r.E, post0[0]), hit = post0.length > 1 && (post0[1] - tr) * r.dir < 0;
+    rows.push(['Stop móvil 0.382', fmt(tr), `0.382 del tramo D → E (Carney)${post0.length > 1 ? (hit ? ': el pivote F lo rompió, la operación se habría cerrado ahí' : ': el pivote F lo respetó') : ''}`]);
+  } else rows.push(['Stop móvil 0.382', '–', 'cuando el precio reaccione: extremo de la reacción − 0.382 × (extremo − D). Si el retroceso lo supera, se cierra (Carney)']);
+  const L = lotFor(r.entry, r.SL);
+  rows.push(['Tamaño de posición', L && !L.below ? L.lots.toFixed(L.dp) + ' lotes' : '–', lotTxt(L)]);
+  const third = L && !L.below ? Math.floor(L.lots / 3 / (state.asset.minLot || 0.01) + 1e-9) * (state.asset.minLot || 0.01) : NaN;
+  rows.push(['Salida en tercios', `${fmt(r.TP1)} · ${fmt(r.TP2)} · stop móvil`, 'Beck: un tercio en TP1, un tercio en TP2 y el último con stop móvil (0.382 de Carney). ' + (isF(third) ? (third > 0 ? third.toFixed(L.dp) + ' lotes por tercio' : 'el lote no alcanza para dividir en tercios') : '')]);
+  if(!r.hasD){
+    rows.push(['Ejecución', 'T-Bar + 1', 'espera la vela que pruebe toda la PRZ (vela terminal) y entra en la siguiente si gira (Carney Vol. 3). Qué vigilar después: «Señales tras tocar la PRZ»']);
+    if(g.hasX && SIM[k].fam === 'xabcd'){
+      const P0 = state.asset.price, przN = r.dir > 0 ? r.prz[1] : r.prz[0];
+      const st = !isF(P0) ? 'indica el precio actual para ver su estado' : (przN - P0) * r.dir >= 0 ? 'la PRZ ya fue alcanzada' : (sim.coords.B - P0) * r.dir > 0 ? 'activo: el precio ya cruzó B y va hacia la PRZ' : 'aún no cruza B';
+      rows.push(['BAMM (disparador)', fmt(sim.coords.B), `si el tramo CD cruza B, el precio suele ir "atraído" hasta la PRZ (${fmt(przN)}); ${SIM[k].name === 'Bat' || k === 'altbat' ? 'es el caso más fiable (Bat)' : 'más fiable en el Bat que en este patrón'} · ${st}. Sal si se estanca (Carney Vol. 2)`]);
+    }
+    rows.push(['Simetría (Duddella)', g.R.cab < 0.5 ? fmt(sim.coords.C - r.dir * g.ab) : '–', g.R.cab < 0.5 ? 'C retrocedió menos del 50%: espera CD ≈ 100% de AB' : 'C retrocedió más del 50%: CD suele ser igual o menor que AB']);
+  }
+  // Agrupar por etapa de la operación
+  const grpOf = n => /^SL|^Tamaño de posición/.test(n) ? 1 : /^TP|^R:R/.test(n) ? 2 : /^Proteger|^Stop móvil|^Salida/.test(n) ? 3 : 0;
+  const GRP = ['Entrada', 'Riesgo', 'Objetivos', 'Gestión tras la entrada'];
+  $('simTable').innerHTML = '<tr><th>Nivel</th><th>Precio</th><th>Detalle</th></tr>' + GRP.map((t, gi) => {
+    const rs = rows.filter(x => grpOf(x[0]) === gi); if(!rs.length) return '';
+    return `<tr class="grp"><td colspan="3">${t}</td></tr>` + rs.map(x => `<tr><td>${x[0]}</td><td class="num"><b>${x[1]}</b></td><td>${esc(x[2])}</td></tr>`).join('');
+  }).join('');
+  $('simFail').disabled = sim.broken;
+  renderLadderPanel(k, g);
+  renderResultPanel(k);
+  renderSlTable(k);
+  $('simNotes').innerHTML = notesHtml(k);
+  $('simSignals').innerHTML = signalsHtml(k, r, selectedPattern());
+  if($('notesC')) renderNotes();
+  renderFav();
+  renderTF(k, r);
+}
+
+function renderSlTable(k){
+  const order = ['gartley','bat','altbat','butterfly','butterfly2','crab','deepcrab','shark','shark2','nenstar','cypher','abcd','abcd2','abcd3'];
+  $('slTable').innerHTML = '<tr><th>Patrón</th><th>D</th><th>SL1 agresivo</th><th>SL2 conservador</th><th>Colchón</th></tr>' +
+    order.map(q => { const P = SIM[q], b = ' ' + P.base;
+      return `<tr class="${q === k ? 'cur' : ''}"><td>${P.name}</td><td class="num">${fr(P.d)}${b}</td><td class="num">${fr(P.sl[1])}${b}${P.slNote ? ' *' : ''}</td><td class="num">${fr(P.sl[0])}${b}${P.sl[0] === 1 && P.base === 'XA' ? ' (X)' : ''}${P.sl[0] === 1 && P.base === 'XC' ? ' (X)' : ''}</td><td>2% de ${P.base}</td></tr>`; }).join('');
+}
+
+// Patrones de otras temporalidades respecto al seleccionado
+function renderTF(k, r){
+  const p = selectedPattern(); if(!p){ $('simTF').innerHTML = ''; return; }
+  const roles = tfRoles(p);
+  if(!roles.prox.length && !roles.dist.length && !roles.same.length){ $('simTF').innerHTML = ''; return; }
+  const line = (a, prox) => {
+    const kk = expectedKeyOf(a.p), rr = kk ? simCompute(noD(a.p), kk, 'cons', 'AD') : null;
+    const side = a.hasD ? a.dir : a.dir, same = side === r.dir;
+    let extra = '';
+    if(prox && rr && rr.ok){ const tol = 0.02 * r.leg; const ov = rr.prz[1] >= r.prz[0] - tol && rr.prz[0] <= r.prz[1] + tol; extra = ov ? ' · <b class="t-bull">su PRZ coincide con la tuya: afina la entrada</b>' : ''; }
+    return `<li><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${a.p.color};margin-right:6px"></span><b>${esc(a.p.label)}</b> ${a.p.tf ? '<span class="zsub">' + esc(a.p.tf) + '</span>' : ''} · ${a.dir > 0 ? 'compra' : 'venta'}${kk ? ' (' + SIM[kk].name + ')' : ''} · ${same ? '<span class="t-bull">misma dirección</span>' : '<span class="t-bear">dirección contraria</span>'}${extra}</li>`;
+  };
+  $('simTF').innerHTML = `<div class="msg info"><b>Temporalidades (Carney).</b> <b>Primaria:</b> ${esc(p.label)}${p.tf ? ' (' + esc(p.tf) + ')' : ''}, el patrón más claro.
+    ${roles.prox.length ? `<div style="margin-top:.4rem"><b>Próxima</b> (menor, para afinar la entrada):</div><ul style="margin:.2rem 0 .2rem 1rem;padding:0">${roles.prox.map(a => line(a, true)).join('')}</ul>` : ''}
+    ${roles.dist.length ? `<div style="margin-top:.4rem"><b>Distal</b> (mayor, da el contexto):</div><ul style="margin:.2rem 0 .2rem 1rem;padding:0">${roles.dist.map(a => line(a, false)).join('')}</ul>` : ''}
+    ${roles.same.length ? `<div style="margin-top:.4rem"><b>Misma temporalidad</b>:</div><ul style="margin:.2rem 0 .2rem 1rem;padding:0">${roles.same.map(a => line(a, true)).join('')}</ul>` : ''}</div>`;
+}
+
+// Escalera completa: en qué se convierte si el precio atraviesa D, y el escenario de ruptura
+function renderLadderPanel(k, g){
+  const box = $('simLadder');
+  const c0 = noD(sim.coords), g0 = geom(c0);
+  if(!g0.ok){ box.innerHTML = ''; return; }
+  const P = SIM[k];
+  // inicio de la escalera: el patrón compatible de la misma familia con D menos profundo
+  let start = PARENT[k] || k;
+  if(P.fam === 'xabcd'){
+    const comp = Object.keys(SIM).filter(q => SIM[q].fam === 'xabcd' && !SIM[q].hidden && simFit(q, g0).fit > 0).sort((a,b) => SIM[a].d - SIM[b].d);
+    if(comp.length && simFit(start, g0).fit > 0) start = comp[0];
+  }
+  const steps = []; let cur = start, guard = 0;
+  while(cur && guard++ < 8){
+    const rc = simCompute(c0, cur, 'cons', 'AD'), ra = simCompute(c0, cur, 'agr', 'AD');
+    if(!rc.ok) break;
+    steps.push({k:cur, D:rc.Dp, SL1:ra.SL, SL2:rc.SL, prz:rc.prz});
+    cur = nextOf(cur, g0);
+  }
+  if(!steps.length){ box.innerHTML = ''; return; }
+  const last = steps[steps.length - 1], dir = g0.dir, Dr = sim.coords.D;
+  const passed = v => isF(Dr) && (v - Dr) * dir >= 0;
+  const li = steps.map((st, i) => {
+    let tag = '';
+    if(isF(Dr)){
+      if(passed(st.SL2)) tag = '<span class="tag bear">D real pasó su SL2</span>';
+      else if(passed(st.SL1)) tag = '<span class="tag fib">D real tocó SL1</span>';
+      else if(passed(dir > 0 ? st.prz[1] : st.prz[0])) tag = '<span class="tag bull">D real giró aquí</span>';
+    }
+    return `<li class="${st.k === k ? 'cur' : ''}"><button type="button" class="chip${st.k === k ? ' on' : ''}" data-key="${st.k}">${SIM[st.k].name}</button>
+      D <b class="num">${fmt(st.D)}</b> <span class="zsub">(${fr(SIM[st.k].d)} ${SIM[st.k].base})</span> · SL1 <span class="num">${fmt(st.SL1)}</span> · SL2 <span class="num">${fmt(st.SL2)}</span> ${tag}</li>`;
+  }).join('');
+  const Cp = sim.coords.C, Ap = last.SL2;
+  const newDir = dir > 0 ? 'bajista (venta en su D′)' : 'alcista (compra en su D′)';
+  const sameDir = dir > 0 ? 'alcista (compra)' : 'bajista (venta)';
+  // Operar la falla (Carney, Vol. 1 cap. 12): entrada al romper la PRZ, stop del otro lado, objetivo en el siguiente nivel
+  const cur0 = steps.find(st => st.k === k) || steps[0], lg0 = g0.hasX ? g0.xa : g0.ab;
+  const fEntry = (dir > 0 ? cur0.prz[0] : cur0.prz[1]) - dir * 0.02 * lg0;
+  const fStop = (dir > 0 ? cur0.prz[1] : cur0.prz[0]) + dir * 0.02 * lg0;
+  const nxStep = steps[steps.indexOf(cur0) + 1];
+  const fOpts = nxStep ? [{v:nxStep.D, t:'D del ' + SIM[nxStep.k].name}] : [];
+  const fTarget = fOpts.length ? fOpts[0].v : NaN, fTargetTxt = fOpts.length ? fOpts[0].t : '';
+  const fRR = isF(fTarget) ? Math.abs(fTarget - fEntry) / Math.abs(fEntry - fStop) : NaN;
+  const failBlock = `<li class="brk"><b>Si el patrón falla (Carney)</b>: la señal es una reacción débil que vuelve a probar toda la PRZ y rompe el extremo de la vela que la probó.
+    Entonces se opera a favor de la ruptura: ${dir > 0 ? 'venta' : 'compra'} más allá de <b class="num">${fmt(fEntry)}</b>, stop al otro lado de la PRZ en <b class="num">${fmt(fStop)}</b>${isF(fTarget) ? `, objetivo <b class="num">${fmt(fTarget)}</b> (${fTargetTxt}) · R:R ${fRR.toFixed(2)}` : ''}.
+    La PRZ rota pasa a ser ${dir > 0 ? 'resistencia' : 'soporte'}.</li>`;
+  // Trampa de Hobbs (Shark Attack): al romper X, el precio suele correr a 1.272–1.618 de XA y girar
+  let trapBlock = '';
+  if(g0.hasX && SIM[start].base === 'XA' && SIM[start].d < 1){
+    const t1 = sim.coords.A - dir * 1.272 * g0.xa, t2 = sim.coords.A - dir * 1.618 * g0.xa, lo = Math.min(t1, t2), hi = Math.max(t1, t2);
+    const allLv = analyses.filter(a => a.ok && a.p.enabled).flatMap(a => a.levels);
+    const nExt = allLv.filter(l => l.price >= lo && l.price <= hi && l.labels.some(t => /1\.272|1\.618/.test(t))).length;
+    const w113 = sim.coords.A - dir * 1.13 * g0.xa;
+    trapBlock = `<li class="brk"><b>Onda fallida 1.13 (Carney, Vol. 2)</b>: si el precio pasa X (${fmt(sim.coords.X)}) pero no supera 1.13 XA (<b class="num">${fmt(w113)}</b>), suele ser una sacudida que saca stops y gira. Si supera 1.13, lo normal es que siga hasta 1.27 o 1.618.</li>
+      <li class="brk"><b>Trampa al romper X (Hobbs, "Shark Attack")</b>: si el precio pierde X con fuerza, suele correr hasta 1.272–1.618 de XA
+      (<b class="num">${fmt(lo)} – ${fmt(hi)}</b>), sacar los stops y girar. Es la misma franja del Butterfly y del Crab.
+      Hay <b>${nExt}</b> extensiones 1.272/1.618 de tus patrones en esa franja${nExt >= 4 ? ': con cuatro o más, Hobbs espera al menos una reversión operable.' : '.'}</li>`;
+  }
+  const bl = [[0.382,'Bat'],[0.5,'Bat'],[0.618,'Gartley o Crab'],[0.786,'Butterfly'],[0.886,'Deep Crab']]
+    .map(([q,n]) => `<span class="chip no" style="cursor:default">B′ ${fr(q)} = <b class="num">${fmt(Ap + q * (Cp - Ap))}</b> → ${n}</span>`).join('');
+  const lateral = [];
+  if(g0.hasX && !g0.cBeyondA && !isF(Dr)) lateral.push('Si C todavía no está confirmado y termina superando A (' + fmt(sim.coords.A) + '), evalúa Cypher o Shark.');
+  if(!g0.hasX) lateral.push('Agrega X para evaluar los patrones XABCD además del AB=CD.');
+  box.innerHTML = `<h3 class="ptitle">Si el precio atraviesa D</h3>
+    <ol class="ladder">${li}
+      ${trapBlock}${failBlock}
+      <li class="brk"><b>Ruptura</b> más allá de <b class="num">${fmt(Ap)}</b>: el patrón queda invalidado. Hay dos escenarios según lo que haga el precio después:
+        <p style="margin:.4rem 0"><b>1. Sigue rompiendo.</b> El tramo desde C (${fmt(Cp)}) hasta el nuevo extremo es un impulso: es el X′A′ de un patrón ${newDir}, con X′ = C y A′ en el extremo (al menos ${fmt(Ap)}). Cuando rebote, su B′ decide el patrón:</p>
+        <div class="cands" style="margin:.3rem 0">${bl}</div>
+        <button type="button" class="btn sm" id="mkNext">Crear patrón con X′ = C</button>
+        <p style="margin:.6rem 0 .4rem"><b>2. Gira desde el extremo.</b> Ese extremo pasa a ser el X de un patrón nuevo ${sameDir}, en la misma dirección que el original. Su A será el siguiente pivote que marque el rebote.</p>
+        <button type="button" class="btn sm" id="mkNext2">Crear patrón con X = extremo</button></li>
+    </ol>${lateral.map(t => `<p class="hint">${esc(t)}</p>`).join('')}`;
+  $('mkNext').onclick = () => {
+    const p = selectedPattern();
+    clearForm();
+    $('fLabel').value = (p ? p.label : 'Patrón') + ' · ruptura'; $('fTf').value = p ? p.tf : '';
+    $('fX').value = +Cp.toFixed(dec()); $('fA').value = +Ap.toFixed(dec());
+    $('fMsg').textContent = 'Ajusta A al extremo real y completa B y C cuando se formen.';
+    $('patrones').scrollIntoView({block:'start'}); $('fA').focus();
+  };
+  $('mkNext2').onclick = () => {
+    const p = selectedPattern();
+    clearForm();
+    $('fLabel').value = (p ? p.label : 'Patrón') + ' · giro desde el extremo'; $('fTf').value = p ? p.tf : '';
+    $('fX').value = +Ap.toFixed(dec());
+    $('fMsg').textContent = 'Ajusta X al extremo real y completa A, B y C cuando se formen.';
+    $('patrones').scrollIntoView({block:'start'}); $('fX').focus();
+  };
+}
+
+// Resultado real del patrón (cuando ya tiene D)
+function renderResultPanel(k){
+  const box = $('simResult'), p = selectedPattern();
+  if(!p || !sim.coords || !isF(sim.coords.D)){
+    box.innerHTML = '';
+    return;
+  }
+  const o = outcomeOf({...p, ...sim.coords});
+  if(!o.key){ box.innerHTML = ''; return; }
+  const cls = STATUS_CLS[o.status] || '';
+  const rows = [
+    ['Patrón esperado', SIM[o.key].name + (p.key ? '' : ' (automático)'), 'D teórico ' + fmt(o.Dp)],
+    ['D real', fmt(sim.coords.D), fr(o.realRatio) + ' ' + o.base + ' · desvío ' + (o.dev >= 0 ? '+' : '') + fr(o.dev) + ' ' + o.base + (o.dev >= 0 ? ' (fue más lejos)' : ' (se quedó corto)')],
+    ['PRZ', fmt(o.prz[0]) + ' – ' + fmt(o.prz[1]), o.reachedPRZ ? 'alcanzada' : 'no alcanzada'],
+    ['SL1 agresivo', fmt(o.SL1), o.hitSL1 ? 'tocado' : 'intacto'],
+    ['SL2 conservador', fmt(o.SL2), o.hitSL2 ? 'tocado: patrón invalidado' : 'intacto'],
+    ['Reacción', isF(o.E) ? fmt(o.E) : 'sin registrar', isF(o.reactFrac) ? fr(o.reactFrac) + ' de AD · ' + (o.tp2 ? 'TP1 y TP2 alcanzados' : o.tp1 ? 'TP1 alcanzado, TP2 no' : 'no llegó a TP1') : 'agrega el pivote E'],
+    ['Se completó como', o.completedAs ? SIM[o.completedAs].name : 'ningún patrón exacto', o.completedAs && o.completedAs !== o.key ? 'distinto del esperado' : ''],
+    ['PEZ', fmt(o.pez[0]) + ' – ' + fmt(o.pez[1]), 'PRZ + extremo de la vela terminal (D real): la entrada iba en la vela siguiente (Carney Vol. 3)'],
+    ['Tipo de reversión', !o.reacted ? '–' : o.type2 ? 'Tipo I + retest Tipo II' : 'Tipo I', !o.reacted ? 'registra el pivote E' : o.type2 ? `F (${fmt(o.F)}) volvió a probar la PRZ sin romper el SL2: retest Tipo II, nueva entrada con gestión más paciente` : o.type2Broke ? 'F volvió a la PRZ y rompió el SL2: el retest falló' : 'primera prueba de la PRZ: gestión automática en TP1 y TP2']
+  ];
+  if(isF(o.reactFrac) && o.reactFrac >= 0.382 && o.reactFrac < 0.618){
+    const path = o.type2 ? 'el retest aguantó el SL2: es un Tipo II, otra oportunidad.' : (o.type2Broke || (isF(o.F) && (o.F - o.SL2) * o.dir < 0)) ? 'el retest rompió: patrón fallado, la tendencia continúa y la PRZ rota pasa a ser el nivel contrario.' : isF(o.F) ? 'el pivote F no volvió a probar la PRZ.' : 'registra el pivote F para saber qué camino tomó.';
+    box.dataset.case1 = '1';
+    rows.push(['Caso 1', fr(o.reactFrac) + ' de AD', 'la reacción llegó al 38.2% pero no al 61.8%: Carney espera un retest; ' + path]);
+  }
+  const pp = (sim.coords.post || []).filter(isF);
+  if(pp.length){
+    const tr = trail382(sim.coords.D, pp[0]);
+    rows.push(['Stop móvil 0.382', fmt(tr), pp.length > 1 ? ((pp[1] - tr) * o.dir < 0 ? 'el pivote F lo rompió: salida en el stop móvil' : 'el pivote F lo respetó: la reacción siguió viva') : 'registra F para saber si se respetó']);
+  }
+  const fixBtn = k !== p.key ? `<button type="button" class="btn sm" id="fixKey">Fijar ${esc(SIM[k].name)} como patrón esperado</button>` : '';
+  box.innerHTML = `<h3 class="ptitle">Resultado real <span class="tag ${cls}">${STATUS_TXT[o.status]}</span></h3>
+    ${sim.modified ? '<div class="msg fib">Pulsa «Aplicar al patrón» para guardar el D real en el patrón.</div>' : ''}
+    <div class="tablewrap"><table><tr><th>Dato</th><th>Precio</th><th>Lectura</th></tr>${rows.map(x => `<tr><td>${x[0]}</td><td class="num"><b>${x[1]}</b></td><td>${esc(x[2])}</td></tr>`).join('')}</table></div>${fixBtn}`;
+  if(fixBtn) $('fixKey').onclick = () => { p.key = k; sim.key = null; touch(); };
+}
+
+// Precio actual: se guarda al momento
+function syncLiveInputs(){
+  const el = $('sPrice'); if(document.activeElement !== el) el.value = isF(state.asset.price) ? state.asset.price : '';
+}
+$('sPrice').addEventListener('change', e => { const v = num(e.target.value); state.asset.price = isF(v) ? v : null; $('assetPrice').value = isF(v) ? v : ''; touch(); });
+// Eventos del simulador
+$('simPick').addEventListener('change', e => { selectPattern(e.target.value); renderNotes(); });
+$('simCands').addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  sim.key = b.dataset.key; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim();
+});
+['X','A','B','C','D'].forEach(k => $('s' + k).addEventListener('input', e => {
+  if(!sim.coords) return; sim.coords[k] = num(e.target.value); sim.modified = true; sim.msg = ''; sim.broken = false;
+  renderSim();
+}));
+$('sPost').addEventListener('input', e => {
+  if(!sim.coords) return; sim.coords.post = parsePivots(e.target.value); sim.modified = true; sim.msg = '';
+  renderSim();
+});
+$('simLadder').addEventListener('click', e => {
+  const b = e.target.closest('[data-key]'); if(!b) return;
+  sim.key = b.dataset.key; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim();
+});
+$('bR').addEventListener('input', e => {
+  const c = sim.coords; if(!c) return; const g = geom(c); if(!g.ok || !g.hasX) return;
+  const b = +e.target.value, cab = g.R.cab;
+  c.B = +(c.A - b * (c.A - c.X)).toFixed(dec() + 2);
+  c.C = +(c.B - cab * (c.B - c.A)).toFixed(dec() + 2);
+  sim.modified = true; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim();
+});
+$('cR').addEventListener('input', e => {
+  const c = sim.coords; if(!c) return; const g = geom(c); if(!g.ok) return;
+  c.C = +(c.B - (+e.target.value) * (c.B - c.A)).toFixed(dec() + 2);
+  sim.modified = true; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim();
+});
+document.querySelectorAll('input[name=sl]').forEach(i => i.addEventListener('change', e => { sim.slMode = e.target.value; renderSim(); }));
+document.querySelectorAll('input[name=tp]').forEach(i => i.addEventListener('change', e => { sim.tpMode = e.target.value; renderSim(); }));
+document.querySelectorAll('input[name=entry]').forEach(i => i.addEventListener('change', e => { sim.entryMode = e.target.value; renderSim(); }));
+$('simFail').addEventListener('click', () => {
+  const k = effectiveKey(); if(!k) return;
+  const P = SIM[k], g0 = geom(sim.coords);
+  const nx = nextOf(k, g0);
+  if(nx){
+    const g = geom(sim.coords), f = simFit(nx, g);
+    const crossX = P.base === 'XA' && P.d < 1 && SIM[nx].d > 1;
+    sim.msg = `El precio atravesó ${fr(P.d)} ${P.base}${crossX ? ' y rompió X' : ''}. Pasa a ${SIM[nx].name}, con D en ${fr(SIM[nx].d)} ${SIM[nx].base}.` + (f.fit || SIM[nx].hidden ? '' : ' Ojo: tus ratios actuales no lo validan del todo.');
+    sim.key = nx; sim.draw = true;
+  } else {
+    sim.msg = `Después de ${fr(P.d)} ${P.base} no queda otro patrón en la escalera de ${P.name}. Es una ruptura: el extremo que marque el precio será el nuevo X de una estructura en la dirección del movimiento.`;
+    sim.broken = true;
+  }
+  renderSim();
+});
+$('simApply').addEventListener('click', () => {
+  const p = selectedPattern(); if(!p || !sim.coords) return;
+  const g = geom(sim.coords); if(!g.ok){ alert(g.err); return; }
+  Object.assign(p, sim.coords); sim.modified = false; sim.msg = 'Coordenadas aplicadas al patrón.'; touch();
+});
+$('simReset').addEventListener('click', () => {
+  const p = selectedPattern(); if(!p) return;
+  sim.coords = coordsOf(p); sim.modified = false; sim.msg = ''; sim.broken = false; syncSimInputs(); renderSim();
+});
+
+/* ============ Recalcular y pintar ============ */
+function recompute(){
+  hist = computeHistory();
+  analyses = state.patterns.map(analyze);
+  const actA = analyses.filter(a => a.ok && a.p.enabled), maxLeg = Math.max(0, ...actA.map(a => a.legRef || 0));
+  actA.forEach(a => { a.sizeF = maxLeg ? 0.6 + 0.4 * Math.sqrt((a.legRef || 0) / maxLeg) : 1; a.levels.forEach(l => { l.w *= a.sizeF; }); });
+  ensureSelection();
+  syncSimInputs();
+  renderPatterns(); renderSim(); renderNotes();
+  $('dirty').hidden = !dirty;
+  try { localStorage.setItem('confluencias-armonicas:sesion', JSON.stringify(state)); } catch(e) {}
+}
+function touch(){ dirty = true; recompute(); }
+
+function renderPatterns(){
+  const box = $('plist');
+  if(!state.patterns.length){ box.innerHTML = '<div class="empty">Aún no hay patrones para este activo. Empieza por la estructura más grande del movimiento.</div>'; return; }
+  box.innerHTML = analyses.map(a => {
+    const p = a.p, sel = p.id === state.selectedId;
+    let body, tagP = '';
+    if(!a.ok) body = `<p class="err">${esc(a.errors[0])}</p>`;
+    else {
+      const R = a.ratios, rc = [];
+      if(isF(R.bxa)) rc.push('B ' + fr(R.bxa) + ' XA'); rc.push('C ' + fr(R.cab) + ' AB'); if(isF(R.dxa)) rc.push('D ' + fr(R.dxa) + ' XA');
+      const rk = rankCands(noD(p)), best = rk.find(x => x.fit > 0);
+      const k = (p.key && SIM[p.key]) ? p.key : best ? best.key : (rk.find(x => simCompute(coordsOf(p), x.key, 'cons', 'AD').ok) || {}).key;
+      if(k) tagP = `<span class="tag fib">${SIM[k].name}${p.key ? ' · esperado' : ''}${perfectOf(k, p) ? ' · perfecto' : ''}</span>`;
+      const o = hist.out.get(p.id);
+      if(o && o.status !== 'pendiente' && STATUS_TXT[o.status]) tagP += `<span class="tag ${STATUS_CLS[o.status]}">${STATUS_TXT[o.status]}</span>`;
+      const lvP = !isF(p.D) ? patternLive(p) : null;
+      if(lvP && lvP.valid === false) tagP += `<span class="tag bear">invalidado con el precio actual</span>`;
+      else if(lvP && lvP.code === 'prz') tagP += `<span class="tag bull">en la PRZ</span>`;
+      const r = k ? simCompute(coordsOf(p), k, 'cons', 'AD') : null;
+      const fv = !isF(p.D) ? favRows(p).filter(x => x.fit > 0) : [];
+      body = `<p>${rc.join(' · ')} · ${a.dir > 0 ? '<span class="t-bull">compra</span>' : '<span class="t-bear">venta</span>'}</p>` +
+             (fv.length ? `<p style="color:var(--fib)">Tus extensiones: ${fv.map(x => SIM[x.k].name + ' ' + fmt(x.r.Dp)).join(' · ')}</p>` : '') +
+             (r && r.ok ? patternChart(r, {compact:true, W:260, H:140, color:p.color, label:p.label}) : '');
+    }
+    return `<div class="mini${sel ? ' sel' : ''}${p.enabled ? '' : ' off'}" style="--c:${p.color}" data-id="${p.id}" tabindex="0" role="button" aria-pressed="${sel}">
+      <h4>${esc(p.label || 'Sin nombre')}${p.tf ? `<span class="tag">${esc(p.tf)}</span>` : ''}${tagP}${sel ? '<span class="tag acc">en simulador</span>' : ''}</h4>
+      ${body}
+      <div class="pbtns">
+        <button class="btn sm" data-act="edit" data-id="${p.id}" type="button">Editar</button>
+        <button class="btn sm" data-act="toggle" data-id="${p.id}" type="button">${p.enabled ? 'Ocultar' : 'Mostrar'}</button>
+        <button class="btn sm" data-act="dup" data-id="${p.id}" type="button">Duplicar</button>
+        <button class="btn sm" data-act="del" data-id="${p.id}" type="button">Eliminar</button>
+      </div></div>`;
+  }).join('');
+}
+
+/* ============ Tabla de comparación (formato del usuario, datos de Carney y la plantilla) ============ */
+const CMP = [
+  {k:'gartley',   b:'0.618 XA (±3%: 0.588–0.648)', c:'0.382–0.886 AB', d:'0.786 XA · variante 0.886 si BC es 1.618–2.618', bc:'1.13–1.618', abcd:'1.0–1.27', sl:'> 1.0 XA (X), o detrás del AB=CD', tp:'0.382 y 0.618 de AD', n:'Con B por debajo de 0.588 pasa a Bat. Perfecto: B y C en 0.618. Funciona mejor a favor de la tendencia.'},
+  {k:'bat',       b:'0.382–0.50 XA (±5%: hasta 0.55)', c:'0.382–0.886 AB', d:'0.886 XA', bc:'1.618–2.618', abcd:'1.0–1.618 (1.27 el más común)', sl:'> 1.13 XA, o detrás del AB=CD', tp:'0.382 y 0.618 de AD', n:'Si el tramo CD cruza B, el precio suele ir hasta 0.886 (BAMM). Perfecto: B 0.50, BC 2.0, AB=CD 1.27.'},
+  {k:'altbat',    b:'0.382 o menos', c:'0.382–0.886 AB', d:'1.13 XA (PRZ 0.886–1.13, incluye 1.0)', bc:'2.0–3.618', abcd:'1.0–1.618', sl:'> 1.27 XA', tp:'0.382 y 0.618 de AD', n:'Debe revertir de inmediato tras pasar X. Carney lo descubrió porque sus stops en X saltaban y el precio giraba en 1.13.'},
+  {k:'butterfly', b:'0.786 XA (±3%)', c:'0.382–0.886 AB', d:'1.27 XA (Carney: no 1.618)', bc:'1.618–2.24', abcd:'1.0–1.27', sl:'> 1.414 XA, o detrás del AB=CD', tp:'0.382 y 0.618 de AD', n:'Si B se sale del ±3% de 0.786, la estructura suele terminar como Crab en 1.618.'},
+  {k:'butterfly2',b:'0.786 XA (±3%)', c:'0.382–0.886 AB', d:'1.618 XA', bc:'2.24–2.618', abcd:'1.618', sl:'> 2.0 XA (SL1 en 1.902)', tp:'0.382 y 0.618 de AD', n:'Plantilla: Carney no la considera Butterfly; se trata con las reglas del Crab.'},
+  {k:'crab',      b:'0.382–0.618 XA (±5%)', c:'0.382–0.886 AB', d:'1.618 XA (tolerancia 1.902)', bc:'2.618–3.618 (Vol. 1: 2.24–3.618)', abcd:'1.0–1.618', sl:'> 2.0 XA, o detrás del AB=CD', tp:'0.382 y 0.618 de AD', n:'Espera prueba violenta de 1.618 y reversión inmediata. Converge mejor con C de 0.618 a 0.786 y BC 3.14–3.618.'},
+  {k:'deepcrab',  b:'0.886 XA (+5%: hasta 0.93)', c:'0.382–0.886 AB', d:'1.618 XA (tolerancia 1.902)', bc:'2.0–3.618', abcd:'1.0–1.618', sl:'> 2.0 XA, o detrás del AB=CD', tp:'0.382 y 0.618 de AD', n:'Al romper B y X, el precio suele correr rápido hasta 1.618. Con C en 0.382, la BC 3.14 cae en 1.618.'},
+  {k:'shark',     b:'libre (no supera X)', c:'1.13–1.618 AB (C supera A)', d:'0.886–1.13 XA', bc:'1.618–2.24', abcd:'–', sl:'> 1.27 XA (tabla del Vol. 3)', tp:'0.50 y 0.618 del último tramo (CD)', n:'No es M ni W: es un impulso extremo que vuelve a probar 0.886–1.13. Si pasa 1.13 con C en su rango, mira el Nen Star.'},
+  {k:'nenstar',   b:'0.382–0.618 XA', c:'1.13–2.14 AB (C supera A; las fuentes dan 1.13–1.414 o 1.414–2.14)', d:'1.272 XA', bc:'1.272–2.0', abcd:'–', sl:'> 1.414 XA (plantilla)', tp:'0.382 y 0.618 de CD', n:'No es de Carney (patrón exótico). Escalón siguiente al Shark: D más allá de X.'},
+  {k:'cypher',    b:'0.382–0.618 XA', c:'1.13–1.414 de XA (C supera A)', d:'0.786 de XC', bc:'–', abcd:'–', sl:'> 1.0 XC (X)', tp:'0.382 y 0.618 de CD', n:'No es de Carney (Darren Oglethorpe). La plantilla mide D sobre XC, como es habitual.'},
+  {k:'abcd',      b:'–', c:'0.382–0.886 AB', d:'CD = 1.0 AB (alternos 1.27 y 1.618)', bc:'recíproca de C', abcd:'1.0', sl:'> 1.27 AB (plantilla)', tp:'0.382 y 0.618 de AD', n:'Estructura base de todos los patrones; el punto exacto del AB=CD es el número más importante.'}
+];
+function compareHtml(){
+  const p = selectedPattern(), c = p && sim.coords ? {...p, ...sim.coords} : null, g = c ? geom(noD(c)) : null;
+  const k = c ? effectiveKey() : null, base = k ? (PARENT[k] && k !== 'butterfly2' ? PARENT[k] : k) : null;
+  const r = k && g && g.ok ? simCompute(c, k, 'cons', 'AD') : null;
+  const mark = ok => ok === null ? '' : ok ? ' <span class="ok">✓</span>' : ' <span class="no">✗</span>';
+  let you = '';
+  if(g && g.ok && r && r.ok){
+    const P = SIM[k], sl = state.settings.ratioSlack;
+    const bOk = P.b ? fitB(g.R.bxa, P, sl) > 0 : P.fam === 'shark' ? g.R.bxa < 1 : P.fam === 'nenstar' ? fitR(g.R.bxa, .382, .618, sl) > 0 : P.fam === 'cypher' ? fitR(g.R.bxa, .382, .618, sl) > 0 : null;
+    const cOk = P.fam === 'shark' ? fitR(g.R.cab, 1.13, 1.618, sl) > 0 : P.fam === 'nenstar' ? fitR(g.R.cab, 1.13, 2.14, sl) > 0 : P.fam === 'cypher' ? fitR(g.R.cx, 1.13, 1.414, sl) > 0 : fitR(g.R.cab, .382, .886, sl) > 0;
+    const Dv = isF(c.D) ? c.D : r.Dp, dReal = isF(c.D);
+    const dRatio = P.base === 'XA' ? Math.abs(Dv - c.A) / g.xa : P.base === 'XC' ? Math.abs(Dv - c.C) / Math.abs(c.C - c.X) : P.base === 'BC' ? Math.abs(Dv - c.C) / g.bc : Math.abs(Dv - c.C) / g.ab;
+    const dOk = dReal ? Math.abs(dRatio - P.d) <= Math.max(0.04, P.d * 0.04) : null;
+    const bcR = Math.abs(Dv - c.C) / g.bc, abR = Math.abs(Dv - c.C) / g.ab;
+    const bcOk = P.bc ? (bcR >= P.bc[0] - 0.05 && bcR <= P.bc[1] + 0.05) : null;
+    const abOk = P.abcd ? P.abcd.some(q => Math.abs(abR - q) <= 0.06) || (abR >= Math.min(...P.abcd) - 0.03 && abR <= Math.max(...P.abcd) + 0.03) : null;
+    you = `<tr class="you"><td>Tus puntos<div class="zsub" style="font-weight:400">${esc(p.label)} · como ${P.name}</div></td>
+      <td class="num">${g.hasX ? fr(g.R.bxa) + ' XA' + mark(bOk) : '–'}</td>
+      <td class="num">${P.fam === 'cypher' ? fr(g.R.cx) + ' de XA' : fr(g.R.cab) + ' AB'}${mark(cOk)}</td>
+      <td class="num">${fr(dRatio)} ${P.base}${dReal ? ' (D real)' + mark(dOk) : ' (proyectado)'}</td>
+      <td class="num">${fr(bcR)}${mark(bcOk)}</td>
+      <td class="num">${fr(abR)}${mark(abOk)}</td>
+      <td class="num">${fmt(r.SL)}</td><td class="num" style="white-space:normal">${fmt(r.TP1)}<br>${fmt(r.TP2)}</td>
+      <td style="font-weight:400">${dReal ? 'D real frente al patrón.' : 'D todavía proyectado: BC y AB=CD se miden hasta ese D.'}</td></tr>`;
+  }
+  return '<tr><th>Patrón</th><th>B</th><th>C</th><th>D</th><th>CD (proyección BC)</th><th>AB=CD</th><th>SL (Carney)</th><th>TP</th><th>Notas</th></tr>' + you +
+    CMP.map(x => `<tr class="${x.k === base || x.k === k ? 'cur' : ''}"><td><b>${SIM[x.k].name}</b></td><td>${x.b}</td><td>${x.c}</td><td>${x.d}</td><td>${x.bc}</td><td>${x.abcd}</td><td>${x.sl}</td><td>${x.tp}</td><td>${esc(x.n)}</td></tr>`).join('');
+}
+
+/* ============ Leyenda de la BC y Caso 1 (reacción que no pasa del 61.8%) ============ */
+function bcLegendHtml(){
+  return `<ul class="check" style="margin-top:0">
+    <li class="ok"><span class="ic">✓</span><span><b>«BC converge»:</b> alguna BC cae a 0.05 XA o menos de 1.618 XA. La PRZ es estrecha y confiable.</span></li>
+    <li class="no"><span class="ic">✗</span><span><b>«BC más allá del stop»:</b> ninguna converge con 1.618, y la 3.14 o la 3.618 cae más allá de 2.0 XA. La estructura pide ir más lejos y es probable que sobrepase tu stop.</span></li>
+    <li class="wa"><span class="ic">!</span><span><b>«BC lejos de D»:</b> ninguna converge, pero tampoco caen más allá del stop. La PRZ es ancha y la convergencia, débil.</span></li></ul>`;
+}
+function case1Html(extra){
+  return `<div class="msg info" style="margin:0"><p style="margin:0 0 .3rem">Es un escenario que Carney describe como común.${extra || ''}</p><ul style="margin:.2rem 0 0 1.1rem;padding:0">
+    <li><b>El 38.2% es la reacción mínima válida.</b> En el Vol. 3 dice que siempre ha sostenido que un retroceso del 38.2% es la formación mínima que valida un tramo. Llegar ahí significa que el patrón funcionó como reacción, aunque no como reversión grande.</li>
+    <li><b>Si no pasa del 61.8% en la reacción inicial, espera un retest.</b> Carney escribe que una reversión Tipo I que no supera el segundo objetivo "probablemente experimentará algún grado de retest". Añade que, en ese caso, la reversión mayor, si llega, necesitará más tiempo. Por eso recomienda tomar los objetivos automáticos en lugar de esperar.</li>
+    <li><b>De ahí salen dos caminos:</b> el retest aguanta el SL2: es el Tipo II, otra oportunidad; o el retest rompe la PRZ: es un patrón fallado, la tendencia continúa y la PRZ rota pasa a ser el nivel contrario (Vol. 1, cap. 12).</li></ul>
+    <p style="margin:.5rem 0 .2rem"><b>Gestión que sugiere Carney.</b> Los objetivos automáticos (TP1 y TP2), la protección de ganancia y el stop móvil 0.382 ya tienen sus precios en el plan de la operación. Además:</p><ul style="margin:.2rem 0 0 1.1rem;padding:0">
+    <li><b>Ajusta la gestión si se estanca:</b> si la reacción no supera con claridad los objetivos iniciales, espera consolidación y reduce el riesgo en vez de esperar.</li></ul></div>`;
+}
+
+/* ============ Notas: el punto C ============ */
+const C_LEVELS = [0.382, 0.5, 0.618, 0.707, 0.786, 0.886];
+const nearestC = c => C_LEVELS.reduce((a, b) => Math.abs(b - c) < Math.abs(a - c) ? b : a);
+const C_NOTES = {
+  0.382:{title:'C poco profundo', items:[
+    ['Recíproca: BC 2.24 o 2.618 (Vol. 1); el Vol. 3 agrega 3.14 y 3.618. Un C poco profundo implica un tramo CD largo.', 'Carney'],
+    ['Con B en 0.786, la BC 2.618 cae exactamente en 1.27 XA (Butterfly). Con B en 0.886, la BC 3.14 cae en 1.618 XA (Deep Crab).', 'cálculo'],
+    ['Con B en 0.618 (Gartley), la recíproca empuja D hacia 0.886 XA o hasta X: es la variante del Gartley en 0.886, y hay más riesgo de pasar el stop.', 'Carney Vol. 3 + cálculo'],
+    ['C retrocedió menos del 50%: espera un CD de al menos el 100% de AB.', 'Duddella'],
+    ['Mi lectura: BC fue débil frente a AB, así que el impulso de AB sigue vivo. Espera una prueba profunda de la PRZ: favorece tus patrones de extensión y castiga la orden límite en el nivel menos profundo.', 'opinión']]},
+  0.5:{title:'C en la mitad', items:[
+    ['Recíproca: BC 2.0.', 'Carney'],
+    ['El Bat perfecto usa BC 2.0, con C entre 0.50 y 0.618 como única alineación "discrecional" permitida.', 'Carney Vol. 1'],
+    ['Con B en 0.618, la BC 2.0 cae cerca de 0.93 XA: entre el Gartley y X, por detrás del 0.786.', 'cálculo'],
+    ['Mi lectura: es un retroceso neutral. Por sí solo no empuja hacia extensión ni hacia un CD corto; manda la convergencia con el D del patrón.', 'opinión']]},
+  0.618:{title:'El retroceso de referencia', items:[
+    ['Recíproca: BC 1.618. El AB=CD perfecto exige C en 0.618 con BC 1.618 convergiendo con el AB=CD.', 'Carney Vol. 1'],
+    ['El Gartley perfecto usa C en 0.618; el Crab perfecto, C entre 0.50 y 0.618.', 'Carney Vol. 1'],
+    ['Con B en 0.618, la BC 1.618 cae en 0.854 XA, algo por detrás del 0.786 del Gartley: la PRZ del Gartley perfecto es algo más ancha de lo que parece.', 'cálculo'],
+    ['Mi lectura: es la alineación más equilibrada entre precio y proporción; suele dar las PRZ más limpias en Gartley y AB=CD.', 'opinión']]},
+  0.707:{title:'Retroceso secundario', items:[
+    ['Recíproca: BC 1.41. Carney lo cuenta entre los retrocesos secundarios derivados (0.382, 0.50, 0.707).', 'Carney Vol. 1'],
+    ['Con B en 0.618, la BC 1.41 cae en 0.80 XA: prácticamente sobre el 0.786 del Gartley.', 'cálculo'],
+    ['Mi lectura: aunque se menciona poco, es de las mejores convergencias para el Gartley.', 'opinión']]},
+  0.786:{title:'C profundo', items:[
+    ['Recíproca: BC 1.27. El CD resulta corto medido en BC.', 'Carney'],
+    ['C retrocedió más del 50%: el CD suele ser igual o menor que AB.', 'Duddella'],
+    ['Con B en 0.618, la BC 1.27 cae en 0.75 XA, antes del 0.786: D puede aparecer algo temprano. En el Crab, un C profundo con BC 2.618–3.14 es lo que converge con 1.618 XA.', 'cálculo'],
+    ['Mi lectura: en patrones de retroceso, el precio puede girar antes del número exacto; en tus extensiones, lo que importa es la BC extrema del rango, no la recíproca.', 'opinión']]},
+  0.886:{title:'C casi en A', items:[
+    ['Recíproca: BC 1.13. Es el límite superior del rango de C (0.382 a 0.886); C no debe superar a A.', 'Carney'],
+    ['En Crab y Deep Crab, la BC que converge es la extrema (2.618–3.618): con B 0.618 y C 0.886, la BC 3.14 da unos 1.79 XA y la 2.618 unos 1.50.', 'cálculo'],
+    ['Si C supera a A, la estructura ya no es un XABCD clásico: evalúa Shark o Cypher.', 'plantilla'],
+    ['Mi lectura: es una estructura casi simétrica, donde el AB=CD pesa más que la recíproca para definir la PRZ.', 'opinión']]}
+};
+const C_GENERAL = [
+  ['El patrón no es una oportunidad válida hasta que el tramo CD rompe B: antes de eso, C todavía puede cambiar.', 'Carney Vol. 3'],
+  ['El tramo BC debe tener un mínimo de precio y de tiempo respecto a AB: al menos el 38.2% de AB en ambos.', 'Beck'],
+  ['El número más importante es el punto exacto del AB=CD; la BC recíproca lo complementa y confirma la PRZ.', 'Carney Vol. 1'],
+  ['Mi lectura general: el retroceso de C no dice hacia dónde irá el precio ni si reaccionará. Su valor está en anticipar qué BC converge y, por tanto, qué tan estrecha será la PRZ y qué tan profundo puede llegar D. Confírmalo con tus observaciones.', 'opinión']
+];
+const C_SIMPLE = {
+  0.382:'BC fue débil frente a AB: espera un CD largo y un D profundo. Es la forma típica del Butterfly y del Deep Crab. El Crab no converge con un C tan poco profundo, y en un Gartley D tiende a irse hacia 0.886 o X.',
+  0.5:'Retroceso neutral: la recíproca (BC 2.0) no coincide con el D de ningún patrón ideal. Manda la BC del rango de cada patrón.',
+  0.618:'El más equilibrado: es el C del Gartley y del AB=CD perfectos. En el Crab, la BC 3.618 cae justo en 1.618 XA.',
+  0.707:'Poco común, pero su recíproca (BC 1.414) cae prácticamente sobre el 0.786 del Gartley.',
+  0.786:'BC fuerte: el CD suele ser igual o más corto que AB. Favorece al Gartley, y en el Crab la BC 3.14 converge con 1.618 XA.',
+  0.886:'C casi en A: pocas convergencias. Si C supera a A, ya no es un XABCD clásico (mira Shark o Cypher).'
+};
+const MATRIX_PATS = [['gartley', .618], ['bat', .5], ['butterfly', .786], ['crab', .618], ['deepcrab', .886]];
+const dAt = (b, c, k) => b * (1 + c * (k - 1));
+const srcTag = t => `<span class="src">(${esc(t)})</span>`;
+
+function renderNotes(){
+  const p = selectedPattern(), g = p && sim.coords ? geom(noD({...p, ...sim.coords})) : null;
+  const curC = g && g.ok ? nearestC(g.R.cab) : null;
+  const k = p && sim.coords ? effectiveKey() : null, curCol = k ? (PARENT[k] || k) : null;
+  // lectura del patrón seleccionado
+  let live = '';
+  if(g && g.ok){
+    const rc = recipOf(g.R.cab), bi = [];
+    live = `<div class="msg info"><b>Punto C:</b> retrocede <b>${fr(g.R.cab)}</b> de AB (lo más cercano es ${fr(curC)}), así que su BC recíproca es <b>${rc[1].map(fr).join(' o ')}</b>.${g.hasX ? ` B está en ${fr(g.R.bxa)} de XA: con esa B y la recíproca, D caería en ${rc[1].map(q => fr(dAt(g.R.bxa, g.R.cab, q)) + ' XA').join(' o ')}.` : ''}${bi.length ? ' En tiempo, ' + bi.join('; ') + '.' : ''}</div>`;
+  }
+  $('notesLive').innerHTML = live;
+  // tabla sencilla (patrones que convergen calculados con la fórmula y el B ideal)
+  const conv = c => MATRIX_PATS.map(([q, b]) => {
+    const P = SIM[q], rc = recipOf(c)[1];
+    const rec = rc.map(kk => ({kk, d:dAt(b, c, kk)})).reduce((a, x) => Math.abs(x.d - P.d) < Math.abs(a.d - P.d) ? x : a);
+    const rng = FIB_EXT.filter(kk => kk >= P.bc[0] - 1e-9 && kk <= P.bc[1] + 1e-9).map(kk => ({kk, d:dAt(b, c, kk)})).reduce((a, x) => !a || Math.abs(x.d - P.d) < Math.abs(a.d - P.d) ? x : a, null);
+    if(Math.abs(rec.d - P.d) <= 0.05) return {q, b, kk:rec.kk, recip:true};
+    if(rng && Math.abs(rng.d - P.d) <= 0.05) return {q, b, kk:rng.kk, recip:false};
+    return null;
+  }).filter(Boolean);
+  $('notesSimple').innerHTML = '<tr><th>Si C retrocede</th><th>En simple</th><th>Lo más probable (con la recíproca de Carney)</th><th>También converge (con otra BC del rango)</th></tr>' +
+    C_LEVELS.map(c => { const L = conv(c), R = L.filter(x => x.recip), O = L.filter(x => !x.recip);
+      const t = x => `<b>${SIM[x.q].name}</b> <span class="zsub" style="white-space:nowrap">B ${fr(x.b)} · BC ${fr(x.kk)}</span>`;
+      return `<tr class="${c === curC ? 'cur' : ''}"><td class="num"><b>${fr(c)}</b> de AB${c === curC ? ' <span class="tag acc">tu patrón</span>' : ''}</td><td>${esc(C_SIMPLE[c])}</td><td>${R.map(t).join('<br>') || '–'}</td><td>${O.map(t).join('<br>') || '–'}</td></tr>`; }).join('');
+  // etiquetas de la BC
+  $('notesBC').innerHTML = bcLegendHtml();
+  $('notesCompare').innerHTML = compareHtml();
+  // caso 1: reacción que llega al 38.2% pero no al 61.8%
+  $('notesCase1').innerHTML = case1Html();
+  // tarjetas por retroceso
+  const mine = state.notes || [];
+  $('notesC').innerHTML = C_LEVELS.map(c => {
+    const N = C_NOTES[c], my = mine.filter(n => n.tag === 'c' + c);
+    return `<div class="ccard${c === curC ? ' cur' : ''}"><h4><span class="m">${fr(c)}</span>${N.title}${c === curC ? ' <span class="tag acc">tu patrón</span>' : ''}</h4>
+      <ul>${N.items.map(([t, src]) => `<li>${esc(t)} ${srcTag(src)}</li>`).join('')}</ul>
+      ${my.length ? `<div class="mine"><b>Tus observaciones:</b><ul>${my.map(n => `<li>${esc(n.text)} <span class="src">${esc(n.t)}</span></li>`).join('')}</ul></div>` : ''}</div>`;
+  }).join('') + `<div class="ccard"><h4>Reglas generales del punto C</h4><ul>${C_GENERAL.map(([t, src]) => `<li>${esc(t)} ${srcTag(src)}</li>`).join('')}</ul></div>`;
+  // matriz calculada
+  const head = '<tr><th>C</th>' + MATRIX_PATS.map(([q, b]) => `<th class="${q === curCol ? 'cur' : ''}">${SIM[q].name}<div class="zsub">B ${fr(b)} · D ${fr(SIM[q].d)} XA</div></th>`).join('') + '</tr>';
+  const rows = C_LEVELS.map(c => '<tr><td class="num"><b>' + fr(c) + '</b></td>' + MATRIX_PATS.map(([q, b]) => {
+    const P = SIM[q], rc = recipOf(c)[1];
+    const rec = rc.map(kk => ({kk, d:dAt(b, c, kk)})).reduce((a, x) => Math.abs(x.d - P.d) < Math.abs(a.d - P.d) ? x : a);
+    const rng = FIB_EXT.filter(kk => kk >= P.bc[0] - 1e-9 && kk <= P.bc[1] + 1e-9).map(kk => ({kk, d:dAt(b, c, kk)})).reduce((a, x) => !a || Math.abs(x.d - P.d) < Math.abs(a.d - P.d) ? x : a, null);
+    const okR = Math.abs(rec.d - P.d) <= 0.05, okG = rng && Math.abs(rng.d - P.d) <= 0.05;
+    const cls = (c === curC && q === curCol) ? 'cur both' : (c === curC || q === curCol) ? 'cur' : '';
+    return `<td class="num ${cls}">Recíproca ${fr(rec.kk)} → ${fr(rec.d)} XA ${okR ? '<b class="t-bull">✓</b>' : ''}<div class="zsub">Rango: ${rng ? fr(rng.kk) + ' BC → ' + fr(rng.d) + ' XA ' + (okG ? '<b class="t-bull">✓</b>' : '') : '–'}</div></td>`;
+  }).join('') + '</tr>').join('');
+  $('notesMatrix').innerHTML = head + rows;
+  // observaciones propias
+  const tagName = t => t === 'general' ? 'General' : t.startsWith('c') ? 'C ' + t.slice(1) : (SIM[t] ? SIM[t].name : t);
+  const tagSel = $('noteTag'), prev = tagSel.dataset.touched ? tagSel.value : '';
+  tagSel.innerHTML = [['general', 'General'], ...C_LEVELS.map(c => ['c' + c, 'C en ' + fr(c)]), ...['crab','deepcrab','butterfly2','butterfly','gartley','bat','altbat'].map(q => [q, SIM[q].name])].map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+  tagSel.value = prev || (curC ? 'c' + curC : 'general');
+  $('notesMine').innerHTML = mine.length ? `<ul class="nlist">${mine.slice().reverse().map(n => `<li><span class="tag fib tagc" style="margin-left:0">${esc(tagName(n.tag))}</span><span class="tx">${esc(n.text)} <span class="src">${esc(n.t)}</span></span><button type="button" class="btn sm" data-ndel="${n.id}">Borrar</button></li>`).join('')}</ul>`
+    : '<p class="hint">Todavía no hay observaciones. Se guardan con el activo cuando pulsas «Guardar activo».</p>';
+}
+$('noteTag').addEventListener('change', e => { e.target.dataset.touched = '1'; });
+$('noteAdd').addEventListener('click', () => {
+  const t = $('noteText').value.trim(); if(!t) return;
+  const d = new Date();
+  state.notes = [...(state.notes || []), {id:uid(), tag:$('noteTag').value, text:t, t:`${z2(d.getDate())}/${z2(d.getMonth() + 1)}/${d.getFullYear()}`}];
+  $('noteText').value = ''; touch();
+});
+$('noteText').addEventListener('keydown', e => { if(e.key === 'Enter') $('noteAdd').click(); });
+$('notesMine').addEventListener('click', e => {
+  const b = e.target.closest('[data-ndel]'); if(!b) return;
+  state.notes = (state.notes || []).filter(n => n.id !== b.dataset.ndel); touch();
+});
+
+/* ============ Formulario de patrones ============ */
+const fIds = ['fLabel','fTf','fX','fA','fB','fC','fD','fPost'];
+$('fKey').innerHTML = '<option value="">Automático (el más probable)</option>' + Object.keys(SIM).map(k => `<option value="${k}">${SIM[k].name}</option>`).join('');
+const readForm = () => ({label:$('fLabel').value.trim(), tf:$('fTf').value.trim(), X:num($('fX').value), A:num($('fA').value), B:num($('fB').value), C:num($('fC').value), D:num($('fD').value), post:parsePivots($('fPost').value), key:$('fKey').value || null});
+function clearForm(){ fIds.forEach(id => $(id).value = ''); $('fKey').value = ''; editingId = null; $('fSubmit').textContent = 'Agregar patrón'; $('formTitle').textContent = 'Nuevo patrón'; $('fCancel').hidden = true; $('fMsg').textContent = ''; }
+function submitForm(){
+  const f = readForm();
+  if(![f.A, f.B, f.C].every(isF)){ $('fMsg').textContent = 'Ingresa al menos A, B y C.'; return; }
+  const g = geom(f); if(!g.ok){ $('fMsg').textContent = g.err; return; }
+  if(editingId){
+    const p = state.patterns.find(q => q.id === editingId);
+    Object.assign(p, f, {label:f.label || p.label});
+    if(p.id === state.selectedId){ sim.coords = coordsOf(p); sim.modified = false; sim.key = null; }
+  } else {
+    const used = new Set(state.patterns.map(p => p.color));
+    const color = COLORS.find(c => !used.has(c)) || COLORS[state.patterns.length % COLORS.length];
+    const np = {id:uid(), ...f, label:f.label || ('Patrón ' + (state.patterns.length + 1)), enabled:true, color};
+    state.patterns.push(np);
+    state.selectedId = np.id; sim.coords = coordsOf(np); sim.key = null; sim.modified = false; sim.msg = ''; sim.broken = false; sim.draw = true;
+  }
+  clearForm(); touch();
+}
+$('fSubmit').addEventListener('click', submitForm);
+$('fCancel').addEventListener('click', clearForm);
+fIds.forEach(id => $(id).addEventListener('keydown', e => { if(e.key === 'Enter') submitForm(); }));
+
+// El toque se resuelve con pointerdown/pointerup: si un campo pierde el foco y la lista se redibuja
+// en medio del clic, la acción no se pierde.
+const plistKey = t => { const b = t.closest('button[data-act]'); if(b) return b.dataset.act + '|' + b.dataset.id; const c = t.closest('.mini[data-id]'); return c ? 'card|' + c.dataset.id : null; };
+let plistDown = null;
+$('plist').addEventListener('pointerdown', e => { plistDown = plistKey(e.target); });
+$('plist').addEventListener('pointerup', e => { const k = plistKey(e.target); if(k && k === plistDown) plistAction(k); plistDown = null; });
+$('plist').addEventListener('click', e => { if(e.detail === 0){ const k = plistKey(e.target); if(k) plistAction(k); } });
+function plistAction(key){
+  const [act, id] = key.split('|');
+  if(act === 'card'){ selectPattern(id); return; }
+  const p = state.patterns.find(q => q.id === id); if(!p) return;
+  if(act === 'edit'){
+    editingId = p.id; $('fLabel').value = p.label || ''; $('fTf').value = p.tf || '';
+    ['X','A','B','C','D'].forEach(k => $('f' + k).value = isF(p[k]) ? p[k] : '');
+    $('fPost').value = (p.post || []).join('; '); $('fKey').value = p.key || '';
+    $('fSubmit').textContent = 'Guardar cambios'; $('formTitle').textContent = 'Editando ' + (p.label || 'patrón'); $('fCancel').hidden = false; $('fMsg').textContent = '';
+    $('fLabel').focus(); return;
+  }
+  if(act === 'toggle') p.enabled = !p.enabled;
+  if(act === 'dup'){ const used = new Set(state.patterns.map(q => q.color)); state.patterns.push({...clone(p), id:uid(), label:p.label + ' (copia)', color:COLORS.find(c => !used.has(c)) || p.color}); }
+  if(act === 'del'){
+    if(!confirm('¿Eliminar «' + (p.label || 'patrón') + '»?')) return;
+    state.patterns = state.patterns.filter(q => q.id !== p.id);
+    if(editingId === p.id) clearForm();
+    if(state.selectedId === p.id){ state.selectedId = null; sim.coords = null; }
+  }
+  touch();
+}
+$('plist').addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && e.target.matches('.mini[data-id]')){ e.preventDefault(); selectPattern(e.target.dataset.id); } });
+
+/* ============ Activo, ajustes y tema ============ */
+function syncInputs(){
+  const a = state.asset, S = state.settings;
+  $('assetName').value = a.name || ''; $('assetType').value = a.type; $('assetDec').value = String(a.decimals);
+  $('assetPrice').value = isF(a.price) ? a.price : '';
+  $('assetTrend').value = a.trend || 'auto';
+  $('rkCap').value = isF(a.capital) ? a.capital : ''; $('rkPct').value = isF(a.riskPct) ? a.riskPct : 2;
+  $('rkPv').value = isF(a.pointValue) ? a.pointValue : 1; $('rkMin').value = isF(a.minLot) ? a.minLot : 0.01;
+  document.title = (a.name ? a.name + ' · ' : '') + 'Confluencias armónicas';
+}
+$('assetName').addEventListener('input', e => { state.asset.name = e.target.value; dirty = true; $('dirty').hidden = false; document.title = (e.target.value ? e.target.value + ' · ' : '') + 'Confluencias armónicas'; });
+$('assetType').addEventListener('change', e => { state.asset.type = e.target.value; touch(); });
+$('assetTrend').addEventListener('change', e => { state.asset.trend = e.target.value; touch(); });
+$('assetDec').addEventListener('change', e => { state.asset.decimals = +e.target.value; touch(); });
+[['rkCap','capital'],['rkPct','riskPct'],['rkPv','pointValue'],['rkMin','minLot']].forEach(([id, k]) => $(id).addEventListener('change', e => {
+  const v = num(e.target.value); state.asset[k] = isF(v) && v >= 0 ? v : (k === 'capital' ? null : blankState().asset[k]);
+  e.target.value = isF(state.asset[k]) ? state.asset[k] : ''; touch();
+}));
+$('assetPrice').addEventListener('change', e => { const v = num(e.target.value), nv = isF(v) ? v : null; if(nv === state.asset.price) return; state.asset.price = nv; touch(); });
+
+const THEMES = ['system','light','dark'], THEME_TXT = {system:'Tema: sistema', light:'Tema: claro', dark:'Tema: oscuro'};
+function applyTheme(t){
+  if(t === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  $('btnTheme').textContent = THEME_TXT[t];
+  try { localStorage.setItem('confluencias-armonicas:tema', t); } catch(e) {}
+}
+let theme = 'system'; try { theme = localStorage.getItem('confluencias-armonicas:tema') || 'system'; } catch(e) {}
+applyTheme(theme);
+$('btnTheme').addEventListener('click', () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(theme); });
+
+/* ============ Guardar / cargar ============ */
+const slug = s => (s || 'activo').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'activo';
+let lastFileBase = '';
+const cleanFileName = s => String(s || '').replace(/\.json$/i, '').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim();
+const today = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+function finalFileName(){
+  let base = cleanFileName($('svFile').value) || ('armonico_' + slug($('svAsset').value));
+  base = base.replace(/_\d{4}-\d{2}-\d{2}$/, '');
+  return base + ($('svDate').checked ? '_' + today() : '') + '.json';
+}
+function updateSavePreview(){ $('svPreview').textContent = finalFileName(); }
+$('btnSave').addEventListener('click', () => {
+  $('svAsset').value = state.asset.name || '';
+  $('svFile').value = lastFileBase || ('armonico_' + slug(state.asset.name));
+  $('svWhere').textContent = window.showSaveFilePicker
+    ? 'Al pulsar Guardar podrás elegir la carpeta; conviene una carpeta por activo para tener sus versiones juntas.'
+    : 'Tu navegador lo guardará en la carpeta de descargas. Luego puedes moverlo a una carpeta por activo.';
+  updateSavePreview();
+  $('saveDlg').showModal(); $('svAsset').focus();
+});
+$('svAsset').addEventListener('input', e => {
+  const prevAuto = 'armonico_' + slug(state.asset.name);
+  if(!cleanFileName($('svFile').value) || cleanFileName($('svFile').value) === prevAuto) $('svFile').value = 'armonico_' + slug(e.target.value);
+  state.asset.name = e.target.value; $('assetName').value = e.target.value;
+  document.title = (e.target.value ? e.target.value + ' · ' : '') + 'Confluencias armónicas';
+  dirty = true; $('dirty').hidden = false; updateSavePreview();
+});
+$('svFile').addEventListener('input', updateSavePreview);
+$('svDate').addEventListener('change', updateSavePreview);
+$('svOk').addEventListener('click', async () => {
+  const name = finalFileName();
+  const data = {format:'confluencias-armonicas', version:2, savedAt:new Date().toISOString(), notes:state.notes || [], asset:state.asset, settings:state.settings, selectedId:state.selectedId, patterns:state.patterns};
+  const json = JSON.stringify(data, null, 2);
+  try {
+    if(window.showSaveFilePicker){
+      const h = await window.showSaveFilePicker({suggestedName:name, types:[{description:'Activo de confluencias armónicas', accept:{'application/json':['.json']}}]});
+      const w = await h.createWritable(); await w.write(json); await w.close();
+      lastFileBase = cleanFileName(h.name).replace(/_\d{4}-\d{2}-\d{2}$/, '');
+    } else {
+      const blob = new Blob([json], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      lastFileBase = cleanFileName(name).replace(/_\d{4}-\d{2}-\d{2}$/, '');
+    }
+  } catch(err){ if(err && err.name === 'AbortError') return; alert('No se pudo guardar el archivo: ' + (err && err.message ? err.message : err)); return; }
+  $('saveDlg').close();
+  dirty = false; $('dirty').hidden = true;
+});
+$('btnLoad').addEventListener('click', () => {
+  if(dirty && state.patterns.length && !confirm('Hay cambios sin guardar en este activo. ¿Cargar otro de todos modos?')) return;
+  $('fileIn').value = ''; $('fileIn').click();
+});
+$('btnNew').addEventListener('click', () => {
+  if(dirty && state.patterns.length && !confirm('Hay cambios sin guardar. ¿Empezar un activo nuevo?')) return;
+  state = blankState(); dirty = false; sim.coords = null; lastFileBase = ''; clearForm(); syncInputs(); recompute(); $('assetName').focus();
+});
+$('fileIn').addEventListener('change', e => {
+  const file = e.target.files[0]; if(!file) return;
+  lastFileBase = cleanFileName(file.name).replace(/\.csv$/i, '').replace(/_\d{4}-\d{2}-\d{2}$/, '');
+  const rd = new FileReader();
+  rd.onload = () => {
+    const text = String(rd.result).replace(/^\ufeff/, '');
+    try { const d = JSON.parse(text); if(d.format !== 'confluencias-armonicas' || !Array.isArray(d.patterns)) throw 0; loadData(d); }
+    catch(err){ if(!importLegacyCSV(text, file.name)) alert('No se pudo leer el archivo. Usa un .json guardado con «Guardar activo» o el CSV del asistente anterior.'); }
+  };
+  rd.readAsText(file);
+});
+function cleanPattern(p, i){
+  const n = v => { const x = num(v); return isF(x) ? x : NaN; };
+  return {id:String(p.id || uid()), label:String(p.label || ('Patrón ' + (i + 1))), tf:String(p.tf || ''),
+    X:n(p.X), A:n(p.A), B:n(p.B), C:n(p.C), D:n(p.D), post:(Array.isArray(p.post) ? p.post : parsePivots(p.post)).map(num).filter(isF),
+    key:(p.key && SIM[p.key]) ? p.key : null, enabled:p.enabled !== false,
+    taken:Array.isArray(p.taken) ? [...new Set(p.taken.filter(k => typeof k === 'string' && SIM[k]))] : [],
+j:p.j && typeof p.j === 'object' ? {fast:['si','no'].includes(p.j.fast) ? p.j.fast : '', conf:['si','no'].includes(p.j.conf) ? p.j.conf : '', entry:['limite','vela','no'].includes(p.j.entry) ? p.j.entry : '', trade:['tp2','tp1','be','sl','no'].includes(p.j.trade) ? p.j.trade : '', rsi:!!p.j.rsi, note:String(p.j.note || '').slice(0, 500)} : {}, color:COLORS.includes(p.color) ? p.color : COLORS[i % COLORS.length]};
+}
+function loadData(d){
+  const s = blankState();
+  s.asset = Object.assign(s.asset, d.asset || {});
+  s.asset.price = isF(num(s.asset.price)) ? num(s.asset.price) : null;
+  s.asset.decimals = Math.min(5, Math.max(0, parseInt(s.asset.decimals, 10) || 2));
+  ['capital','riskPct','pointValue','minLot'].forEach(k => { const v = num(s.asset[k]); s.asset[k] = isF(v) ? v : blankState().asset[k]; });
+  s.settings = Object.assign(s.settings, d.settings || {});
+  if(((d.settings || {}).minLevelsV || 0) < 3){ if(!isF(s.settings.minLevels) || s.settings.minLevels === 2 || s.settings.minLevels === 4) s.settings.minLevels = 3; s.settings.minLevelsV = 3; }
+  s.settings.grid = Object.assign(clone(DEFAULT_SETTINGS.grid), (d.settings || {}).grid || {});
+  s.settings.sum = Object.assign(clone(DEFAULT_SETTINGS.sum), (d.settings || {}).sum || {});
+  s.patterns = d.patterns.map(cleanPattern);
+  s.selectedId = d.selectedId || null;
+  s.notes = (Array.isArray(d.notes) ? d.notes : []).filter(n => n && n.text).map(n => ({id:String(n.id || uid()), tag:String(n.tag || 'general'), text:String(n.text).slice(0, 1000), t:String(n.t || '')}));
+  state = s; dirty = false; sim.coords = null; sim.key = null; sim.modified = false; sim.msg = ''; clearForm(); syncInputs(); recompute();
+}
+function importLegacyCSV(text, fname){
+  const lines = text.split(/\r?\n/), rows = [];
+  const parse = line => { const out = []; let cur = '', q = false;
+    for(let i = 0; i < line.length; i++){ const ch = line[i];
+      if(q){ if(ch === '"'){ if(line[i + 1] === '"'){ cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if(ch === '"') q = true; else if(ch === ';' || ch === ','){ out.push(cur); cur = ''; } else cur += ch; }
+    out.push(cur); return out; };
+  const start = lines.findIndex(l => l.trim().toUpperCase() === '#PATRONES');
+  const slice = start >= 0 ? lines.slice(start + 2) : lines;
+  for(const line of slice){
+    const t = line.trim(); if(start >= 0 && (t === '' || t.startsWith('#'))) break;
+    if(!t || t.startsWith('#') || t.toLowerCase().startsWith('sep=')) continue;
+    const c = parse(t); if(c.length < 6) continue;
+    const [label, tf, x, a, b, cc] = c;
+    if([x,a,b,cc].map(num).every(isF)) rows.push({label, tf, X:x, A:a, B:b, C:cc});
+  }
+  if(!rows.length) return false;
+  const imported = rows.map((r,i) => cleanPattern(r, state.patterns.length + i));
+  if(state.patterns.length && confirm('Se encontraron ' + imported.length + ' patrones.\nAceptar = reemplazar los actuales · Cancelar = agregarlos.')) state.patterns = [];
+  const used = new Set(state.patterns.map(p => p.color));
+  imported.forEach(p => { const c = COLORS.find(k => !used.has(k)); if(c){ p.color = c; used.add(c); } });
+  state.patterns.push(...imported);
+  if(!state.asset.name) state.asset.name = fname.replace(/\.[^.]+$/, '');
+  syncInputs(); touch(); return true;
+}
+
+/* ============ Inicio ============ */
+try {
+  const saved = JSON.parse(localStorage.getItem('confluencias-armonicas:sesion') || 'null');
+  if(saved && Array.isArray(saved.patterns)) loadData({...saved, format:'confluencias-armonicas'});
+} catch(e) {}
+syncInputs(); recompute();
+})();
+</script>
+</body>
+</html>

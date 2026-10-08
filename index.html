@@ -100,6 +100,7 @@ fieldset label{display:inline-flex !important;align-items:center;gap:.35rem;marg
 .chip{display:inline-block;padding:1px 10px;border-radius:999px;border:1px solid var(--line);margin:2px 3px;font-size:.85rem;background:var(--surface);color:var(--ink);font-family:inherit;cursor:pointer}
 .chip:hover{border-color:var(--accent)}
 .chip.no{color:var(--muted);border-style:dashed}
+.chip.taken{text-decoration:line-through;color:var(--muted)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700;border-style:solid}
 .chip .best{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);margin-left:4px}
 .chip.on .best{color:var(--surface)}
@@ -230,6 +231,34 @@ details.times .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 #allPrz .ax{font-size:11px;fill:var(--muted);font-variant-numeric:tabular-nums}
 #allPrzTable tr.sel td{background:var(--tint-acc)}
 #allPrzTable tr.no td{color:var(--muted)}
+#allPrzTable tr.taken td{color:var(--muted)}
+#allPrzTable tr.taken td .chip{text-decoration:line-through}
+#allPrz .bar-taken{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:1 3}
+#allPrz .rowname.taken{fill:var(--muted);text-decoration:line-through}
+.takebox{display:inline-flex;align-items:center;gap:.35rem;font-size:.85rem;color:var(--muted);cursor:pointer;white-space:nowrap}
+.takebox input{width:1.05rem;height:1.05rem;accent-color:var(--bull);cursor:pointer}
+.przbar{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;margin:.3rem 0}
+.przbar label{display:inline-flex;gap:.4rem;align-items:center;font-size:.9rem}
+/* resumen */
+#sumTable{font-size:.9rem}
+#sumTable th,#sumTable td{white-space:nowrap}
+#sumTable th:first-child,#sumTable td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
+#sumTable th:first-child{background:var(--tint-acc);background-image:linear-gradient(var(--tint-acc),var(--tint-acc)),linear-gradient(var(--surface),var(--surface))}
+#sumTable tr.grp-start td{border-top:2px solid var(--line)}
+#sumTable tr.sel td{background:var(--tint-acc)}
+#sumTable tr.sel td:first-child{background-image:linear-gradient(var(--tint-acc),var(--tint-acc));background-color:var(--surface)}
+#sumTable tr.off td{opacity:.6}
+#sumTable .gname{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+#sumTable .gname:hover{color:var(--accent);text-decoration:underline}
+#sumTable .gname .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+#sumTable td.pc{min-width:140px}
+#sumTable .pc .pn{font-weight:600}
+#sumTable th{text-align:left}
+#sumTable .pc .pz{display:block;font-size:.84rem;color:var(--muted);margin-left:1.45rem}
+#sumTable .pc.taken .pn,#sumTable .pc.taken .pz{text-decoration:line-through;color:var(--muted);font-weight:400}
+#sumTable .pc.next{background:var(--tint-fib);box-shadow:inset 3px 0 0 var(--fib)}
+#sumTable .pc .crossed{display:block;margin-left:1.45rem;font-size:.78rem;color:var(--bear)}
+#sumTable .pc label{color:var(--ink);font-size:.9rem}
 #simTable tr.grp td{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib);font-size:1rem;background:var(--paper);padding-top:.55rem}
 #notesSimple tr.cur td{background:var(--tint-acc)}
 #notesSimple td:first-child{white-space:nowrap}
@@ -354,6 +383,7 @@ footer{margin:4rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);co
   <nav class="toc" aria-label="Secciones">
     <ol>
       <li><a href="#patrones">Patrones del movimiento</a></li>
+      <li><a href="#resumen">Resumen</a></li>
       <li><a href="#simulador">Simulador</a></li>
       <li><a href="#notas">Notas</a></li>
     </ol>
@@ -392,8 +422,20 @@ footer{margin:4rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);co
 </section>
 
 <!-- 2 -->
+<section id="resumen">
+  <h2><span class="n">2</span>Resumen de gráficos</h2>
+  <p class="intro">Cada fila es un gráfico, ordenado por nombre y luego por temporalidad. Cada columna es un patrón, con la PRZ que tendría en ese gráfico (los mismos de «Proyectar como» en el simulador); vacía si no se puede proyectar ahí. Marca «superado» aquí o en el simulador cuando el precio ya atravesó un patrón: la casilla es la misma en los dos lugares. La celda resaltada es el siguiente patrón pendiente.</p>
+  <div class="przbar">
+    <label><input type="checkbox" id="sumHideTaken" checked> Ocultar los patrones superados</label>
+    <label><input type="checkbox" id="sumHidePts" checked> Ocultar X, A, B y C</label>
+    <span class="zsub" id="sumCount"></span>
+  </div>
+  <div class="tablewrap"><table id="sumTable"></table></div>
+</section>
+
+<!-- 3 -->
 <section id="simulador">
-  <h2><span class="n">2</span>Simulador</h2>
+  <h2><span class="n">3</span>Simulador</h2>
   <p class="intro">Muestra el patrón seleccionado con su proyección más probable. Toca otro patrón en la fila de candidatos para ver cómo quedaría si se convierte en él, o mueve las coordenadas: nada se guarda hasta que pulses «Aplicar al patrón».</p>
   <div class="lab">
     <div class="controls">
@@ -456,9 +498,9 @@ footer{margin:4rem 0 3rem;padding-top:1.2rem;border-top:1px solid var(--line);co
   </div>
 </section>
 
-<!-- 3 -->
+<!-- 4 -->
 <section id="notas">
-  <h2><span class="n">3</span>Notas</h2>
+  <h2><span class="n">4</span>Notas</h2>
   <p class="intro">Referencia de Carney que no cambia con el patrón. Lo que corresponde a tu patrón seleccionado aparece resaltado; su lectura concreta está en el simulador.</p>
 
   <h3 class="ptitle">Comparación de patrones armónicos</h3>
@@ -558,7 +600,7 @@ const parseExtra = s => String(s || '').split(/[;\s]+|,(?=\s)|,(?=\d+\.)/).map(n
 
 /* ============ Estado ============ */
 const DEFAULT_SETTINGS = {fav:['crab','deepcrab','butterfly2'], timeTol:0, bandPct:1.5, minPts:0, ratioSlack:0.03, slPct:10, useHistory:true, minLevels:3, minLevelsV:3, minPatterns:1, maxZones:12, sort:'score', extra:'',
-  grid:{xa:true, bc:true, abcd:true, struct:true, passed:false}};
+  grid:{xa:true, bc:true, abcd:true, struct:true, passed:false}, sum:{hideTaken:true, hidePts:true}};
 const blankState = () => ({notes:[], asset:{name:'', type:'boom', trend:'auto', decimals:2, price:null, capital:null, riskPct:2, pointValue:1, minLot:0.01}, settings:clone(DEFAULT_SETTINGS), patterns:[], selectedId:null});
 let state = blankState();
 let dirty = false, editingId = null;
@@ -1090,8 +1132,8 @@ function renderFav(){
   if(isF(sim.coords.D)){ box.innerHTML = head + '<p class="hint">Este patrón ya tiene D real: mira el resultado real más abajo.</p>'; return; }
   const rows = favRows({...p, ...sim.coords});
   if(!rows.length){ box.innerHTML = head + '<p class="hint">Hace falta el punto X para proyectar las extensiones sobre XA.</p>'; return; }
-  box.innerHTML = head + `<div class="tablewrap"><table><tr><th>Patrón</th><th>Zona (PRZ)</th><th>SL1 · SL2</th><th>TP1 · TP2</th><th>Ratios y estado</th></tr>` +
-    rows.map(x => `<tr><td><b>${SIM[x.k].name}</b><div class="zsub num">D ${fr(SIM[x.k].d)} XA · ${fmt(x.r.Dp)}</div></td>
+  box.innerHTML = head + `<div class="tablewrap"><table><tr><th>Superado</th><th>Patrón</th><th>Zona (PRZ)</th><th>SL1 · SL2</th><th>TP1 · TP2</th><th>Ratios y estado</th></tr>` +
+    rows.map(x => `<tr${isTaken(p, x.k) ? ' style="opacity:.55"' : ''}><td><label class="takebox"><input type="checkbox" data-favtake="${x.k}"${isTaken(p, x.k) ? ' checked' : ''} aria-label="${esc(SIM[x.k].name)} superado"></label></td><td><b${isTaken(p, x.k) ? ' style="text-decoration:line-through"' : ''}>${SIM[x.k].name}</b><div class="zsub num">D ${fr(SIM[x.k].d)} XA · ${fmt(x.r.Dp)}</div></td>
       <td class="num">${fmt(x.r.prz[0])} – ${fmt(x.r.prz[1])}${x.bc ? `<div style="margin-top:3px"><span class="tag ${x.bc.cls === 'ok' ? 'bull' : x.bc.cls === 'warn' ? 'bear' : 'acc'}" style="margin-left:0">${x.bc.cls === 'ok' ? 'BC converge' : x.bc.cls === 'warn' ? 'BC más allá del stop' : 'BC lejos de D'}</span></div>` : ''}</td>
       <td class="num">${fmt(x.SL1)} · <b class="t-bear">${fmt(x.r.SL)}</b>${x.r.slByAbcd ? '<div class="zsub">SL2 detrás del AB=CD</div>' : ''}</td>
       <td class="num">${fmt(x.r.TP1)} · ${fmt(x.r.TP2)}<div class="zsub">R:R ${x.r.rr1.toFixed(1)} / ${x.r.rr2.toFixed(1)}${x.lot && !x.lot.below ? ' · ' + x.lot.lots.toFixed(x.lot.dp) + ' lotes' : ''}</div></td>
@@ -1371,7 +1413,18 @@ function patternChart(r, o){
 }
 
 /* ============ Estado del simulador ============ */
-const sim = {coords:null, key:null, slMode:'cons', tpMode:'AD', entryMode:'D', allPrz:false, msg:'', modified:false, broken:false, draw:false};
+const sim = {coords:null, key:null, slMode:'cons', tpMode:'AD', entryMode:'D', allPrz:false, showTaken:false, msg:'', modified:false, broken:false, draw:false};
+// Patrones ya superados por el precio, guardados por gráfico (p.taken = [claves de SIM])
+const takenOf = p => p && Array.isArray(p.taken) ? p.taken : [];
+const isTaken = (p, k) => takenOf(p).includes(k);
+function setTaken(id, keys, on){
+  const p = state.patterns.find(q => q.id === id); if(!p) return;
+  const t = new Set(takenOf(p));
+  (Array.isArray(keys) ? keys : [keys]).forEach(k => { if(SIM[k]) on ? t.add(k) : t.delete(k); });
+  p.taken = Object.keys(SIM).filter(k => t.has(k));
+  if(on && p.id === state.selectedId && sim.key && t.has(sim.key)) sim.key = null;   // el simulador pasa al siguiente pendiente
+  touch();
+}
 const selectedPattern = () => state.patterns.find(p => p.id === state.selectedId) || null;
 const coordsOf = p => ({X:p.X, A:p.A, B:p.B, C:p.C, D:p.D, post:Array.isArray(p.post) ? p.post.filter(isF) : []});
 const parsePivots = t => String(t || '').split(/[;\s]+|,(?=\s)/).map(num).filter(isF);
@@ -1397,9 +1450,9 @@ function effectiveKey(){
   if(!sim.coords) return null;
   if(sim.key) return sim.key;
   const p = selectedPattern();
-  if(p && p.key && SIM[p.key] && simCompute(sim.coords, p.key, 'cons', 'AD').ok) return p.key;   // patrón esperado fijado
-  const rk = rankCands(noD(sim.coords));
-  const best = rk.find(x => x.fit > 0) || rk.find(x => simCompute(sim.coords, x.key, 'cons', 'AD').ok);
+  if(p && p.key && SIM[p.key] && !isTaken(p, p.key) && simCompute(sim.coords, p.key, 'cons', 'AD').ok) return p.key;   // patrón esperado fijado
+  const rk = rankCands(noD(sim.coords)), pend = rk.filter(x => !isTaken(p, x.key));
+  const best = pend.find(x => x.fit > 0) || rk.find(x => x.fit > 0) || rk.find(x => simCompute(sim.coords, x.key, 'cons', 'AD').ok);
   return best ? best.key : null;
 }
 function simResultFor(){
@@ -1426,7 +1479,8 @@ function syncSliders(g){
 
 // Todas las PRZ: la de cada patrón posible con estas X, A, B y C, ordenadas por cercanía a C
 const XA_EXTREMES = [[2, '2.0 XA'], [2.24, '2.24 XA']];
-function allPrzData(c){
+function allPrzData(c, taken){
+  const tk = new Set(taken || []);
   const c0 = noD(c), g = geom(c0); if(!g.ok) return null;
   const rows = Object.keys(SIM).filter(k => k !== 'shark2').map(k => {
     const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return null;
@@ -1437,7 +1491,8 @@ function allPrzData(c){
   }).filter(Boolean).sort((a, b) => a.dNear - b.dNear || a.dFar - b.dFar);
   // confluencias: PRZ de patrones que encajan y se solapan o quedan a menos del 3% del tramo
   // con X, el AB=CD ya forma parte de la PRZ de cada XABCD: no cuenta como patrón aparte en las confluencias
-  const fit = rows.filter(x => x.fit > 0 && !(g.hasX && SIM[x.k].fam === 'abcd')), tol = 0.03 * (g.hasX ? g.xa : g.ab), clusters = [];
+  rows.forEach(x => { x.taken = tk.has(x.k); });
+  const fit = rows.filter(x => x.fit > 0 && !x.taken && !(g.hasX && SIM[x.k].fam === 'abcd')), tol = 0.03 * (g.hasX ? g.xa : g.ab), clusters = [];
   fit.forEach(x => {
     const cl = clusters.find(q => x.dNear <= q.hi + tol && x.dFar >= q.lo - tol);
     if(cl){ cl.lo = Math.min(cl.lo, x.dNear); cl.hi = Math.max(cl.hi, x.dFar); cl.rows.push(x); }
@@ -1447,10 +1502,15 @@ function allPrzData(c){
   return {g, rows, clusters:clusters.filter(q => q.rows.length > 1), ext, tol};
 }
 function renderAllPrz(kSel){
-  const box = $('allPrz'), c = sim.coords, D = c ? allPrzData(c) : null;
+  const box = $('allPrz'), c = sim.coords, pSel = selectedPattern(), D = c ? allPrzData(c, takenOf(pSel)) : null;
   if(!D || !D.rows.length){ box.innerHTML = ''; return; }
-  const {g, clusters, ext} = D, rows = sim.allPrz ? D.rows : D.rows.filter(x => x.fit > 0 || x.k === kSel);
+  const {g, clusters, ext} = D;
   const P0 = state.asset.price, dP = isF(P0) ? g.dir * (c.C - P0) : NaN;
+  const nTaken = D.rows.filter(x => x.taken).length;
+  const favS = g.hasX ? new Set(favList()) : new Set();
+  const rows = D.rows.filter(x => (sim.allPrz || x.fit > 0 || favS.has(x.k) || x.k === kSel || x.taken) && (sim.showTaken || !x.taken || x.k === kSel));
+  // patrones que el precio ya atravesó (más allá del borde lejano de la PRZ) y aún no están marcados
+  const crossed = isF(dP) ? D.rows.filter(x => x.fit > 0 && !x.taken && dP > x.dFar) : [];
   const sameCl = x => clusters.find(q => q.rows.includes(x));
   // resumen
   const sum = clusters.length
@@ -1466,32 +1526,48 @@ function renderAllPrz(kSel){
   ext.forEach(e => { if(e.d >= d0 && e.d <= d1) S.push(`<line class="ext" x1="${X(e.d)}" x2="${X(e.d)}" y1="${top - 10}" y2="${top + rows.length * rh}"/><text class="ax" x="${X(e.d)}" y="${top - 14}" text-anchor="middle">${e.t}</text>`); });
   if(isF(dP) && dP >= d0 && dP <= d1) S.push(`<line class="px" x1="${X(dP)}" x2="${X(dP)}" y1="${top - 10}" y2="${top + rows.length * rh}"/><text class="ax" x="${X(dP)}" y="${top - 14}" text-anchor="middle">precio</text>`);
   rows.forEach((x, i) => {
-    const y = top + i * rh, cls = x.k === kSel ? 'bar-sel' : x.fit > 0 ? 'bar-fit' : 'bar-no';
-    S.push(`<g data-prz="${x.k}" style="cursor:pointer"><text class="rowname${x.fit > 0 ? '' : ' no'}" x="${L - 8}" y="${y + 13}" text-anchor="end"${x.k === kSel ? ' font-weight="700"' : ''}>${esc(SIM[x.k].name)}</text>
+    const y = top + i * rh, cls = x.k === kSel ? 'bar-sel' : x.taken ? 'bar-taken' : x.fit > 0 ? 'bar-fit' : 'bar-no';
+    S.push(`<g data-prz="${x.k}" style="cursor:pointer"><text class="rowname${x.taken ? ' taken' : x.fit > 0 ? '' : ' no'}" x="${L - 8}" y="${y + 13}" text-anchor="end"${x.k === kSel ? ' font-weight="700"' : ''}>${esc(SIM[x.k].name)}</text>
       <rect class="${cls}" x="${X(x.dNear)}" y="${y + 3}" width="${Math.max(3, X(x.dFar) - X(x.dNear))}" height="${rh - 8}" rx="3"/>
       <circle cx="${X(x.dD)}" cy="${y + rh / 2 - 1}" r="3" class="s-ink"/>
       <line x1="${X(x.dSL)}" x2="${X(x.dSL)}" y1="${y + 3}" y2="${y + rh - 5}" stroke="var(--bear)" stroke-width="2"/></g>`);
   });
   const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="PRZ de cada patrón posible">${S.join('')}</svg>`;
   // tabla
-  const tbl = '<tr><th>Patrón</th><th>Encaja</th><th>PRZ</th><th>Ancho</th><th>D</th><th>SL2</th><th>Coincide con</th></tr>' + rows.map(x => {
+  const tbl = '<tr><th>Superado</th><th>Patrón</th><th>Encaja</th><th>PRZ</th><th>Ancho</th><th>D</th><th>SL2</th><th>Coincide con</th></tr>' + rows.map(x => {
     const pl = przPlanOf(x.r.prz, x.r.dir, x.r.baseLeg), wTag = pl.type === 'una' ? 'orden en la mitad' : 'orden al 90%';
     const cl = sameCl(x), with_ = cl ? cl.rows.filter(q => q !== x).map(q => SIM[q.k].name).join(', ') : '';
-    return `<tr class="${x.k === kSel ? 'sel' : ''}${x.fit > 0 ? '' : ' no'}"><td><button type="button" class="chip${x.k === kSel ? ' on' : ''}" data-prz="${x.k}">${esc(SIM[x.k].name)}</button></td>
+    const tb = pSel ? `<label class="takebox" title="El precio ya superó este patrón"><input type="checkbox" data-take="${x.k}"${x.taken ? ' checked' : ''} aria-label="${esc(SIM[x.k].name)} superado">${x.taken ? 'sí' : ''}</label>` : '';
+    return `<tr class="${x.k === kSel ? 'sel' : ''}${x.fit > 0 ? '' : ' no'}${x.taken ? ' taken' : ''}"><td>${tb}</td><td><button type="button" class="chip${x.k === kSel ? ' on' : ''}" data-prz="${x.k}">${esc(SIM[x.k].name)}</button></td>
       <td>${x.fit > 0 ? Math.round(x.fit * 100) + '%' : `<span class="zsub">${esc(x.why)}</span>`}</td>
       <td class="num">${fmt(x.r.prz[0])} – ${fmt(x.r.prz[1])}</td><td class="num">${(pl.pct * 100).toFixed(1)}%<div class="zsub" style="font-family:inherit">${wTag}</div></td><td class="num">${fmt(x.r.Dp)}</td><td class="num t-bear">${fmt(x.r.SL)}</td>
       <td>${with_ ? esc(with_) : '<span class="zsub">–</span>'}</td></tr>`;
-  }).join('') + ext.map(e => `<tr class="no"><td>Nivel extremo</td><td><span class="zsub">referencia, no es un patrón</span></td><td class="num">${fmt(e.v)}</td><td></td><td class="num">${e.t}</td><td></td><td><span class="zsub">${e.k === 2 ? 'stop del Crab y del Deep Crab' : 'proyección extrema; más allá del stop del Crab'}</span></td></tr>`).join('');
+  }).join('') + ext.map(e => `<tr class="no"><td></td><td>Nivel extremo</td><td><span class="zsub">referencia, no es un patrón</span></td><td class="num">${fmt(e.v)}</td><td></td><td class="num">${e.t}</td><td></td><td><span class="zsub">${e.k === 2 ? 'stop del Crab y del Deep Crab' : 'proyección extrema; más allá del stop del Crab'}</span></td></tr>`).join('');
   box.innerHTML = `<div class="msg ${clusters.length ? 'ok' : 'info'}"><b>Confluencias entre patrones:</b> ${sum}.</div>
     <div class="chartbox" style="padding:10px 12px">${svg}<p class="hint" style="margin:.3rem 0 0">Cada barra es una PRZ (punto: D; raya roja: SL2). Franja verde: PRZ que se solapan o quedan a menos del 3% del tramo. Líneas rojas punteadas: 2.0 y 2.24 XA. Toca un patrón para proyectarlo.</p></div>
-    <label style="display:inline-flex;gap:.4rem;align-items:center;margin:.3rem 0;font-size:.9rem"><input type="checkbox" id="allPrzToggle"${sim.allPrz ? ' checked' : ''}> Mostrar también los patrones que no encajan</label>
+    <div class="przbar">
+      <label><input type="checkbox" id="allPrzToggle"${sim.allPrz ? ' checked' : ''}> Mostrar también los patrones que no encajan</label>
+      <label><input type="checkbox" id="allPrzTaken"${sim.showTaken ? ' checked' : ''}${nTaken ? '' : ' disabled'}> Mostrar los superados (${nTaken})</label>
+      ${crossed.length ? `<button type="button" class="btn sm" id="allPrzCrossed">Marcar como superados los que el precio ya cruzó (${crossed.map(x => esc(SIM[x.k].name)).join(', ')})</button>` : ''}
+    </div>
     <div class="tablewrap"><table id="allPrzTable">${tbl}</table></div>`;
 }
 $('allPrz').addEventListener('click', e => {
   const b = e.target.closest('[data-prz]'); if(!b) return;
   sim.key = b.dataset.prz; sim.msg = ''; sim.broken = false; sim.draw = true; renderSim();
 });
-$('allPrz').addEventListener('change', e => { if(e.target.id === 'allPrzToggle'){ sim.allPrz = e.target.checked; renderSim(); } });
+$('allPrz').addEventListener('change', e => {
+  if(e.target.id === 'allPrzToggle'){ sim.allPrz = e.target.checked; renderSim(); return; }
+  if(e.target.id === 'allPrzTaken'){ sim.showTaken = e.target.checked; renderSim(); return; }
+  const k = e.target.dataset.take; if(k && state.selectedId) setTaken(state.selectedId, k, e.target.checked);
+});
+$('allPrz').addEventListener('click', e => {
+  if(e.target.id !== 'allPrzCrossed') return;
+  const c = sim.coords, p = selectedPattern(), D = c && p ? allPrzData(c, takenOf(p)) : null, P0 = state.asset.price;
+  if(!D || !isF(P0)) return;
+  const dP = D.g.dir * (c.C - P0);
+  setTaken(p.id, D.rows.filter(x => x.fit > 0 && !x.taken && dP > x.dFar).map(x => x.k), true);
+});
 
 function renderPrzPlan(r, k){
   const box = $('przPlan');
@@ -1516,6 +1592,70 @@ function renderPrzPlan(r, k){
     <p class="hint">${L ? (L.below ? `Con tu riesgo de ${L.money.toFixed(2)} no alcanza el lote mínimo por orden.` : `${L.each.toFixed(L.dp)} lotes: si se llena y salta el stop, pierdes ${L.real.toFixed(2)} (tu ${state.asset.riskPct}% = ${L.money.toFixed(2)}).`) : 'Indica capital, riesgo y valor por punto en la barra superior para calcular los lotes.'} El tramo base es ${r.P.base}; el umbral se puede comparar con el panel «Todas las PRZ».</p>`;
 }
 
+/* ============ Resumen de gráficos ============ */
+const sumCmp = (a, b) => {
+  const n = (a.label || '').localeCompare(b.label || '', 'es', {numeric:true, sensitivity:'base'}); if(n) return n;
+  const ta = tfMin(a.tf), tb = tfMin(b.tf);
+  if(isF(ta) && isF(tb) && ta !== tb) return ta - tb;
+  if(isF(ta) !== isF(tb)) return isF(ta) ? -1 : 1;
+  return String(a.tf || '').localeCompare(String(b.tf || ''));
+};
+// Orden fijo de columnas: por profundidad de D (XABCD, Shark, Cypher, Nen Star) y al final las AB=CD
+const SUM_ORDER = Object.keys(SIM).filter(k => k !== 'shark2').sort((a, b) =>
+  ((SIM[a].fam === 'abcd') - (SIM[b].fam === 'abcd')) || (SIM[a].d - SIM[b].d) || (Object.keys(SIM).indexOf(a) - Object.keys(SIM).indexOf(b)));
+const sumOpt = () => state.settings.sum || (state.settings.sum = clone(DEFAULT_SETTINGS.sum));
+function summaryRowOf(p){
+  const c = coordsOf(p), D = allPrzData(c, takenOf(p));
+  if(!D) return {p, err:geom(c).err || 'Coordenadas incompletas.'};
+  const g = D.g, P0 = state.asset.price, dP = isF(P0) ? g.dir * (c.C - P0) : NaN;
+  // todos los patrones que el simulador puede proyectar con estos puntos (los de «Proyectar como»),
+  // encajen o no con los ratios, más las variantes que encajan, las extensiones favoritas, el esperado y los marcados
+  const fav = g.hasX ? new Set(favList()) : new Set(), byKey = {};
+  D.rows.filter(x => !SIM[x.k].hidden || x.fit > 0 || fav.has(x.k) || x.k === p.key || x.taken).forEach(x => {
+    byKey[x.k] = {k:x.k, prz:x.r.prz, taken:x.taken, ext:!(x.fit > 0), dNear:x.dNear, crossed:isF(dP) && dP > x.dFar};
+  });
+  const next = Object.values(byKey).filter(x => !x.taken).sort((a, b) => a.dNear - b.dNear)[0];
+  return {p, g, byKey, next};
+}
+function renderSummary(){
+  const box = $('sumTable'), O = sumOpt(), hide = O.hideTaken, hidePts = O.hidePts;
+  $('sumHideTaken').checked = hide; $('sumHidePts').checked = hidePts;
+  if(!state.patterns.length){ box.innerHTML = '<tr><td class="zsub">Agrega gráficos en la sección 1 para ver el resumen.</td></tr>'; $('sumCount').textContent = ''; return; }
+  const data = [...state.patterns].sort(sumCmp).map(summaryRowOf);
+  const vis = (d, k) => d.byKey && d.byKey[k] && !(hide && d.byKey[k].taken);
+  const cols = SUM_ORDER.filter(k => data.some(d => vis(d, k)));
+  const all = data.flatMap(d => d.byKey ? Object.values(d.byKey) : []), done = all.filter(x => x.taken).length;
+  $('sumCount').textContent = all.length ? `${done} de ${all.length} patrones superados${hide && done ? ' (ocultos)' : ''}` : '';
+  const head = '<tr><th>Gráfico</th><th>TF</th><th>Movimiento</th>' + (hidePts ? '' : '<th>X</th><th>A</th><th>B</th><th>C</th>') +
+    cols.map(k => `<th>${esc(SIM[k].name)}</th>`).join('') + '</tr>';
+  let prevLabel = null;
+  const body = data.map(d => {
+    const p = d.p, lbl = (p.label || '').trim().toLowerCase(), grp = prevLabel !== null && lbl !== prevLabel; prevLabel = lbl;
+    const cls = [p.id === state.selectedId ? 'sel' : '', p.enabled ? '' : 'off', grp ? 'grp-start' : ''].filter(Boolean).join(' ');
+    const name = `<button type="button" class="gname" data-sumsel="${p.id}" title="Abrir en el simulador"><span class="dot" style="background:${p.color}"></span>${esc(p.label || 'Sin nombre')}</button>`;
+    const pts = hidePts ? '' : ['X','A','B','C'].map(k => `<td class="num">${fmt(p[k])}</td>`).join('');
+    if(!d.byKey) return `<tr class="${cls}"><td>${name}</td><td>${esc(p.tf || '–')}</td><td>–</td>${pts}<td colspan="${Math.max(1, cols.length)}" class="t-bear">${esc(d.err)}</td></tr>`;
+    const mv = d.g.dir > 0 ? '<span class="t-bull">Compra</span>' : '<span class="t-bear">Venta</span>';
+    const cells = cols.map(k => {
+      if(!vis(d, k)) return '<td></td>';
+      const x = d.byKey[k], pc = ['pc', x.taken ? 'taken' : '', x === d.next ? 'next' : ''].filter(Boolean).join(' ');
+      return `<td class="${pc}"><label class="takebox"><input type="checkbox" data-sumtake="${p.id}|${k}"${x.taken ? ' checked' : ''} aria-label="${esc(SIM[k].name)} superado en ${esc(p.label || 'gráfico')}"><span class="pn num">${fmt(x.prz[0])} – ${fmt(x.prz[1])}</span></label>` +
+        `${x.ext ? '<span class="pz">no valida con tus ratios</span>' : ''}${x.crossed && !x.taken ? '<span class="crossed">el precio ya la cruzó</span>' : ''}</td>`;
+    }).join('');
+    const empty = cols.length ? '' : '<td class="zsub">sin patrones pendientes</td>';
+    return `<tr class="${cls}"><td>${name}</td><td>${esc(p.tf || '–')}</td><td>${mv}</td>${pts}${cells}${empty}</tr>`;
+  }).join('');
+  box.innerHTML = head + body;
+}
+const saveSession = () => { try { localStorage.setItem('confluencias-armonicas:sesion', JSON.stringify(state)); } catch(e) {} };
+$('sumTable').addEventListener('change', e => {
+  const v = e.target.dataset.sumtake; if(!v) return;
+  const [id, k] = v.split('|'); setTaken(id, k, e.target.checked);
+});
+$('sumTable').addEventListener('click', e => { const b = e.target.closest('[data-sumsel]'); if(b) selectPattern(b.dataset.sumsel, {scroll:true}); });
+$('sumHideTaken').addEventListener('change', e => { sumOpt().hideTaken = e.target.checked; saveSession(); renderSummary(); });
+$('sumHidePts').addEventListener('change', e => { sumOpt().hidePts = e.target.checked; saveSession(); renderSummary(); });
+
 function renderLive(){
   const box = $('liveTable'), act = state.patterns.filter(p => p.enabled);
   if(!act.length){ box.innerHTML = '<tr><td class="zsub">Agrega patrones para ver si siguen vigentes.</td></tr>'; return; }
@@ -1530,7 +1670,7 @@ function renderLive(){
 $('liveTable').addEventListener('click', e => { const b = e.target.closest('[data-live]'); if(b && b.dataset.live !== state.selectedId) selectPattern(b.dataset.live); });
 
 function renderSim(){
-  renderLive(); syncLiveInputs();
+  renderLive(); syncLiveInputs(); renderSummary();
   const p = selectedPattern();
   const has = !!(p && sim.coords);
   ['simFail'].forEach(id => $(id).disabled = !has);
@@ -1552,16 +1692,16 @@ function renderSim(){
     ? (g.dir > 0 ? 'Completado abajo: la reacción esperada es alcista.' : 'Completado arriba: la reacción esperada es bajista.')
     : (g.dir > 0 ? 'Alcista: D se forma abajo, compra en la PRZ.' : 'Bajista: D se forma arriba, venta en la PRZ.');
   const rk = rankCands(noD(sim.coords));
-  const bestKey = (rk.find(x => x.fit > 0) || {}).key;
-  const k = effectiveKey();
   const pSel = selectedPattern(), expKey = pSel && pSel.key;
+  const bestKey = (rk.find(x => x.fit > 0 && !isTaken(pSel, x.key)) || {}).key;
+  const k = effectiveKey();
   const przMode = sim.entryMode === 'prz';
   const r = k ? simCompute(sim.coords, k, sim.slMode, sim.tpMode, przMode ? 'D' : sim.entryMode) : null;
   const rPlan = k && przMode ? simCompute(sim.coords, k, sim.slMode, sim.tpMode, 'prz') : null;
   // candidatos
   let chips = rk.map(x => {
     const on = x.key === k || (SIM[k] && SIM[k].hidden && SIM[k].name.startsWith(SIM[x.key].name) && false);
-    return `<button type="button" class="chip${x.key === k ? ' on' : ''}${x.fit > 0 ? '' : ' no'}" data-key="${x.key}" title="${esc(x.fit > 0 ? 'Encaje ' + Math.round(x.fit * 100) + '%' : x.why)}">${SIM[x.key].name}${x.fit > 0 ? ' ' + Math.round(x.fit * 100) + '%' : ''}${x.key === bestKey ? '<span class="best">más probable</span>' : ''}${x.key === expKey ? '<span class="best">esperado</span>' : ''}${x.fit > 0 && perfectOf(x.key, sim.coords) ? '<span class="best">perfecto</span>' : ''}</button>`;
+    return `<button type="button" class="chip${x.key === k ? ' on' : ''}${x.fit > 0 ? '' : ' no'}${isTaken(pSel, x.key) ? ' taken' : ''}" data-key="${x.key}" title="${esc(isTaken(pSel, x.key) ? 'Marcado como superado' : x.fit > 0 ? 'Encaje ' + Math.round(x.fit * 100) + '%' : x.why)}">${SIM[x.key].name}${x.fit > 0 ? ' ' + Math.round(x.fit * 100) + '%' : ''}${x.key === bestKey ? '<span class="best">más probable</span>' : ''}${x.key === expKey ? '<span class="best">esperado</span>' : ''}${x.fit > 0 && perfectOf(x.key, sim.coords) ? '<span class="best">perfecto</span>' : ''}</button>`;
   }).join('');
   if(k && SIM[k].hidden) chips += `<button type="button" class="chip on" data-key="${k}">${SIM[k].name}</button>`;
   $('simCands').innerHTML = 'Proyectar como: ' + chips;
@@ -2265,6 +2405,7 @@ function cleanPattern(p, i){
   return {id:String(p.id || uid()), label:String(p.label || ('Patrón ' + (i + 1))), tf:String(p.tf || ''),
     X:n(p.X), A:n(p.A), B:n(p.B), C:n(p.C), D:n(p.D), post:(Array.isArray(p.post) ? p.post : parsePivots(p.post)).map(num).filter(isF),
     key:(p.key && SIM[p.key]) ? p.key : null, enabled:p.enabled !== false,
+    taken:Array.isArray(p.taken) ? [...new Set(p.taken.filter(k => typeof k === 'string' && SIM[k]))] : [],
 j:p.j && typeof p.j === 'object' ? {fast:['si','no'].includes(p.j.fast) ? p.j.fast : '', conf:['si','no'].includes(p.j.conf) ? p.j.conf : '', entry:['limite','vela','no'].includes(p.j.entry) ? p.j.entry : '', trade:['tp2','tp1','be','sl','no'].includes(p.j.trade) ? p.j.trade : '', rsi:!!p.j.rsi, note:String(p.j.note || '').slice(0, 500)} : {}, color:COLORS.includes(p.color) ? p.color : COLORS[i % COLORS.length]};
 }
 function loadData(d){
@@ -2276,6 +2417,7 @@ function loadData(d){
   s.settings = Object.assign(s.settings, d.settings || {});
   if(((d.settings || {}).minLevelsV || 0) < 3){ if(!isF(s.settings.minLevels) || s.settings.minLevels === 2 || s.settings.minLevels === 4) s.settings.minLevels = 3; s.settings.minLevelsV = 3; }
   s.settings.grid = Object.assign(clone(DEFAULT_SETTINGS.grid), (d.settings || {}).grid || {});
+  s.settings.sum = Object.assign(clone(DEFAULT_SETTINGS.sum), (d.settings || {}).sum || {});
   s.patterns = d.patterns.map(cleanPattern);
   s.selectedId = d.selectedId || null;
   s.notes = (Array.isArray(d.notes) ? d.notes : []).filter(n => n && n.text).map(n => ({id:String(n.id || uid()), tag:String(n.tag || 'general'), text:String(n.text).slice(0, 1000), t:String(n.t || '')}));
