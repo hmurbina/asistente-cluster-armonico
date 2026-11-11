@@ -3,9 +3,10 @@ name: Aviso HARMONIX
 on:
   schedule:
     # GitHub usa hora UTC. Nicaragua = UTC-6 todo el año (sin horario de verano).
-    - cron: '*/15 14-23 * * *'   # 08:00 – 17:45 en Nicaragua
-    - cron: '*/15 0-3 * * *'     # 18:00 – 21:45 en Nicaragua
-    - cron: '0 4 * * *'          # 22:00 en Nicaragua
+    # Minutos 7, 22, 37 y 52: GitHub va saturado en los minutos 00/15/30/45 y a veces se salta esas tareas.
+    - cron: '7,22,37,52 14-23 * * *'   # 08:07 – 17:52 en Nicaragua
+    - cron: '7,22,37,52 0-3 * * *'     # 18:07 – 21:52 en Nicaragua
+    - cron: '7 4 * * *'                # 22:07 en Nicaragua (última del día)
   workflow_dispatch:
     inputs:
       prueba:
