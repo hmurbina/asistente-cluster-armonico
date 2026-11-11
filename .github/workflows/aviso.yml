@@ -1,0 +1,41 @@
+name: Aviso HARMONIX
+
+on:
+  schedule:
+    # GitHub usa hora UTC. Nicaragua = UTC-6 todo el año (sin horario de verano).
+    - cron: '*/15 14-23 * * *'   # 08:00 – 17:45 en Nicaragua
+    - cron: '*/15 0-3 * * *'     # 18:00 – 21:45 en Nicaragua
+    - cron: '0 4 * * *'          # 22:00 en Nicaragua
+  workflow_dispatch:
+    inputs:
+      prueba:
+        description: 'Prueba: avisar aunque sea fuera de horario y repetir las zonas ya avisadas'
+        type: boolean
+        default: true
+
+concurrency:
+  group: aviso
+  cancel-in-progress: false
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: estado.json
+          key: estado-${{ github.run_id }}
+          restore-keys: estado-
+      - run: npm install --no-audit --no-fund
+      - run: node aviso.js
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PRUEBA: ${{ github.event_name == 'workflow_dispatch' && inputs.prueba }}
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: estado.json
+          key: estado-${{ github.run_id }}
