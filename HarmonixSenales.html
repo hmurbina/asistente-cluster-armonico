@@ -1151,7 +1151,7 @@ const OFF_DEFAULT = ['CRASH150N','CRASH50','BOOM150N','BOOM50','R_10','R_25','R_
   'frxXPTUSD','frxXPDUSD','OTC_SPC','OTC_GDAXI','OTC_FTSE','OTC_N225','cryETHUSD'];
 const loadJ = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch(e) { return d; } };
 const saveJ = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } };
-const S = Object.assign({band:'synth', tfs:[300, 900, 3600], hist:1000, off:OFF_DEFAULT.slice(), adv:60, age:100, wait:true, mode:'thirds', filter:'all', pts:[20, 20, 50], ptsV:4, edges:'both', mktPct:3, nearSide:'all', nearReact:15, watch:false, watchMin:2}, loadJ(SKEY, {}));
+const S = Object.assign({band:'synth', tfs:[300, 900, 3600], hist:1000, off:OFF_DEFAULT.slice(), adv:60, age:100, wait:true, mode:'thirds', filter:'all', pts:[20, 20, 50], ptsV:4, edges:'far', mktPct:3, nearSide:'all', nearReact:15, watch:false, watchMin:2}, loadJ(SKEY, {}));
 if(![1000, 2000, 3000].includes(+S.hist)) S.hist = 1000;
 S.watch = false;   // la vigilancia siempre empieza apagada: el navegador pide un clic para poder sonar
 if(!(+S.mktPct > 0)) S.mktPct = 3;
@@ -1171,6 +1171,8 @@ if(!(+S.preV >= 1)){
 }
 // sintéticos: 20 puntos por debajo de 10 000 y por debajo de 100 000 (una sola vez; luego se puede cambiar a mano)
 if(!(+S.preV >= 2)){ S.pts = [20, 20, +S.pts[2] > 0 ? +S.pts[2] : 50]; S.preV = 2; saveS(); }
+// solo el borde lejano de la PRZ (una sola vez; luego se puede cambiar en «Bordes a vigilar»)
+if(!(+S.preV >= 3)){ S.edges = 'far'; S.preV = 3; saveS(); }
 // en «Cerca de su zona» (y en el aviso del móvil): Boom solo compras, Crash solo ventas
 const sideAllowed = (sym, dir) => /^BOOM/i.test(sym) ? dir > 0 : /^CRASH/i.test(sym) ? dir < 0 : true;
 

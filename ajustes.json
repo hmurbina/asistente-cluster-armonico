@@ -4,12 +4,14 @@
     "tfs": [300, 900, 3600],
     "pts": [20, 20, 50],
     "nearSide": "all",
+    "edges": "far",
     "off": ["CRASH150N","CRASH50","BOOM150N","BOOM50","R_10","R_25","R_50","R_75","R_100","1HZ10V","1HZ25V","1HZ50V","1HZ75V","1HZ100V"]
   },
   {
     "band": "mkt",
     "tfs": [300, 900],
     "nearSide": "all",
+    "edges": "far",
     "off": ["frxXAGUSD","frxXPTUSD","frxXPDUSD","OTC_DJI","OTC_NDX","OTC_SPC","OTC_GDAXI","OTC_FTSE","OTC_N225","cryBTCUSD","cryETHUSD"]
   }
 ]
