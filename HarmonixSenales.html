@@ -1,0 +1,2182 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HARMONIX · Señales</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%224.5 6.5 23 18%22%3E%3Cpolyline points=%226,22 11,9 15,17 19,12 26,23%22 fill=%22none%22 stroke=%22%234A6CF0%22 stroke-width=%222.6%22 stroke-linejoin=%22round%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=STIX+Two+Text:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4; --surface:#FFFFFF; --ink:#16233A; --muted:#5A6678; --grid:#DDE3EA; --line:#CCD4DE;
+  --accent:#3446C4; --tri:rgba(52,70,196,.09); --fib:#A97A12; --prz:rgba(201,148,32,.17);
+  --bull:#157455; --bear:#B3303D;
+  --tint-bear:rgba(179,48,61,.08); --tint-acc:rgba(52,70,196,.08); --tint-bull:rgba(21,116,85,.09); --tint-fib:rgba(201,148,32,.10);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+    --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+    --bull:#4FC79C; --bear:#FF6F7C;
+    --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F151E; --surface:#161F2B; --ink:#E4EAF2; --muted:#98A5B6; --grid:#243042; --line:#2D3A4D;
+  --accent:#8F9CFF; --tri:rgba(143,156,255,.13); --fib:#E2B44C; --prz:rgba(226,180,76,.17);
+  --bull:#4FC79C; --bear:#FF6F7C;
+  --tint-bear:rgba(255,111,124,.10); --tint-acc:rgba(143,156,255,.10); --tint-bull:rgba(79,199,156,.10); --tint-fib:rgba(226,180,76,.10);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1260px;margin:0 auto;padding:0 22px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+svg{max-width:100%}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ic{width:16px;height:16px;vertical-align:-3px;flex:none}
+
+/* cabecera */
+.hero{padding-top:40px;padding-bottom:6px}
+.herorow{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin:0 0 10px}
+.hxbrand{display:flex;align-items:center;gap:14px;margin:0;font-weight:800;letter-spacing:.14em;font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1}
+.hxbrand .hxlogo{width:auto;height:1.05em;flex:none}
+.hxbrand .hxsig{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:400;letter-spacing:0;color:var(--fib);font-size:.8em}
+.kicker{color:var(--fib);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.15rem;margin:12px 0 4px}
+.lead{font-size:1.08rem;max-width:720px;color:var(--muted);margin:0 0 18px}
+.prefs{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.segbtn{font:inherit;font-size:.9rem;padding:.4rem .8rem;border:0;background:transparent;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:.35rem}
+.segbtn+.segbtn{border-left:1px solid var(--line)}
+.segbtn[aria-pressed="true"]{background:var(--accent);color:var(--surface);font-weight:600}
+@media (max-width:560px){.segi .segbtn{width:44px;height:42px;justify-content:center}.prefs .seg{height:44px}}
+
+/* grupo de trabajo: sintéticos / mercados */
+.bandrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:6px 0 0}
+.band{display:inline-flex;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:4px;gap:4px}
+.band button{font:inherit;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;padding:.55rem 1.1rem;text-align:left;line-height:1.25}
+.band button b{display:block;font-size:1.02rem;color:var(--ink)}
+.band button small{font-size:.8rem}
+.band button[aria-pressed="true"]{background:var(--ink)}
+.band button[aria-pressed="true"] b,.band button[aria-pressed="true"] small{color:var(--paper)}
+
+.toc{margin:18px 0 0;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.toc ol{margin:0;padding-left:1.3rem;display:flex;flex-wrap:wrap;gap:4px 34px}
+.toc li::marker{font-family:"STIX Two Text",Georgia,serif;font-style:italic;color:var(--fib)}
+
+h2{font-size:clamp(1.5rem,3.2vw,2rem);line-height:1.15;letter-spacing:-.01em;margin:3rem 0 .5rem;font-weight:800}
+h2 .n{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:600;color:var(--fib);margin-right:.35em}
+h3{font-size:1.1rem;margin:1.6rem 0 .5rem}
+.intro{max-width:760px;color:var(--muted);margin:.2rem 0 1rem}
+
+/* botones y controles */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .85rem;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;font-size:.95rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sm{padding:.22rem .6rem;font-size:.84rem;font-weight:500}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;gap:.3rem;padding:2px 11px;border-radius:999px;border:1px solid var(--line);margin:2px 3px 2px 0;font-size:.86rem;background:var(--surface);color:var(--ink);font-family:inherit;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip.on,.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.chip.no{color:var(--muted);border-style:dashed}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:.86rem;font-weight:600;color:var(--muted)}
+.fld select{padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400;font-size:.95rem}
+.inum{width:4.2rem;padding:.2rem .4rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;text-align:right}
+.spacer{flex:1}
+details.settings{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin:.8rem 0}
+details.settings summary{cursor:pointer;font-weight:700}
+details.settings label{display:block;margin:.45rem 0;font-size:.93rem}
+.instgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 18px;margin-top:.6rem}
+.instgrid fieldset{border:1px solid var(--line);border-radius:8px;margin:0;padding:.3rem .8rem .5rem}
+.instgrid legend{font-weight:700;font-size:.9rem;padding:0 .3rem}
+.instgrid legend button{margin-left:.4rem}
+.instgrid label{display:flex !important;gap:.4rem;align-items:center;margin:.15rem 0 !important;font-size:.9rem}
+
+.progress{height:6px;border-radius:999px;background:var(--grid);overflow:hidden;margin:.6rem 0 .2rem}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.status{font-size:.9rem;color:var(--muted);min-height:1.4em}
+.msg{padding:.55rem .85rem;border-radius:6px;margin:.5rem 0;font-size:.93rem}
+.msg.warn{background:var(--tint-bear);border-left:3px solid var(--bear)}
+.msg.info{background:var(--tint-acc);border-left:3px solid var(--accent)}
+.msg.fib{background:var(--tint-fib);border-left:3px solid var(--fib)}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);background:var(--surface)}
+.zsub{font-size:.85rem;color:var(--muted)}
+.t-bull{color:var(--bull)} .t-bear{color:var(--bear)} .t-fib{color:var(--fib)} .t-mut{color:var(--muted)}
+.side{display:inline-flex;align-items:center;gap:.3rem;font-weight:700;white-space:nowrap}
+
+/* tarjetas de señal */
+.sigs{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;margin:1rem 0}
+.sig{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sig.st-wait{--c:var(--fib)} .sig.st-ok{--c:var(--bull)} .sig.st-adv{--c:var(--line)}
+.sig.st-adv .chart{opacity:.7}
+.sig header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.sig h4{margin:0;font-size:1.12rem;line-height:1.25}
+.sig h4 .tf{font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-weight:400;color:var(--fib);margin-left:.25em}
+.badge{margin-left:auto;font-size:.78rem;font-weight:700;padding:1px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.badge.st-wait{color:var(--fib)} .badge.st-ok{color:var(--bull)} .badge.st-adv{color:var(--muted)}
+.sig .pat{font-size:.9rem;color:var(--muted);margin:0}
+.sig .pat b{color:var(--ink)}
+.chart{display:block;width:100%;height:auto;border-radius:8px;background:var(--paper)}
+.lv{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;font-size:.92rem;margin:0}
+.lv dt{color:var(--muted)}
+.lv dd{margin:0;font-variant-numeric:tabular-nums;font-weight:600}
+.lv .rr{color:var(--muted);font-weight:400;font-size:.84rem;text-align:right}
+.lv .hit{color:var(--bull)}
+.avbar{position:relative;height:8px;border-radius:999px;background:var(--grid);overflow:hidden}
+.avbar i{position:absolute;left:0;top:0;bottom:0;background:var(--bull);border-radius:999px}
+.avbar u{position:absolute;top:0;bottom:0;width:2px;background:var(--fib)}
+.sig.st-adv .avbar i{background:var(--muted)}
+.sig .meta{font-size:.84rem;color:var(--muted);margin:0}
+.sig footer{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-top:auto;padding-top:6px;border-top:1px solid var(--line)}
+.sig footer label{display:flex;align-items:center;gap:.35rem;font-size:.9rem;font-weight:600;margin-right:auto}
+.sig footer .no{font-size:.84rem;color:var(--muted);margin-right:auto}
+.snapbar{position:sticky;bottom:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:1rem 0;box-shadow:0 -6px 18px rgba(0,0,0,.06)}
+.snapbar .note{flex:1 1 260px;font-size:.88rem;color:var(--muted)}
+@media (max-width:640px){
+  .snapbar{padding:8px 10px;gap:8px}
+  .snapbar:not(.old) .note{display:none}
+  .snapbar .btn{flex:1 1 0;justify-content:center;font-size:.86rem;padding:.5rem .6rem}
+}
+
+/* tablas */
+.tablewrap{overflow-x:auto;margin:.6rem 0 1rem;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.92rem}
+th,td{padding:.5rem .75rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font-weight:700;color:var(--muted);font-size:.83rem;background:var(--tint-acc);white-space:nowrap}
+td.n{white-space:nowrap}
+.res{display:inline-block;font-weight:700;font-size:.82rem;padding:0 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.res.win{color:var(--bull)} .res.loss{color:var(--bear)} .res.open{color:var(--muted)}
+.tps span{white-space:nowrap;margin-right:.6rem}
+.tps .hit{color:var(--bull);font-weight:700}
+
+/* fotos */
+.snap{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:.7rem 0;padding:0}
+.snap>summary{cursor:pointer;padding:12px 16px;display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;list-style:none}
+.snap>summary::-webkit-details-marker{display:none}
+.snap>summary b{font-size:1.02rem}
+.snap>summary .zsub{flex:1}
+.snap .tablewrap{margin:0 12px 12px;border-radius:8px}
+.snap .sbtns{padding:0 16px 12px;display:flex;gap:8px;flex-wrap:wrap}
+.counts{display:inline-flex;gap:10px;font-size:.88rem}
+
+/* resultados */
+.stats{display:flex;flex-wrap:wrap;gap:6px 26px;margin:.4rem 0 .8rem;color:var(--muted);font-size:.93rem}
+.stats b{display:block;color:var(--ink);font-family:"STIX Two Text",Georgia,serif;font-style:italic;font-size:1.6rem;font-weight:600;line-height:1.1}
+.stats .big b{font-size:2.4rem;color:var(--bull)}
+.repwrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.repwrap{grid-template-columns:1fr}}
+.repimg{width:100%;height:auto;border-radius:12px;border:1px solid var(--line);display:block}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:.6rem 0}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:.55rem 1rem;border-radius:8px;font-size:.92rem;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.files{display:flex;flex-wrap:wrap;gap:6px;margin:.5rem 0 0}
+.filetag{display:inline-flex;align-items:center;gap:.4rem;font-size:.86rem;padding:2px 4px 2px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper)}
+.filetag button{border:0;background:transparent;color:var(--muted);cursor:pointer;font:inherit;padding:0 6px}
+.drop{display:block;cursor:pointer;border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);background:var(--paper)}
+.drop.over{border-color:var(--accent);background:var(--tint-acc)}
+/* cerca de la zona */
+.watch{margin:.4rem 0 .8rem}
+.zcode{display:inline-block;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.04em;padding:0 7px;margin-right:4px;border-radius:5px;background:var(--tint-acc);color:var(--accent)}
+.watchrow{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.wtoggle{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;flex-wrap:wrap}
+.wtoggle input{width:1.15rem;height:1.15rem;accent-color:var(--accent)}
+.nearbar select{padding:.3rem .5rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit}
+.wtoggle select{padding:.3rem .5rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-weight:400}
+.alog{list-style:none;margin:0 0 .5rem;padding:8px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;max-height:220px;overflow:auto;font-size:.9rem}
+.alog li{padding:3px 0;border-bottom:1px solid var(--grid)}
+.alog li:last-child{border-bottom:0}
+.alog .num{color:var(--muted);margin-right:.3rem}
+.sig.st-near{--c:var(--accent)}
+.badge.st-near{color:var(--accent)}
+.sig.st-in{--c:var(--ink)} .badge.st-in{color:var(--ink)} .sig.st-in .avbar i{background:var(--ink)}
+.sig.st-past{--c:var(--fib)} .badge.st-past{color:var(--fib)} .sig.st-past .avbar i{background:var(--fib)}
+.sig.st-in .lv .rr,.sig.st-past .lv .rr{font-variant-numeric:normal}
+.lv .hl{background:var(--hlt);color:var(--hlc);font-weight:700;padding-top:3px;padding-bottom:3px}
+.lv dt.hl{padding-left:6px;border-radius:6px 0 0 6px;border-left:3px solid var(--hlc)}
+.lv dd.hl.rr{color:var(--hlc);border-radius:0 6px 6px 0;padding-right:6px}
+.hl-buy{--hlc:var(--bull);--hlt:var(--tint-bull)} .hl-sell{--hlc:var(--bear);--hlt:var(--tint-bear)}
+.przbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--paper);font-size:.88rem}
+.przbox .pzh{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;margin:0 0 4px}
+.przbox .pzh b{font-size:.95rem}
+.przbox .pzh .num{font-weight:700}
+.przbox ul{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:1fr auto;gap:1px 12px}
+.przbox li{display:contents}
+.przbox li span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.przbox li.on span{color:var(--hlc);font-weight:700}
+.nearbar{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:.4rem 0 .6rem;font-size:.93rem}
+.nearbar label{display:inline-flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.nearbar .inum{width:5.2rem}
+.nearbar .react{flex-basis:100%}
+.nearbar>[data-t="ptsA"],.nearbar>[data-t="ptsNote"]{flex-basis:100%}
+.nearbar select{padding:.3rem .5rem;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;font-size:.93rem}
+.sig.st-near .avbar i{background:var(--accent)}
+.sig.st-near .lv .rr{font-variant-numeric:normal}
+footer.page{margin:3rem 0 2rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:1rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress i{transition:none}}
+</style>
+</head>
+<body>
+<header class="wrap hero">
+  <div class="herorow">
+    <h1 class="hxbrand"><svg class="hxlogo" width="40" height="32" viewBox="4.5 6.5 23 18" aria-hidden="true"><polyline points="6,22 11,9 15,17 19,12 26,23" fill="none" stroke="#4A6CF0" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>HARMONIX</span><span class="hxsig" data-t="brandSig"></span></h1>
+    <div class="prefs">
+      <div class="seg" role="group" aria-label="Idioma / Language"><button type="button" class="segbtn" data-lang="es" aria-pressed="true">Español</button><button type="button" class="segbtn" data-lang="en" aria-pressed="false">English</button></div>
+      <div class="seg segi" role="group" data-ta="themeGroup"><button type="button" class="segbtn" data-theme-btn="system" data-ta="themeSys"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button><button type="button" class="segbtn" data-theme-btn="light" data-ta="themeLight"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button><button type="button" class="segbtn" data-theme-btn="dark" data-ta="themeDark"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button></div>
+    </div>
+  </div>
+  <p class="kicker" data-t="kicker"></p>
+  <p class="lead" data-t="lead"></p>
+  <nav class="toc" data-ta="navLabel">
+    <ol>
+      <li><a href="#senales" data-t="nav1"></a></li>
+      <li><a href="#cerca" data-t="nav3"></a></li>
+      <li><a href="#comparar" data-t="nav2"></a></li>
+    </ol>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<section id="senales">
+  <h2><span class="n">1</span><span data-t="nav1"></span></h2>
+  <p class="intro" data-t="intro1"></p>
+  <div class="panel">
+    <div class="bandrow"><div class="band" role="group" id="bandSeg"></div></div>
+    <div class="toolbar" style="margin-top:14px">
+      <div class="fld"><span data-t="tfs"></span><div id="tfChips"></div></div>
+      <label class="fld"><span data-t="hist"></span><select id="histSel"></select></label>
+      <div class="spacer"></div>
+      <button type="button" class="btn primary" id="scanBtn"></button>
+    </div>
+    <div class="progress" id="prog" hidden><i></i></div>
+    <div class="status" id="scanStatus" role="status" aria-live="polite"></div>
+  </div>
+  <details class="settings" id="instBox"><summary id="instSum"></summary><p class="zsub" id="instHint" style="margin:.5rem 0 0"></p><div class="instgrid" id="instGrid"></div></details>
+  <details class="settings"><summary data-t="opts"></summary>
+    <label><span data-t="advA"></span> <input class="inum" id="optAdv" inputmode="numeric"> <span data-t="advB"></span></label>
+    <label><span data-t="ageA"></span> <input class="inum" id="optAge" inputmode="numeric"> <span data-t="ageB"></span></label>
+    <label><input type="checkbox" id="optWait"> <span data-t="optWait"></span></label>
+  </details>
+  <div id="scanFilters"></div>
+  <div id="scanOut"></div>
+  <div class="snapbar" id="saveBar" hidden>
+    <span class="note" id="saveNote"></span>
+    <button type="button" class="btn" id="copyAllBtn"></button>
+    <button type="button" class="btn primary" id="saveBtn"></button>
+  </div>
+</section>
+
+<section id="cerca">
+  <h2><span class="n">2</span><span data-t="nav3"></span></h2>
+  <p class="intro" data-t="intro3"></p>
+  <div class="panel watch">
+    <div class="watchrow">
+      <label class="wtoggle"><input type="checkbox" id="optWatch"> <span data-t="wLabel"></span> <select id="watchMin"></select></label>
+      <button type="button" class="btn sm" id="testAlert" data-t="wTest"></button>
+      <button type="button" class="btn sm" id="copyCfg" data-t="wCfg"></button>
+    </div>
+    <div class="status" id="watchStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div class="nearbar">
+    <span data-t="ptsA" class="synthOnly"></span>
+    <label class="synthOnly"><input class="inum" id="pts0" inputmode="decimal"> <span data-t="pts0"></span></label>
+    <label class="synthOnly"><input class="inum" id="pts1" inputmode="decimal"> <span data-t="pts1"></span></label>
+    <label class="synthOnly"><input class="inum" id="pts2" inputmode="decimal"> <span data-t="pts2"></span></label>
+    <span class="zsub synthOnly" data-t="ptsNote"></span>
+    <label class="mktOnly"><span data-t="pctA"></span> <input class="inum" id="mktPct" inputmode="decimal"> <span data-t="pctB"></span></label>
+    <label class="react"><span data-t="edgesA"></span> <select id="edgesSel"></select></label>
+    <label class="react"><span data-t="reactA"></span> <input class="inum" id="optReact" inputmode="decimal"> <span data-t="reactB"></span></label>
+  </div>
+  <div id="alertLog" style="margin-bottom:.6rem"></div>
+  <div id="nearFilters"></div>
+  <div id="nearOut"></div>
+</section>
+
+<section id="comparar">
+  <h2><span class="n">3</span><span data-t="nav2"></span></h2>
+  <p class="intro" data-t="intro2"></p>
+  <div class="panel">
+    <label class="drop" id="drop" for="cmpFile"><span data-t="drop"></span></label>
+    <input type="file" id="cmpFile" accept=".csv,text/csv" multiple hidden>
+    <div class="files" id="fileList"></div>
+    <div class="toolbar" style="margin-top:12px">
+      <label class="fld"><span data-t="mode"></span><select id="modeSel"></select></label>
+      <div class="spacer"></div>
+      <button type="button" class="btn primary" id="cmpBtn"></button>
+    </div>
+    <div class="status" id="cmpStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div id="cmpOut" hidden>
+    <div id="repStats"></div>
+    <div class="btnrow">
+      <button type="button" class="btn primary" id="xPdf"></button>
+      <button type="button" class="btn primary" id="xXlsx"></button>
+      <button type="button" class="btn" id="xCsv"></button>
+      <button type="button" class="btn" id="xImg"></button>
+      <button type="button" class="btn" id="xTxt"></button>
+    </div>
+    <div class="tablewrap"><table id="cmpTable"></table></div>
+    <div class="repwrap">
+      <div><h3 data-t="byPat"></h3><div class="tablewrap"><table id="patTable"></table></div></div>
+      <div><h3 data-t="byTf"></h3><div class="tablewrap"><table id="tfTable"></table></div></div>
+    </div>
+  </div>
+</section>
+
+<footer class="page" data-t="foot"></footer>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script>
+(function(){
+'use strict';
+const isF = Number.isFinite;
+const num = v => { if(v == null) return NaN; const s = String(v).trim().replace(/\s/g,'').replace(',', '.'); return s === '' ? NaN : Number(s); };
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fr = r => (+r).toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+
+/* ============ Motor de HARMONIX v9 (copiado sin cambios) ============ */
+/* ============ Teoría ============ */
+const FIB_RET = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886];
+const FIB_EXT = [1.13, 1.272, 1.414, 1.618, 2.0, 2.24, 2.618, 3.14, 3.618];
+const ABCD_SET = [0.618, 0.786, 1, 1.272, 1.618, 2.0, 2.618];
+const KEY_XA = new Set([0.618, 0.786, 0.886, 1.13, 1.272, 1.618, 2.618]);
+const KEY_BC = new Set([1.272, 1.618, 2.0, 2.24, 2.618, 3.618]);
+const KEY_AB = new Set([1, 1.272, 1.618]);
+const COLORS = ['#3F7FD6','#8E5CCB','#C28A16','#C9507F','#1E9C84','#D8702C','#6E9B2A','#5A66D9','#C94545','#2A9DC0'];
+
+// Patrones clásicos (Carney). b: rango B/XA · d: retroceso/extensión XA (el primero es el principal)
+// bc: rango de proyección CD/BC · abcd: variantes AB=CD. C siempre 0.382–0.886 de AB.
+const HARM = [
+  // Tablas estandarizadas de Carney, Harmonic Trading Vol. 3. tol: tolerancia del punto B (±3% Gartley/Butterfly, ±5% el resto)
+  // extra: niveles que Carney incluye en la PRZ (mínimos o capas de tolerancia)
+  {key:'gartley',  name:'Gartley',     b:[0.618,0.618], tol:0.03, d:[0.786], bc:[1.13,1.618],  abcd:[1,1.272]},
+  {key:'bat',      name:'Bat',         b:[0.382,0.5],   tol:0.05, d:[0.886], bc:[1.618,2.618], abcd:[1,1.272,1.618]},
+  {key:'altbat',   name:'Bat alterno', b:[0.236,0.382], tol:0.03, d:[1.13],  bc:[2.0,3.618],   abcd:[1,1.272,1.618], extra:[[0.886,'mínimo 0.886 XA'],[1,'debe incluir 1.0 XA']]},
+  {key:'butterfly',name:'Butterfly',   b:[0.786,0.786], tol:0.03, d:[1.272], bc:[1.618,2.24],  abcd:[1,1.272]},
+  {key:'crab',     name:'Crab',        b:[0.382,0.618], tol:0.05, d:[1.618], bc:[2.618,3.618], abcd:[1,1.272,1.618], extra:[[1.902,'tolerancia 1.902 XA']]},
+  {key:'deepcrab', name:'Deep Crab',   b:[0.886,0.936], tol:0.02, d:[1.618], bc:[2.0,3.618],   abcd:[1,1.272,1.618], extra:[[1.902,'tolerancia 1.902 XA']]}
+];
+const FAM_RANK = {pat:6, post:5, xa:4, bc:3, abcd:2, st:1};
+// Encaje de B con rango preferido (Carney: el Bat admite B < 0.618, pero prefiere 0.382–0.50)
+// Encaje con tolerancia (Carney Vol. 3): 1 dentro del ideal; baja hasta 0.7 en el borde de la tolerancia; 0 fuera
+function fitTol(v, lo, hi, tol){
+  if(!isF(v)) return 0;
+  if(v >= lo - 1e-9 && v <= hi + 1e-9) return 1;
+  const dev = v < lo ? lo - v : v - hi;
+  return dev <= tol + 1e-9 ? 1 - 0.3 * dev / tol : 0;
+}
+const fitB = (v, h, slack) => fitTol(v, h.b[0], h.b[1], isF(h.tol) ? h.tol : slack);
+// Tabla recíproca de Carney: retroceso de C → proyección BC
+const RECIP = [[0.382, [2.24, 2.618, 3.14, 3.618]], [0.5, [2.0]], [0.618, [1.618]], [0.707, [1.414]], [0.786, [1.272]], [0.886, [1.13]], [1, [2.0]]];
+const recipOf = cab => RECIP.reduce((a, r) => Math.abs(r[0] - cab) < Math.abs(a[0] - cab) ? r : a);
+
+// Encaje de un ratio en un rango: 1 dentro, decae hasta 0.5 en el borde de la tolerancia, 0 fuera
+function fitR(v, lo, hi, slack){
+  if(!isF(v)) return 0;
+  if(v >= lo - 1e-9 && v <= hi + 1e-9) return 1;
+  const dev = v < lo ? lo - v : v - hi;
+  return dev <= slack ? 1 - 0.5 * dev / slack : 0;
+}
+const parseExtra = s => String(s || '').split(/[;\s]+|,(?=\s)|,(?=\d+\.)/).map(num).filter(v => isF(v) && v > 0 && v < 10);
+
+/* ============ Estado ============ */
+const DEFAULT_SETTINGS = {fav:['crab','deepcrab','butterfly2'], timeTol:0, bandPct:1.5, minPts:0, ratioSlack:0.03, slPct:10, useHistory:true, minLevels:3, minLevelsV:3, minPatterns:1, maxZones:12, sort:'score', extra:'',
+  grid:{xa:true, bc:true, abcd:true, struct:true, passed:false}, sum:{hideTaken:true, hidePts:true}, edge:{tol:0.5, fitOnly:false}, trk:{on:true, react:10, bars:2, early:3, tp:'CD'}, cvf:{atrK:3, minBars:3}};
+const blankState = () => ({notes:[], asset:{name:'', type:'boom', trend:'auto', decimals:2, price:null, capital:null, riskPct:2, pointValue:1, minLot:0.01}, settings:clone(DEFAULT_SETTINGS), patterns:[], selectedId:null});
+let state = blankState();
+let dirty = false, editingId = null;
+let analyses = [];
+let hist = {out:new Map(), byKey:{}, legs:[], bins:[], pref:new Set(), total:0, onFib:0, chance:0};
+const PIV = ['E','F','G','H','I','J','K','L'];
+
+const dec = () => state.asset.decimals;
+const fmt = n => isF(n) ? n.toFixed(dec()) : '–';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const colorOf = id => { const p = state.patterns.find(q => q.id === id); return p ? p.color : '#888'; };
+const labelOf = id => { const p = state.patterns.find(q => q.id === id); return p ? (p.label || 'Sin nombre') : '?'; };
+
+/* ============ Simulador: definiciones ============ */
+// sl: [conservador, agresivo] en ratio de la misma base que D. next: a qué migra si el precio atraviesa D.
+const SIM = {
+  // sl: [SL2 conservador = stop estándar de Carney Vol. 3, SL1 agresivo]. slNote: SL1 que no es un ratio canónico
+  gartley:   {name:'Gartley',        fam:'xabcd', b:[.618,.618], tol:.03, d:.786,  base:'XA', bc:[1.13,1.618],  abcd:[1,1.272],       sl:[1,.886],        next:'crab', variant:.886, slAbcd:true},
+  bat:       {name:'Bat',            fam:'xabcd', b:[.382,.5],   tol:.05, d:.886,  base:'XA', bc:[1.618,2.618], abcd:[1,1.272,1.618], sl:[1.13,1],        next:'altbat', slAbcd:true},
+  altbat:    {name:'Bat alterno',    fam:'xabcd', b:[.236,.382], tol:.03, d:1.13,  base:'XA', bc:[2,3.618],     abcd:[1,1.272,1.618], sl:[1.272,1.2],     next:'crab', extra:[[.886,'mínimo 0.886 XA',true],[1,'1.0 XA',true]], slNote:true},
+  butterfly: {name:'Butterfly',      fam:'xabcd', b:[.786,.786], tol:.03, d:1.272, base:'XA', bc:[1.618,2.24],  abcd:[1,1.272],       sl:[1.414,1.343],   next:'butterfly2', slNote:true, slAbcd:true},
+  butterfly2:{name:'Extensión 1.618',fam:'xabcd', b:[.786,.786], tol:.03, d:1.618, base:'XA', bc:[2.24,2.618],  abcd:[1.618],         sl:[2,1.902],       next:null, hidden:true, slAbcd:true},
+  crab:      {name:'Crab',           fam:'xabcd', b:[.382,.618], tol:.05, d:1.618, base:'XA', bc:[2.618,3.618], abcd:[1,1.272,1.618], sl:[2,1.902],       next:null, extra:[[1.902,'tolerancia 1.902 XA',false]], slAbcd:true},
+  deepcrab:  {name:'Deep Crab',      fam:'xabcd', b:[.886,.936], tol:.02, d:1.618, base:'XA', bc:[2,3.618],     abcd:[1,1.272,1.618], sl:[2,1.902],       next:null, extra:[[1.902,'tolerancia 1.902 XA',false]], slAbcd:true},
+  shark:     {name:'Shark',          fam:'shark', d:.886,  base:'XA', bc:[1.618,2.24], sl:[1.272,1.2],  next:null, extra:[[1.13,'1.13 XA',true]], slNote:true},
+  shark2:    {name:'Shark 1.13',     fam:'shark', d:1.13,  base:'XA', bc:[1.618,2.24], sl:[1.272,1.2],  next:null, hidden:true, slNote:true},
+  cypher:    {name:'Cypher',         fam:'cypher',d:.786,  base:'XC', sl:[1,.886],     next:null},
+  nenstar:   {name:'Nen Star',       fam:'nenstar', d:1.272, base:'XA', bc:[1.272,2], sl:[1.414,1.343], next:null, slNote:true},
+  abcd:      {name:'AB=CD',          fam:'abcd',  d:1,     base:'AB', sl:[1.272,1.13], next:'abcd2'},
+  abcd2:     {name:'AB=CD 1.272',    fam:'abcd',  d:1.272, base:'AB', sl:[1.618,1.414],next:'abcd3', hidden:true},
+  abcd3:     {name:'AB=CD 1.618',    fam:'abcd',  d:1.618, base:'AB', sl:[2,1.8],      next:null, hidden:true, slNote:true}
+};
+
+const rangeTxt = b => b[0] === b[1] ? fr(b[0]) : fr(b[0]) + '–' + fr(b[1]);
+
+function geom(c){
+  const {X, A, B, C, D} = c, hasX = isF(X), hasD = isF(D);
+  if(![A,B,C].every(isF)) return {ok:false, err:'Faltan A, B o C.'};
+  const ab = Math.abs(B - A), bc = Math.abs(C - B);
+  if(!ab || !bc) return {ok:false, err:'A, B y C no pueden repetirse.'};
+  if(Math.sign(B - A) !== -Math.sign(C - B)) return {ok:false, err:'B y C deben alternar (zigzag).'};
+  let dir, xa = NaN;
+  if(hasX){ xa = Math.abs(A - X); if(!xa || Math.sign(A - X) !== -Math.sign(B - A)) return {ok:false, err:'X→A debe ir contra A→B.'}; dir = Math.sign(A - X); }
+  else dir = Math.sign(C - B);
+  if(hasD && Math.sign(D - C) !== -dir) return {ok:false, err:'C→D debe ir contra B→C.'};
+  const post = Array.isArray(c.post) ? c.post.filter(isF) : [];
+  if(post.length){
+    if(!hasD) return {ok:false, err:'Registra D antes de los pivotes posteriores.'};
+    let prev = C, cur = D;
+    for(const q of post){ if(q === cur || Math.sign(q - cur) !== -Math.sign(cur - prev)) return {ok:false, err:'Los pivotes después de D deben alternar (zigzag).'}; prev = cur; cur = q; }
+  }
+  const R = {cab: bc / ab};
+  if(hasX){ R.bxa = ab / xa; R.cx = Math.abs(C - X) / xa; }
+  return {ok:true, hasX, hasD, dir, xa, ab, bc, R, post, cBeyondA:(C - A) * dir > 0, bBeyondX: hasX && (B - X) * dir < 0};
+}
+
+function simFit(key, g){
+  const P = SIM[key], sl = state.settings.ratioSlack, R = g.R;
+  const no = why => ({fit:0, why});
+  if(P.fam === 'xabcd'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(g.cBeyondA) return no('C supera a A: mira Cypher o Shark.');
+    if(g.bBeyondX) return no('B supera a X: no es un XABCD clásico.');
+    const bf = fitB(R.bxa, P, sl), cf = fitR(R.cab, .382, .886, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y ${P.name} pide ${rangeTxt(P.b)}.`);
+    if(!cf) return no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(P.fam === 'shark'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Shark, C debe superar a A (1.13–1.618 de AB).');
+    const cf = fitR(R.cab, 1.13, 1.618, sl);
+    if(!cf || R.bxa >= 1) return no(`C está en ${fr(R.cab)} de AB y el Shark pide 1.13–1.618.`);
+    return {fit:cf};
+  }
+  if(P.fam === 'cypher'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Cypher, C debe superar a A (1.13–1.414 de XA).');
+    const bf = fitR(R.bxa, .382, .618, sl), xf = fitR(R.cx, 1.13, 1.414, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y el Cypher pide 0.382–0.618.`);
+    if(!xf) return no(`C extiende ${fr(R.cx)} de XA y el Cypher pide 1.13–1.414.`);
+    return {fit:Math.min(bf, xf)};
+  }
+  if(P.fam === 'nenstar'){
+    if(!g.hasX) return no('Necesita el punto X.');
+    if(!g.cBeyondA) return no('En un Nen Star, C debe superar a A (1.13–2.14 de AB).');
+    if(g.bBeyondX) return no('En un Nen Star, B no debe superar a X.');
+    const bf = fitR(R.bxa, .382, .618, sl), cf = fitR(R.cab, 1.13, 2.14, sl);
+    if(!bf) return no(`B está en ${fr(R.bxa)} de XA y el Nen Star pide 0.382–0.618.`);
+    if(!cf) return no(`C está en ${fr(R.cab)} de AB y el Nen Star pide 1.13–2.14.`);
+    return {fit:Math.min(bf, cf)};
+  }
+  if(g.cBeyondA) return no('C supera a A: no es un AB=CD.');
+  const cf = fitR(R.cab, .382, .886, sl);
+  return cf ? {fit:cf} : no(`C está en ${fr(R.cab)} de AB y el rango válido es 0.382–0.886.`);
+}
+
+function simCompute(c, key, slMode, tpMode, entryMode){
+  const g = geom(c); if(!g.ok) return {ok:false, err:g.err};
+  const P = SIM[key], {X, A, B, C} = c, dir = g.dir;
+  if((P.base === 'XA' || P.base === 'XC') && !g.hasX) return {ok:false, err:P.name + ' necesita el punto X.'};
+  const XC = g.hasX ? Math.abs(C - X) : NaN;
+  const at = {XA:k => A - dir * k * g.xa, XC:k => C - dir * k * XC, BC:k => C - dir * k * g.bc, AB:k => C - dir * k * g.ab}[P.base];
+  const bcP = k => C - dir * k * g.bc, abP = k => C - dir * k * g.ab;
+  const leg = g.hasX ? g.xa : g.ab;
+  // identidad de la medida: ratio + tramo + punto desde donde se proyecta. Así el XA de una estructura y el BC de otra con los mismos precios cuentan como una sola medida
+  const legKey = {XA:X + '>' + A + '@' + A, XC:X + '>' + C + '@' + C, BC:B + '>' + C + '@' + C, AB:A + '>' + B + '@' + C}, sk = (b, k) => legKey[b] ? '#' + fr(k) + '|' + legKey[b] : '';
+  const Dp = at(P.d);
+  const proj = [{label:fr(P.d) + ' ' + P.base, v:Dp, main:true, inPrz:true, src:P.base + ' ' + fr(P.d) + sk(P.base, P.d)}];
+  let bcBest = null;
+  if(P.bc){
+    FIB_EXT.forEach(f => { if(f < P.bc[0] - 1e-9 || f > P.bc[1] + 1e-9) return; const v = bcP(f); if(!bcBest || Math.abs(v - Dp) < Math.abs(bcBest.v - Dp)) bcBest = {f, v}; });
+    if(bcBest){
+      proj.push({label:fr(bcBest.f) + ' BC', v:bcBest.v, inPrz:true, bc:true, src:'BC ' + fr(bcBest.f) + sk('BC', bcBest.f)});
+      const f2 = FIB_EXT.find(q => q > bcBest.f + 1e-9);   // capa BC (Carney Vol. 3): tolerancia más allá del ideal
+      if(f2) proj.push({label:fr(f2) + ' BC (capa de tolerancia)', v:bcP(f2), inPrz:false, bc:true, layer:true});
+    }
+  }
+  let abcdPt = null;
+  if(P.abcd){
+    let best = null; P.abcd.forEach(f => { const v = abP(f); if(!best || Math.abs(v - Dp) < Math.abs(best.v - Dp)) best = {f, v}; });
+    const near = Math.abs(best.v - Dp) <= 0.10 * leg;
+    proj.push({label:(best.f === 1 ? 'AB=CD' : 'AB=CD ' + fr(best.f)) + (near ? '' : ' (lejos)'), v:best.v, inPrz:near, src:'AB ' + fr(best.f) + sk('AB', best.f)});
+    abcdPt = {v:best.v, f:best.f};
+  }
+  if(P.base === 'AB' && fitR(g.R.cab, .382, .886, .03) > 0){
+    const rc = recipOf(g.R.cab), k = rc[1].reduce((a, q) => Math.abs(bcP(q) - Dp) < Math.abs(bcP(a) - Dp) ? q : a), v = bcP(k), near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'BC recíproco ' + fr(k) + (near ? '' : ' (lejos)'), v, inPrz:near, bc:true, src:'BC ' + fr(k) + sk('BC', k)});
+  }
+  (P.extra || []).forEach(([k, t, inP]) => proj.push({label:t, v:at(k), inPrz:inP, layer:!inP, src:P.base + ' ' + fr(k) + sk(P.base, k)}));
+  if(P.variant && g.R.cab <= 0.64) proj.push({label:'variante ' + fr(P.variant) + ' XA (BC ≥ 1.618)', v:at(P.variant), inPrz:true, src:P.base + ' ' + fr(P.variant) + sk(P.base, P.variant)});
+  const hs = state.settings.useHistory && hist.byKey[key];
+  if(hs && hs.devN >= 2){
+    const v = Dp - dir * hs.devMean * leg, near = Math.abs(v - Dp) <= 0.10 * leg;
+    proj.push({label:'D según historial (' + hs.devN + ')', v, inPrz:near, hist:true, src:'historial'});
+  }
+  const pz = proj.filter(p => p.inPrz).map(p => p.v);
+  const prz = [Math.min(...pz), Math.max(...pz)];
+  const E = g.hasD ? c.D : Dp;
+  let slR = slMode === 'agr' ? P.sl[1] : P.sl[0];
+  if(slR <= P.d + 1e-9) slR = P.d * 1.15;
+  const baseLeg = {XA:g.xa, XC:XC, BC:g.bc, AB:g.ab}[P.base];
+  // Carney: el stop "depende del AB=CD". Si el AB=CD de la PRZ completa más allá del stop estándar, el stop va detrás del AB=CD
+  let SL = at(slR) - dir * 0.02 * baseLeg, slByAbcd = null, abcdFar = null;
+  if(P.slAbcd && abcdPt && (abcdPt.v - at(slR)) * dir < 0){
+    const past = Math.abs(abcdPt.v - at(slR));
+    if(past <= 0.25 * baseLeg){ SL = abcdPt.v - dir * 0.02 * baseLeg; slByAbcd = abcdPt; }   // hasta 0.25 del tramo: el stop va detrás del AB=CD
+    else abcdFar = abcdPt;                                                                   // más lejos: PRZ incoherente
+  }
+  const refAD = (P.fam === 'cypher' || P.fam === 'shark' || P.fam === 'nenstar') ? C : A;
+  const ref = tpMode === 'CD' ? C : refAD;
+  const tpLbl = (tpMode === 'CD' || ref === C) ? 'CD' : 'AD';
+  const tpR = P.fam === 'shark' ? [0.5, 0.618] : [0.382, 0.618];   // Shark: objetivo en el 50% del último tramo (Carney Vol. 3)
+  const TP1 = E + tpR[0] * (ref - E), TP2 = E + tpR[1] * (ref - E);
+  // Entrada: en D (orden límite) o confirmada (T-Bar + 1: el precio prueba la PRZ y vuelve a su borde cercano)
+  const nearEdge = dir > 0 ? prz[1] : prz[0];
+  const plan = !g.hasD && entryMode === 'prz' ? przPlanOf(prz, dir, baseLeg) : null;
+  const entry = g.hasD ? c.D : entryMode === 'conf' ? nearEdge : plan ? plan.orders[0].v : Dp;
+  const risk = plan ? plan.orders[0].risk : Math.abs(entry - SL);
+  const pts = [];
+  if(g.hasX) pts.push({n:'X', v:X});
+  pts.push({n:'A', v:A}, {n:'B', v:B}, {n:'C', v:C}, {n:'D', v:g.hasD ? c.D : Dp, fut:!g.hasD});
+  const iD = pts.length - 1;
+  if(g.hasD) g.post.forEach((v,i) => pts.push({n:PIV[i], v}));
+  const iOf = n => pts.findIndex(p => p.n === n);
+  const conns = [];
+  if(g.hasX){
+    conns.push([iOf('X'), iOf('B'), 'B ' + fr(g.R.bxa)]);
+    if(P.fam === 'cypher') conns.push([iOf('X'), iOf('C'), 'C ' + fr(g.R.cx) + ' XA']);
+    else conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    if(bcBest) conns.push([iOf('B'), iOf('D'), fr(bcBest.f) + ' BC']);
+    conns.push([iOf('X'), iOf('D'), fr(P.d) + ' ' + P.base]);
+  } else {
+    conns.push([iOf('A'), iOf('C'), 'C ' + fr(g.R.cab)]);
+    conns.push([iOf('B'), iOf('D'), 'CD ' + fr(P.d) + ' AB']);
+  }
+  const breached = g.hasD && (c.D - SL) * dir < 0;
+  return {ok:true, g, P, key, pts, iD, tpR, slByAbcd, abcdFar, conns, proj, prz, Dp, E, SL, slR, TP1, TP2, tpLbl, risk,
+          rr1:Math.abs(TP1 - entry) / risk, rr2:Math.abs(TP2 - entry) / risk, entry, nearEdge, plan, baseLeg, entryMode:g.hasD ? 'real' : entryMode === 'conf' ? 'conf' : plan ? 'prz' : 'D', hasD:g.hasD, hasX:g.hasX, dir, leg, breached, C};
+}
+
+// Operar la PRZ: una sola orden límite según el ancho de la PRZ (en % del tramo base)
+//  < 3%: en la mitad · 3% o más: al 90% de la PRZ (cerca del borde lejano)
+//  stop: más allá del borde lejano (+2% del tramo)
+//  objetivo: el borde cercano de la PRZ (el precio sale de la zona) o 1R, el que quede más lejos
+const PRZ_NARROW = 0.03, PRZ_WIDE = 0.05, PRZ_DEEP = 0.9;
+function przPlanOf(prz, dir, legBase){
+  const w = prz[1] - prz[0], pct = legBase ? w / legBase : NaN;
+  const near = dir > 0 ? prz[1] : prz[0], far = dir > 0 ? prz[0] : prz[1], mid = (prz[0] + prz[1]) / 2;
+  const SL = far - dir * 0.02 * legBase;
+  const type = pct < PRZ_NARROW ? 'una' : pct <= PRZ_WIDE ? 'bordes' : 'ancha';
+  const v = type === 'una' ? mid : near + PRZ_DEEP * (far - near);
+  const n = type === 'una' ? 'Orden (mitad de la PRZ)' : 'Orden al 90% de la PRZ';
+  const t1R = v + (v - SL), useEdge = Math.abs(near - v) >= Math.abs(t1R - v);
+  const T = useEdge ? near : t1R, tKind = useEdge ? 'edge' : '1R';
+  const o = {n, v, risk:Math.abs(v - SL), gain:Math.abs(T - v)}; o.rr = o.gain / o.risk;
+  const orders = [o], sumRisk = o.risk;
+  const a = state.asset, step = a.minLot > 0 ? a.minLot : 0.01, dp = Math.max(0, (String(step).split('.')[1] || '').length);
+  let lots = null;
+  if(isF(a.capital) && a.capital && a.pointValue && sumRisk){
+    const money = a.capital * (a.riskPct || 0) / 100, raw = money / (sumRisk * a.pointValue), l = Math.floor(raw / step + 1e-9) * step;
+    lots = {each:+l.toFixed(dp), money, real:l * sumRisk * a.pointValue, below:l < step - 1e-12, dp};
+  }
+  return {w, pct, type, near, far, mid, SL, T, tKind, orders, sumRisk, lots, avg:v};
+}
+const PRZ_TYPE_TXT = {una:'estrecha (< 3%): orden en la mitad', bordes:'normal (3–5%): orden al 90%', ancha:'ancha (> 5%): orden al 90%'};
+
+// Encajes buenos (≥65%) cuentan igual: entre ellos gana la PRZ que el precio tocaría primero, como en la escalera
+const tier = f => f >= 0.65 ? 2 : f > 0 ? 1 : 0;
+// Ranking: compatibles primero, luego mejor encaje, luego el que el precio tocaría primero (o el más cercano a D real)
+function rankCands(c){
+  const g = geom(c); if(!g.ok) return [];
+  return Object.keys(SIM).filter(k => !SIM[k].hidden).map(k => {
+    const f = simFit(k, g);
+    const r = simCompute(c, k, 'cons', 'AD');
+    const dist = r.ok ? Math.abs(r.Dp - (g.hasD ? c.D : c.C)) : Infinity;
+    // con X, un patrón XABCD es más específico que un AB=CD suelto
+    const spec = g.hasX && SIM[k].fam !== 'abcd' ? 1 : 0;
+    return {key:k, fit:f.fit, why:f.why || '', dist, spec};
+  }).sort((a,b) => ((b.fit > 0) - (a.fit > 0)) || (b.spec - a.spec) || (g.hasD ? a.dist - b.dist : (tier(b.fit) - tier(a.fit)) || (a.dist - b.dist)));
+}
+
+const z2 = n => String(n).padStart(2, '0');
+const PARENT = {butterfly2:'butterfly', shark2:'shark', abcd2:'abcd', abcd3:'abcd'};
+const FIB_ALL = [0.236, 0.382, 0.5, 0.618, 0.707, 0.786, 0.886, 1, 1.13, 1.272, 1.414, 1.618, 2, 2.24, 2.618, 3.14, 3.618];
+const noD = c => ({X:c.X, A:c.A, B:c.B, C:c.C, D:NaN, post:[]});
+// Todas las PRZ: la de cada patrón posible con estas X, A, B y C, ordenadas por cercanía a C
+const XA_EXTREMES = [[2, '2.0 XA'], [2.24, '2.24 XA']];
+function allPrzData(c, taken){
+  const tk = new Set(taken || []);
+  const c0 = noD(c), g = geom(c0); if(!g.ok) return null;
+  const rows = Object.keys(SIM).filter(k => k !== 'shark2').map(k => {
+    const r = simCompute(c0, k, 'cons', 'AD'); if(!r.ok) return null;
+    const f = simFit(PARENT[k] && k !== 'butterfly2' ? PARENT[k] : k, g);
+    const dep = v => g.dir * (c.C - v);
+    const near = g.dir > 0 ? r.prz[1] : r.prz[0], far = g.dir > 0 ? r.prz[0] : r.prz[1];
+    const eps = 1e-9 * Math.max(1, Math.abs(far)), farSrc = [...new Set(r.proj.filter(q => q.inPrz && Math.abs(q.v - far) <= eps).map(q => q.src).filter(Boolean))];
+    return {k, r, fit:f.fit, why:f.why || '', near, far, farSrc, dNear:dep(near), dFar:dep(far), dD:dep(r.Dp), dSL:dep(r.SL)};
+  }).filter(Boolean).sort((a, b) => a.dNear - b.dNear || a.dFar - b.dFar);
+  // confluencias: PRZ de patrones que encajan y se solapan o quedan a menos del 3% del tramo
+  // con X, el AB=CD ya forma parte de la PRZ de cada XABCD: no cuenta como patrón aparte en las confluencias
+  rows.forEach(x => { x.taken = tk.has(x.k); });
+  const fit = rows.filter(x => x.fit > 0 && !x.taken && !(g.hasX && SIM[x.k].fam === 'abcd')), tol = 0.03 * (g.hasX ? g.xa : g.ab), clusters = [];
+  fit.forEach(x => {
+    const cl = clusters.find(q => x.dNear <= q.hi + tol && x.dFar >= q.lo - tol);
+    if(cl){ cl.lo = Math.min(cl.lo, x.dNear); cl.hi = Math.max(cl.hi, x.dFar); cl.rows.push(x); }
+    else clusters.push({lo:x.dNear, hi:x.dFar, rows:[x]});
+  });
+  const ext = g.hasX ? XA_EXTREMES.map(([k, t]) => ({k, t, v:c.A - g.dir * k * g.xa, d:g.dir * (c.C - (c.A - g.dir * k * g.xa))})) : [];
+  return {g, rows, clusters:clusters.filter(q => q.rows.length > 1), ext, tol};
+}
+
+/* ============ Detector: velas → pivotes → formaciones ============ */
+const CV_MAX_FORMS = 12;
+var cv = {candles:null, showAll:false, showAllE:false, side:'all', sort:'prob', bt:null, sym:'', tf:'', file:'', thr:{}, scale:'all', prov:true, alt:true, usePrice:true, sel:null, forms:[]};
+const CV_SCALES = [{id:'mayor', name:'Mayor', target:7}, {id:'media', name:'Media', target:18}, {id:'interna', name:'Interna', target:45}];
+const TF_SEC = [[60,'M1'],[120,'M2'],[180,'M3'],[300,'M5'],[600,'M10'],[900,'M15'],[1800,'M30'],[3600,'H1'],[7200,'H2'],[14400,'H4'],[28800,'H8'],[86400,'D1'],[604800,'W1']];
+
+// Lee CSV de «Descargar velas de Deriv», TradingView (time en unix o ISO) o MT5 (<DATE> <TIME> separados por tabulador)
+function parseCandles(text){
+  const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim());
+  if(lines.length < 10) throw new Error('El archivo tiene menos de 10 filas.');
+  const sep = lines[0].includes('\t') ? '\t' : (lines[0].split(';').length > lines[0].split(',').length ? ';' : ',');
+  const head = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g, '').replace(/[<>]/g, '').toLowerCase());
+  const col = names => head.findIndex(h => names.includes(h));
+  const iE = col(['epoch','timestamp','unix']), iT = col(['time','datetime','date time','fecha']), iD = col(['date']), iH = col(['time']);
+  const iO = col(['open','apertura']), iHi = col(['high','máximo','maximo']), iL = col(['low','mínimo','minimo']), iC = col(['close','cierre']);
+  if([iO, iHi, iL, iC].some(i => i < 0)) throw new Error('No encuentro las columnas open, high, low y close en la primera fila.');
+  const toSec = v => {
+    v = String(v).trim().replace(/^"|"$/g, '');
+    if(/^\d{9,13}$/.test(v)){ const n = +v; return n > 1e12 ? Math.round(n / 1000) : n; }
+    let t = v.replace(/^(\d{4})\.(\d{2})\.(\d{2})/, '$1-$2-$3').replace(' ', 'T');
+    if(!/[zZ]|[+-]\d{2}:?\d{2}$/.test(t)) t += 'Z';              // sin zona: se toma como UTC (así lo escribe el descargador)
+    const ms = Date.parse(t); return isF(ms) ? Math.round(ms / 1000) : NaN;
+  };
+  let maxDec = 0;
+  const rows = lines.slice(1).map(l => {
+    const c = l.split(sep);
+    const tRaw = iE >= 0 ? c[iE] : (iD >= 0 && iH >= 0 && iD !== iH) ? c[iD] + ' ' + c[iH] : c[iT >= 0 ? iT : 0];
+    const q = [iO, iHi, iL, iC].map(i => String(c[i] || '').trim().replace(/^"|"$/g, ''));
+    q.forEach(x => { const d = (x.split('.')[1] || '').length; if(d > maxDec) maxDec = d; });
+    const [o, h, lo, cl] = q.map(Number);
+    return {t:toSec(tRaw), o, h, l:lo, c:cl};
+  }).filter(k => isF(k.t) && [k.o, k.h, k.l, k.c].every(isF) && k.h >= k.l).sort((a, b) => a.t - b.t);
+  if(rows.length < 10) throw new Error('No pude leer las fechas o los precios de las filas.');
+  const gaps = rows.slice(1).map((k, i) => k.t - rows[i].t).filter(d => d > 0).sort((a, b) => a - b), step = gaps[Math.floor(gaps.length / 2)] || 0;
+  const tf = (TF_SEC.find(([s]) => s === step) || [0, step ? Math.round(step / 60) + 'min' : ''])[1];
+  return {rows, tf, dec:Math.min(5, maxDec)};
+}
+
+function zigzag(r, thr){
+  const piv = []; let dir = 0, hi = {i:0, v:r[0].h}, lo = {i:0, v:r[0].l}, cand = null;
+  for(let i = 1; i < r.length; i++){
+    const k = r[i];
+    if(dir === 0){
+      if(k.h > hi.v) hi = {i, v:k.h}; if(k.l < lo.v) lo = {i, v:k.l};
+      if(hi.v - lo.v >= thr){ if(hi.i > lo.i){ piv.push({...lo, hl:'L'}); dir = 1; cand = {...hi}; } else { piv.push({...hi, hl:'H'}); dir = -1; cand = {...lo}; } }
+      continue;
+    }
+    if(dir === 1){ if(k.h >= cand.v) cand = {i, v:k.h}; else if(cand.v - k.l >= thr){ piv.push({...cand, hl:'H'}); dir = -1; cand = {i, v:k.l}; } }
+    else { if(k.l <= cand.v) cand = {i, v:k.l}; else if(k.h - cand.v >= thr){ piv.push({...cand, hl:'L'}); dir = 1; cand = {i, v:k.h}; } }
+  }
+  return {piv, cand:cand ? {...cand, hl:dir === 1 ? 'H' : 'L', prov:true} : null};
+}
+// umbral que deja ~target pivotes (búsqueda binaria; el número de pivotes baja al subir el umbral)
+function thrFor(r, target){
+  let lo = 0, hi = Math.max(...r.map(k => k.h)) - Math.min(...r.map(k => k.l));
+  for(let n = 0; n < 40; n++){ const m = (lo + hi) / 2; if(zigzag(r, m).piv.length > target) lo = m; else hi = m; }
+  return hi;
+}
+// Umbrales automáticos: se calculan con las últimas 1000 velas (los giros objetivo de cada escala son por cada 1000 velas), así 1000, 3000
+// o 5000 velas dan las mismas escalas y la historia extra solo suma casos a la estadística. Nunca bajan del suelo:
+// «suelo» veces la vela típica (mediana del rango máximo-mínimo de esas velas). El suelo solo quita ruido.
+const cvfOpt = () => state.settings.cvf || (state.settings.cvf = clone(DEFAULT_SETTINGS.cvf));
+function typicalRange(r){ const a = r.map(k => k.h - k.l).filter(v => isF(v) && v >= 0).sort((p, q) => p - q); return a.length ? a[Math.floor(a.length / 2)] : 0; }
+function autoThr(r, round){
+  const O = cvfOpt(), w = r.slice(-1000), floor = Math.max(0, +O.atrK || 0) * typicalRange(w), out = {};
+  CV_SCALES.forEach(sc => { const v = Math.max(thrFor(w, sc.target), floor); out[sc.id] = round ? Math.max(roundThr(v), round === 'up' ? v : 0) : v; });
+  return out;
+}
+const minBarsOf = () => Math.max(0, Math.round(+cvfOpt().minBars || 0));
+const roundThr = v => { const e = Math.pow(10, Math.max(0, dec() - 1)); return Math.round(v * e) / e; };
+const tLocal = sec => { const d = new Date(sec * 1000); return `${d.getFullYear()}-${z2(d.getMonth() + 1)}-${z2(d.getDate())}T${z2(d.getHours())}:${z2(d.getMinutes())}`; };
+const tShort = sec => { const d = new Date(sec * 1000); return `${z2(d.getDate())}/${z2(d.getMonth() + 1)} ${z2(d.getHours())}:${z2(d.getMinutes())}`; };
+
+// ¿es X el extremo del tramo X→A y A el extremo opuesto? (para probar X anteriores)
+function cleanLeg(r, iX, iA, xIsHigh){
+  let mx = -Infinity, mn = Infinity;
+  for(let i = iX; i <= iA; i++){ mx = Math.max(mx, r[i].h); mn = Math.min(mn, r[i].l); }
+  return xIsHigh ? (r[iX].h >= mx && r[iA].l <= mn) : (r[iX].l <= mn && r[iA].h >= mx);
+}
+
+
+/* ============ Seguimiento de D: la zona se respetó, se esperan TP1, TP2 y TP3 ============ */
+// El D real es el extremo que marcó el precio después de C (antes de volver a superar C). Con él se decide qué patrón completó:
+//   dentro de su PRZ · un poco antes del borde cercano (hasta «giro anticipado» % del tramo base) · más allá del borde lejano sin tocar su SL.
+// Si coincide con varios, gana el que menos se desvía de su PRZ (así un Bat que se pasa hasta el 1.13 pasa a ser Bat alterno).
+// Los objetivos se miden desde ese D real, sobre CD (por defecto), AD (Carney) o mixto; Shark: 0.5 y 0.618 de CD. TP3 en 1.0 del tramo.
+// Se da por respetada solo con velas cerradas sin nuevo extremo y una reacción mínima del tramo AD; antes de eso no se dibuja nada.
+const trkOpt = () => DEFAULT_SETTINGS.trk;   // seguimiento de D con sus opciones por defecto (controles ocultos)
+const TRK_MAX_AGE = 300;   // velas: un D más antiguo deja de seguirse
+function trkExtreme(r, iC, C, dir, liveLast, cache){
+  const ck = iC + ':' + dir; if(cache && cache.has(ck)) return cache.get(ck);
+  const n = r.length, adv = v => dir * (C - v);
+  let iD = -1, best = 0;
+  for(let i = iC + 1; i < n; i++){
+    const k = r[i];
+    if(adv(dir > 0 ? k.h : k.l) < 0) break;              // volvió a superar C: el tramo CD terminó
+    const tw = adv(dir > 0 ? k.l : k.h); if(tw > best){ best = tw; iD = i; }
+  }
+  let res = null;
+  if(iD >= 0){
+    const Dv = dir > 0 ? r[iD].l : r[iD].h, lastClosed = liveLast ? n - 2 : n - 1;
+    let awAll = Dv, awClosed = Dv;                           // mejor precio a favor después de D (la vela de D no cuenta)
+    for(let i = iD + 1; i < n; i++){ const a = dir > 0 ? r[i].h : r[i].l; if(dir * (a - awAll) > 0) awAll = a; if(i <= lastClosed && dir * (a - awClosed) > 0) awClosed = a; }
+    res = {iD, Dv, dE:best, awAll, awClosed, closedAfter:Math.max(0, lastClosed - iD)};
+  }
+  if(cache) cache.set(ck, res);
+  return res;
+}
+function trkMatch(ex, c, g, rows){
+  const O = trkOpt(), dir = g.dir, d = ex.dE;
+  let best = null;
+  rows.forEach(q => {
+    if(!(q.fit > 0) || q.taken || (g.hasX && SIM[q.k].fam === 'abcd') || !q.r || !q.r.ok) return;
+    if(d >= q.dSL) return;                                   // tocó el SL de este patrón
+    const leg = q.r.baseLeg || (g.hasX ? g.xa : g.ab), tol = Math.max(0, +O.early || 0) / 100 * leg;
+    let where, off;
+    if(d >= q.dNear - 1e-12 && d <= q.dFar + 1e-12){ where = 'dentro'; off = 0; }
+    else if(d < q.dNear){ if(d < q.dNear - tol) return; where = 'antes'; off = (q.dNear - d) / leg; }
+    else { where = 'pasado'; off = (d - q.dFar) / leg; }
+    if(!best || off < best.off - 1e-9 || (Math.abs(off - best.off) <= 1e-9 && q.fit > best.q.fit)) best = {q, where, off};
+  });
+  if(!best) return null;
+  const q = best.q, P = SIM[q.k], Dv = ex.Dv;
+  // tramo de cada objetivo según «Objetivos sobre»: CD (los 3 sobre CD), AD (Carney) o mixto (TP1 sobre CD; TP2 y TP3 sobre AD).
+  // Shark, Cypher y Nen Star miden siempre sobre el último tramo (CD), como en el simulador.
+  const mode = ['CD', 'AD', 'mix'].includes(O.tp) ? O.tp : 'CD', cdOnly = P.fam === 'cypher' || P.fam === 'shark' || P.fam === 'nenstar';
+  const refOf = i => cdOnly || mode === 'CD' || (mode === 'mix' && i === 0) ? 'CD' : 'AD';
+  const tps = [q.r.tpR[0], q.r.tpR[1], 1].map((k, i) => {
+    const ref = refOf(i), span = (ref === 'CD' ? c.C : c.A) - Dv, v = Dv + k * span;
+    return {n:'TP' + (i + 1), k, v, ref, hit:dir * (ex.awAll - v) >= 0};
+  });
+  // la reacción de confirmación se mide sobre el mismo tramo que el TP1
+  const span1 = (tps[0].ref === 'CD' ? c.C : c.A) - Dv;
+  const react = Math.abs(span1) ? dir * (ex.awClosed - Dv) / Math.abs(span1) : 0;
+  const base = P.base, anchor = base === 'XA' ? c.A : c.C;
+  const ratio = q.r.baseLeg ? Math.abs(Dv - anchor) / q.r.baseLeg : NaN;
+  const confirmed = ex.closedAfter >= Math.max(0, Math.round(+O.bars || 0)) && react >= Math.max(0, +O.react || 0) / 100;
+  return {k:q.k, fit:q.fit, where:best.where, off:best.off, Dv, SL:q.r.SL, tps, refN:tps[0].ref, react, ratio, base, confirmed};
+}
+const trkWhere = t => t.where === 'dentro' ? 'dentro de la PRZ' : t.where === 'antes' ? `giró ${fr(t.off)} ${t.base} antes de la PRZ` : `pasó ${fr(t.off)} ${t.base} el borde, sin tocar el SL`;
+
+// formaciones X-A-B-C. Con «unir tramos», cada pierna puede abarcar varios zigzags: basta con que sea un tramo limpio
+// (sus extremos son el máximo y el mínimo de todo lo que hay entre ellos). C no debe haber sido superado después.
+function buildForms(){
+  const r = cv.candles; cv.formsAux = []; if(!r) return [];
+  const last = r[r.length - 1], P0 = isF(state.asset.price) ? state.asset.price : last.c;
+  const thrs = CV_SCALES.map(sc => cv.thr[sc.id]).filter(v => v > 0);
+  if(!thrs.length) return [];
+  // máximos y mínimos de rango con tabla dispersa: cada consulta en O(1)
+  const n = r.length, lg = [0]; for(let i = 1; i <= n; i++) lg[i] = lg[i >> 1] + (i > 1 ? 1 : 0);
+  const mx = [r.map(k => k.h)], mn = [r.map(k => k.l)];
+  for(let j = 1; (1 << j) <= n; j++){ const a = mx[j - 1], b = mn[j - 1], h = 1 << (j - 1); mx.push(a.slice(0, n - (1 << j) + 1).map((v, i) => Math.max(v, a[i + h]))); mn.push(b.slice(0, n - (1 << j) + 1).map((v, i) => Math.min(v, b[i + h]))); }
+  const hiOf = (i, j) => { const k = lg[j - i + 1]; return Math.max(mx[k][i], mx[k][j - (1 << k) + 1]); };
+  const loOf = (i, j) => { const k = lg[j - i + 1]; return Math.min(mn[k][i], mn[k][j - (1 << k) + 1]); };
+  const legOK = (p, q) => p.hl === 'H' ? (p.v >= hiOf(p.i, q.i) && q.v <= loOf(p.i, q.i)) : (p.v <= loOf(p.i, q.i) && q.v >= hiOf(p.i, q.i));
+  const scaleOf = minLeg => { const sc = CV_SCALES.find(q => cv.thr[q.id] > 0 && minLeg >= cv.thr[q.id] - 1e-9); return sc ? sc.name : CV_SCALES[CV_SCALES.length - 1].name; };
+  const combos = [];
+  if(cv.alt){
+    const z = zigzag(r, Math.min(...thrs));
+    const P = [...z.piv, ...(cv.prov && z.cand ? [z.cand] : [])];
+    const Cs = P.filter(c => c.prov || c.i === n - 1 || (c.hl === 'H' ? hiOf(c.i + 1, n - 1) <= c.v : loOf(c.i + 1, n - 1) >= c.v));
+    const mb = minBarsOf();
+    Cs.forEach(c => P.forEach(b => { if(b.i >= c.i || b.hl === c.hl || c.i - b.i < mb || !legOK(b, c)) return;
+      P.forEach(a => { if(a.i >= b.i || a.hl === b.hl || b.i - a.i < mb || !legOK(a, b)) return;
+        P.forEach(x => { if(x.i >= a.i || x.hl === a.hl || !legOK(x, a)) return; combos.push({pts:[x, a, b, c], prov:!!c.prov, P}); }); }); }));
+  } else {
+    CV_SCALES.forEach(sc => {
+      const thr = cv.thr[sc.id]; if(!(thr > 0)) return;
+      const z = zigzag(r, thr), pv = z.piv;
+      if(pv.length >= 4) combos.push({pts:pv.slice(-4), prov:false, P:pv, scale:sc.name});
+      if(cv.prov && z.cand && pv.length >= 3) combos.push({pts:[...pv.slice(-3), z.cand], prov:true, P:pv, scale:sc.name});
+      if(pv.length >= 5) combos.push({pts:pv.slice(-5, -1), prov:false, P:pv, scale:sc.name, trackOnly:true});   // D ya giró: solo para el seguimiento
+    });
+  }
+  const minB = minBarsOf(), out = [], seen = new Map(), trkOn = trkOpt().on, trkMap = new Map(), exCache = new Map(), liveLast = cv.src === 'live';
+  combos.forEach(cb => {
+    const [x, a, b, c] = cb.pts, key = cb.pts.map(p => p.i).join('-') + (cb.prov ? 'p' : '') + (cb.trackOnly ? 't' : '');
+    if(b.i - a.i < minB || c.i - b.i < minB) return;   // AB y BC con menos velas que el mínimo: ruido (XA puede ser un spike)
+    if(seen.has(key)){ const f0 = seen.get(key); if(f0 && cb.scale && !f0.scales.includes(cb.scale)) f0.scales.push(cb.scale); return; }
+    seen.set(key, null);
+    const coords = {X:x.v, A:a.v, B:b.v, C:c.v, D:NaN, post:[]};
+    const g = geom(coords); if(!g.ok) return;
+    // filtro rápido: algún patrón con X que encaje
+    if(!Object.keys(SIM).some(k => !SIM[k].hidden && SIM[k].fam !== 'abcd' && simFit(k, g).fit > 0)) return;
+    const ext = c.i < n - 1 ? (g.dir > 0 ? Math.min(c.v, loOf(c.i + 1, n - 1)) : Math.max(c.v, hiOf(c.i + 1, n - 1))) : c.v;
+    const dExt = g.dir * (c.v - ext), dP = g.dir * (c.v - P0);
+    // tocada: llegó y salió. Si ya retrocedió el 38.2% del tramo CD, esa PRZ ya funcionó: queda resuelta, no es una entrada futura
+    const status = q => dExt > q.dSL ? 'roto' : dExt > q.dFar ? 'atravesado' : dExt >= q.dNear ? (dP >= q.dNear ? 'en PRZ' : (dExt - dP) >= BT_REACT * dExt ? 'resuelta' : 'tocada') : 'pendiente';
+    const D0 = allPrzData(coords, []); if(!D0) return;
+    // seguimiento de D: con C confirmado, el extremo que marcó el precio después de C es el D real
+    if(trkOn && !cb.prov){
+      const ex = trkExtreme(r, c.i, c.v, g.dir, liveLast, exCache), m = ex && trkMatch(ex, coords, g, D0.rows);
+      if(m){
+        const it = {...m, id:g.dir + ':' + r[c.i].t + ':' + r[ex.iD].t, dir:g.dir, coords, g, iD:ex.iD, age:n - 1 - ex.iD, closedAfter:ex.closedAfter,
+          scale:cb.scale || scaleOf(Math.min(g.xa, g.ab, g.bc)), tm:{X:r[x.i].t, A:r[a.i].t, B:r[b.i].t, C:r[c.i].t, D:r[ex.iD].t}};
+        const prev = trkMap.get(it.id);
+        if(!prev || it.off < prev.off - 1e-9 || (Math.abs(it.off - prev.off) <= 1e-9 && (it.fit > prev.fit || (it.fit === prev.fit && g.xa > prev.g.xa)))) trkMap.set(it.id, it);
+      }
+    }
+    if(cb.trackOnly) return;
+    D0.rows.forEach(q => { q.st = status(q); });
+    const crossed = D0.rows.filter(q => q.st === 'roto' || q.st === 'atravesado').map(q => q.k);
+    const D = allPrzData(coords, crossed);
+    D.rows.forEach(q => { q.st = status(q); q.dist = q.dNear - dP; q.react = dExt - dP; });
+    const live = D.rows.filter(q => q.fit > 0 && !q.taken && !SIM[q.k].hidden && SIM[q.k].fam !== 'abcd' && (q.st === 'pendiente' || q.st === 'en PRZ' || q.st === 'tocada'));
+    // sin PRZ viva (p. ej. el precio ya pasó el borde lejano): se guarda aparte para «Cerca de su zona»
+    if(!live.length){ cv.formsAux.push({key, prov:cb.prov, pts:cb.pts, coords, g, D, dExt, P0, scales:[cb.scale || scaleOf(Math.min(g.xa, g.ab, g.bc))]}); return; }
+    // piernas compuestas: cuántos zigzags de la escala fina abarca cada una
+    const swings = (p, q) => 1 + cb.P.filter(z => z.i > p.i && z.i < q.i).length;
+    const legs = [['XA', x, a], ['AB', a, b], ['BC', b, c]].map(([nm, p, q]) => ({nm, n:swings(p, q)}));
+    const minLeg = Math.min(g.xa, g.ab, g.bc);
+    D.rows.forEach(q => { if(q.fit > 0) q.pr = probOf(q.k, q.dNear > 0 ? dExt / q.dNear : 1); });
+    const pv = q => q.pr ? q.pr.p : -1;
+    const best = live.slice().sort((p, q) => pv(q) - pv(p) || q.fit - p.fit || Math.max(0, p.dist) - Math.max(0, q.dist))[0].k;
+    const sc = cb.scale || scaleOf(minLeg);
+    const f = {key, id:'cv' + key, scales:[sc], prov:cb.prov, pts:cb.pts, coords, g, D, crossed, live, ext, dExt, P0, legs, best,
+      near:Math.min(...live.map(q => Math.max(0, q.dist))), pmax:Math.max(...live.map(pv)), chart:{id:'cv', label:sc + ' · C ' + fmt(c.v) + (cb.prov ? ' prov.' : ''), tf:cv.tf}};
+    seen.set(key, f); out.push(f);
+  });
+  cv.tracked = [...trkMap.values()].sort((p, q) => p.age - q.age);
+  return out.sort((p, q) => cv.sort === 'prob' ? (q.pmax - p.pmax || p.near - q.near) : (p.near - q.near));
+}
+
+
+/* ============ Probabilidad: prueba hacia atrás sobre las velas cargadas ============ */
+// Para cada formación pasada (las mismas reglas del detector) y cada patrón que encajaba:
+//   llega: el tramo CD alcanzó el borde cercano de la PRZ antes de que el precio superara C
+//   reacciona: después de llegar, el precio retrocedió al menos el 38.2% del tramo CD antes de tocar el SL2
+// Las formaciones que comparten el mismo C comparten el mismo tramo CD: pesan juntas como un solo caso.
+const BT_REACT = 0.382;
+function rangeTools(r){
+  const n = r.length, lg = [0]; for(let i = 1; i <= n; i++) lg[i] = lg[i >> 1] + (i > 1 ? 1 : 0);
+  const mx = [r.map(k => k.h)], mn = [r.map(k => k.l)];
+  for(let j = 1; (1 << j) <= n; j++){ const a = mx[j - 1], b = mn[j - 1], h = 1 << (j - 1); mx.push(a.slice(0, n - (1 << j) + 1).map((v, i) => Math.max(v, a[i + h]))); mn.push(b.slice(0, n - (1 << j) + 1).map((v, i) => Math.min(v, b[i + h]))); }
+  const hiOf = (i, j) => { const k = lg[j - i + 1]; return Math.max(mx[k][i], mx[k][j - (1 << k) + 1]); };
+  const loOf = (i, j) => { const k = lg[j - i + 1]; return Math.min(mn[k][i], mn[k][j - (1 << k) + 1]); };
+  const legOK = (p, q) => p.hl === 'H' ? (p.v >= hiOf(p.i, q.i) && q.v <= loOf(p.i, q.i)) : (p.v <= loOf(p.i, q.i) && q.v >= hiOf(p.i, q.i));
+  return {hiOf, loOf, legOK};
+}
+function cvBacktest(){
+  const r = cv.candles, thrs = CV_SCALES.map(q => cv.thr[q.id]).filter(v => v > 0);
+  if(!r || !thrs.length) return null;
+  const minB = minBarsOf(), sig = [Math.min(...thrs), state.settings.ratioSlack, r.length, r[r.length - 1].t, cv.alt, minB].join('|');
+  if(cv.bt && cv.bt.sig === sig) return cv.bt;
+  const {legOK} = rangeTools(r), n = r.length;
+  const P = zigzag(r, Math.min(...thrs)).piv;
+  const keys = Object.keys(SIM).filter(k => !SIM[k].hidden && SIM[k].fam !== 'abcd');
+  const samples = {}; keys.forEach(k => { samples[k] = []; });
+  P.forEach(c => P.forEach(b => { if(b.i >= c.i || b.hl === c.hl || c.i - b.i < minB || !legOK(b, c)) return;
+    P.forEach(a => { if(a.i >= b.i || a.hl === b.hl || b.i - a.i < minB || !legOK(a, b)) return;
+      P.forEach(x => { if(x.i >= a.i || x.hl === a.hl || !legOK(x, a)) return;
+        const co = {X:x.v, A:a.v, B:b.v, C:c.v, D:NaN, post:[]}, g = geom(co); if(!g.ok) return;
+        const dir = g.dir, dep = v => dir * (c.v - v);
+        keys.forEach(k => {
+          if(!(simFit(k, g).fit > 0)) return;
+          const rr = simCompute(co, k, 'cons', 'AD'); if(!rr.ok) return;
+          const dNear = dep(dir > 0 ? rr.prz[1] : rr.prz[0]), dSL = dep(rr.SL);
+          if(!(dNear > 0)) return;
+          let e = 0, reached = false, hold = null, m = 0, ended = false;
+          for(let i = c.i + 1; i < n; i++){
+            const toward = dep(dir > 0 ? r[i].l : r[i].h), away = dep(dir > 0 ? r[i].h : r[i].l);
+            if(!reached){
+              if(away < 0){ ended = true; break; }                 // superó C antes de llegar: la formación se anula
+              e = Math.max(e, toward);
+              if(e >= dNear){ reached = true; m = e; if(m >= dSL){ hold = false; ended = true; break; } }
+            } else {
+              m = Math.max(m, toward);
+              if(m >= dSL){ hold = false; ended = true; break; }       // con duda dentro de una vela, cuenta primero el stop
+              if(away <= m * (1 - BT_REACT)){ hold = true; ended = true; break; }
+            }
+          }
+          if(!reached && !ended) return;                            // aún abierta al final del archivo: no se sabe
+          samples[k].push({u:e / dNear, reached, hold, g:c.i});
+        });
+      }); }); }));
+  // peso: las formaciones con el mismo C son un solo caso
+  const stats = {};
+  keys.forEach(k => {
+    const L = samples[k], cnt = {}; L.forEach(q => { cnt[q.g] = (cnt[q.g] || 0) + 1; }); L.forEach(q => { q.w = 1 / cnt[q.g]; });
+    const reachedL = L.filter(q => q.reached), known = reachedL.filter(q => q.hold !== null);
+    const wsum = a => a.reduce((t, q) => t + q.w, 0);
+    stats[k] = {L, cases:new Set(L.map(q => q.g)).size, reachCases:new Set(reachedL.map(q => q.g)).size,
+      holdW:wsum(known.filter(q => q.hold)), knownW:wsum(known)};
+  });
+  cv.bt = {sig, stats, bars:n, tf:cv.tf}; return cv.bt;
+}
+// probabilidad de que el patrón k funcione, dado lo que el precio ya avanzó desde C (u0 = avance / distancia al borde cercano)
+function probOf(k, u0){
+  const bt = cv.bt, st = bt && bt.stats[PARENT[k] && k !== 'butterfly2' ? PARENT[k] : k]; if(!st || !st.L.length) return null;
+  const u = Math.max(0, Math.min(1, isF(u0) ? u0 : 0)), w = q => q.w;
+  const den = st.L.filter(q => q.u >= u - 1e-9).reduce((t, q) => t + w(q), 0), num = st.L.filter(q => q.reached).reduce((t, q) => t + w(q), 0);
+  const reach = u >= 1 ? 1 : (num + 1) / (den + 2);              // suavizado de Laplace: sin casos, 50%
+  const hold = (st.holdW + 1) / (st.knownW + 2);
+  return {p:reach * hold, reach, hold, cases:st.cases, reachCases:st.reachCases, low:st.reachCases < 5};
+}
+const pct = v => Math.round(v * 100) + '%';
+function probCell(pr){
+  if(!pr) return '<span class="zsub">–</span>';
+  return `<span class="prob${pr.low ? ' low' : ''}" title="Llega ${pct(pr.reach)} · reacciona ${pct(pr.hold)} · ${pr.reachCases} de ${pr.cases} casos llegaron a la PRZ en las velas cargadas">${pct(pr.p)}</span>`;
+}
+
+/* =====================================================================
+   HARMONIX · Señales
+   Usa el mismo motor de detección del escáner (copiado sin cambios arriba)
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const nowS = () => Math.floor(Date.now() / 1000);
+const fx = (v, d) => isF(v) ? (+v).toFixed(d) : '–';
+
+/* ---------- idioma ---------- */
+let LANG = 'es'; try { LANG = localStorage.getItem('grafico-armonico:idioma') === 'en' ? 'en' : 'es'; } catch(e) {}
+const L = {
+  es:{
+    brandSig:'señales', kicker:'Señales armónicas listas para tomar',
+    lead:'Revisa todos los instrumentos de un grupo y deja solo las formaciones que están girando o que ya se confirmaron sin llegar al 38.2%. Guarda en un archivo las que envías y, cuando quieras, súbelo para comparar cómo terminó cada una.',
+    bandSynth:'Índices sintéticos', bandSynthSub:'Crash, Boom y Volatility', bandMkt:'Mercados', bandMktSub:'Oro y metales, Forex, índices y cripto',
+    themeGroup:'Tema', themeSys:'Tema del sistema', themeLight:'Tema claro', themeDark:'Tema oscuro', navLabel:'Secciones',
+    nav1:'Señales del momento', nav2:'Comparar resultados', nav3:'Cerca de su zona',
+    intro3:'Avisos en cada borde de la PRZ (el cercano y el lejano) de los patrones que encajan: el precio está por tocarlo, lo está tocando o lo pasó un poco, y todavía no ha reaccionado. En las ventas la zona está arriba y en las compras abajo. En Boom solo se avisan compras y en Crash solo ventas. Activa la vigilancia y deja la página abierta: buscará sola y te avisará con sonido y notificación.',
+    nearA:'Avisar a menos del', nearB:'% de un borde (antes o después)', reactA:'y con un rebote de no más del', reactB:'% del tramo CD',
+    edgeNear:'borde cercano', edgeFar:'borde lejano', bTouch:e => `Tocando el ${e}`, bBefore:(p, e) => `A ${p} pts del ${e}`, bPast:(p, e) => `Pasó ${p} pts el ${e}`,
+    ptsA:'Avisar cuando el precio esté a menos de estos puntos de un borde (antes o después):', pts0:'pts si el precio es menor que 10 000;', pts1:'pts si es menor que 100 000;', pts2:'pts si es 100 000 o más.',
+    ptsNote:'Índices sintéticos. Un punto es una unidad de precio: 10 puntos en Boom 900 son de 9134 a 9144.', ptsTol:p => `ventana de ±${p} pts`,
+    edgesA:'Bordes a vigilar:', edgesBoth:'los dos', edgesNear:'solo el cercano (el primero que toca el precio)', edgesFar:'solo el lejano (inferior en compras, superior en ventas)',
+    przOf:p => `PRZ del ${p}`, przWidth:w => `ancho ${w}`, przLv:'Niveles que la forman', fitTxt:p => `encaje ${p}%`, edgeHere:'borde del aviso',
+    pctA:'Avisar cuando el precio esté a menos del', pctB:'% del recorrido de C al borde (antes o después).', pctTol:(p, v) => `ventana de ±${p}% (${v})`,
+    bBeforeP:(p, e) => `A ${p}% del ${e}`, bPastP:(p, e) => `Pasó ${p}% el ${e}`, gapP:p => `a ${p}%`, gapPastP:p => `pasó ${p}%`,
+    reactNow:(p, m) => `Rebote desde el extremo: ${p}% del tramo CD (máximo ${m}%)`,
+    wLabel:'Vigilar automáticamente y avisarme, buscando cada', wCfg:'Copiar ajustes para el aviso en el móvil', wCfgOk:'Ajustes copiados: pégalos en ajustes.json del aviso en el móvil.', zoneId:c => `Zona #${c}`, zoneC:d => `C formado el ${d}`, wMin:n => `${n} min`, wTest:'Probar el aviso',
+    wOff:'Vigilancia apagada.', wScanning:'Buscando ahora…', wNext:h => `Próxima búsqueda a las ${h}.`,
+    nOn:'Notificaciones activadas.', nAsk:'Acepta las notificaciones del navegador para recibirlas aunque estés en otra ventana.', nDenied:'El navegador bloqueó las notificaciones: solo sonará y cambiará el título de la pestaña.', nNo:'Este navegador no muestra notificaciones: solo sonará.',
+    notifMany:n => `${n} bordes de PRZ nuevos`, logTitle:'Avisos de esta sesión', logClear:'Borrar avisos', testTxt:'Así sonará y se verá cada aviso.',
+    nearPastGap:pts => `pasó ${pts} pts`, nearInGap:'el precio está en la zona', nearPath:'del recorrido de C a la zona', nearPrice:'del precio',
+    nearEmpty:'Pulsa «Buscar señales» arriba: en la misma búsqueda se buscan las formaciones que se acercan a su zona.',
+    nearNone:() => `Ningún borde de PRZ está dentro de su ventana sin haber reaccionado. Con la vigilancia activa te avisaré cuando aparezca uno.`,
+    fBuy:'Compras', fSell:'Ventas',
+    nearLeft:p => `Falta ${p}%`, nearWatch:'Vigilar', zone:'Zona', zoneNear:'Borde cercano', zoneFar:'Borde lejano', priceNow:'Precio ahora', slRef:'SL de referencia',
+    nearGap:pts => `a ${pts} pts`, nearCovered:p => `Recorrido de C a la zona: ${p}%`,
+    nearMeta:(n, dur) => `C hace ${n} ${n === 1 ? 'vela' : 'velas'} (${dur})`,
+    nearProb:(r, h, n) => `llega ${r}% y reacciona ${h}% en ${n} ${n === 1 ? 'caso' : 'casos'} del historial`,
+    intro1:'Se descargan las velas de cada gráfico y se aplica el mismo detector del escáner. Aparecen las formaciones cuyo D ya giró: girando (aún sin confirmar), confirmadas y, al final, las que ya avanzaron demasiado. En Crash y Boom se buscan compras y ventas.',
+    tfs:'Temporalidades', hist:'Velas por gráfico', histN:n => `${n} velas`,
+    scan:'Buscar señales', scanning:'Buscando…', rescan:'Buscar de nuevo',
+    instSum:(n, m, g) => `Instrumentos de ${g}: ${n} de ${m}`, all:'Todos', none:'Ninguno',
+    instHintSynth:'Oro, metales, Forex, índices bursátiles y cripto están en el grupo «Mercados».', instHintMkt:'Crash, Boom y Volatility están en el grupo «Índices sintéticos».', switchBand:'Cambiar de grupo',
+    opts:'Opciones de búsqueda', advA:'Marcar como demasiado avanzada cuando el precio ya recorrió el', advB:'% del camino de D a TP1',
+    ageA:'Ignorar los giros de hace más de', ageB:'velas', optWait:'Incluir las que aún están girando (sin confirmar)',
+    prog:(d, t, cur) => `Revisando ${d} de ${t}: ${cur}`, rate:'Deriv limita las descargas seguidas; continúo en 20 segundos.',
+    done:(n, g, time) => `${n} ${n === 1 ? 'señal' : 'señales'} en ${g} gráficos. Búsqueda de las ${time}.`,
+    errs:n => `${n} ${n === 1 ? 'gráfico no se pudo leer' : 'gráficos no se pudieron leer'}:`,
+    emptyScan:'Elige el grupo y las temporalidades y pulsa «Buscar señales». En los instrumentos puedes quitar los que no operas.',
+    noSig:'Ninguna formación está girando ni confirmada ahora mismo en estos gráficos. Prueba otra temporalidad o vuelve a buscar más tarde.',
+    fAll:'Todas', fWait:'Girando', fOk:'Confirmadas', fAdv:'Demasiado avanzadas',
+    stWait:'Girando', stOk:'Confirmada', stAdv:'Demasiado avanzada',
+    buy:'Compra', sell:'Venta', BUY:'COMPRA', SELL:'VENTA',
+    entry:'Entrada', entryNow:'precio actual', sl:'SL',
+    av:p => `Recorrido de D hacia TP1: ${p}%`,
+    age:(n, dur) => `D hace ${n} ${n === 1 ? 'vela' : 'velas'} (${dur})`,
+    hist2:(p, n) => `respeto histórico ${p}% en ${n} ${n === 1 ? 'caso' : 'casos'}`,
+    histLow:'pocos casos para estimar',
+    whereIn:'D dentro de la PRZ', whereBefore:x => `D giró ${x} antes de la PRZ`, wherePast:x => `D pasó ${x} el borde sin tocar el SL`,
+    scale:{Mayor:'escala mayor', Media:'escala media', Interna:'escala interna'},
+    also:'También encaja:', alsoTf:x => `también en ${x}`, include:'Incluir al guardar', behind:'El precio ya pasó el TP1: no se puede enviar',
+    copy:'Copiar', copied:'Copiado', image:'Imagen',
+    closed:t => `Mercado cerrado: última vela ${t}`,
+    saveBtn:n => `Guardar ${n} ${n === 1 ? 'señal' : 'señales'} (CSV)`, copyAll:'Copiar las seleccionadas',
+    saveNote:'Se descarga un archivo con la hora, la entrada al precio de la búsqueda, el SL y los TP. Súbelo después en «Comparar resultados».',
+    saveOld:m => `La búsqueda tiene ${m} min. La entrada quedaría con el precio de entonces: busca de nuevo antes de guardar.`,
+    saved:n => `Archivo descargado con ${n} ${n === 1 ? 'señal' : 'señales'}.`, saveNone:'Marca al menos una señal para guardarla.',
+    intro2:'Sube uno o varios archivos de señales guardados (por ejemplo, el de ayer). Al comparar se leen las velas de 1 minuto desde la hora de cada señal hasta ahora. Si el precio toca el SL antes que el TP1 es pérdida; si una misma vela toca los dos, cuenta primero el SL.',
+    drop:'Arrastra aquí los archivos .csv de señales o toca para elegirlos',
+    filesN:n => `${n} ${n === 1 ? 'señal cargada' : 'señales cargadas'}`, remove:'Quitar',
+    badFile:f => `«${f}» no es un archivo de señales de HARMONIX.`,
+    mode:'Gestión de la operación', mThirds:'1/3 en cada TP, SL a la entrada tras TP1', mTp1:'Todo en TP1', mTp2:'Todo en TP2, SL a la entrada tras TP1',
+    cmp:'Comparar ahora', cmpNone:'Carga primero un archivo de señales.',
+    comparing:(d, t) => `Leyendo precios: ${d} de ${t} instrumentos…`, compared:t => `Comparado a las ${t}.`,
+    cInst:'Instrumento', cSide:'Lado', cPat:'Patrón', cTime:'Hora de la señal', cEntry:'Entrada', cSl:'SL', cTp:'Objetivos', cRes:'Resultado', cR:'R', cNow:'Precio ahora', cFloat:'Flotante',
+    cN:'Señales', cWin:'Ganadas', cLoss:'Perdidas', cWr:'Win-rate', hitCol:n => `Hora ${n}`,
+    rOpen:'Abierta', rSl:'SL', rTp:n => `TP${n}`, rBe:'cerró en la entrada', rRun:'sigue abierta', notEval:'sin comparar',
+    sN:'Señales', sWin:'Ganadas', sLoss:'Perdidas', sOpen:'Abiertas', sWr:'Win-rate', sR:'Resultado', sTp:'Llegaron a TP1 · TP2 · TP3',
+    pdf:'Descargar PDF', xlsx:'Descargar Excel', csv:'Descargar CSV', img:'Imagen para el canal', txt:'Copiar texto',
+    libErr:'No se pudo cargar la librería para crear el archivo. Revisa tu conexión.',
+    byPat:'Por patrón', byTf:'Por temporalidad', noData:'Sin señales.',
+    repTitle:'Resumen de señales', repGen:t => `Generado el ${t}`, repPeriod:'Periodo', repGroup:'Grupo',
+    imgTitle:'Resultados de señales', imgOf:(w, n) => `${w} de ${n} resueltas`, imgMore:n => `y ${n} más`,
+    imgFoot1:'Entrada al precio del momento de la señal. Ganada: TP1 antes que el SL.', imgFoot2:'Contenido educativo, no es asesoría financiera.',
+    sigImgFoot:'Gestiona tu riesgo. Contenido educativo, no es asesoría financiera.',
+    sheetSum:'Resumen', sheetSig:'Señales',
+    foot:'Precios de Deriv (API pública). En los mercados distintos de los sintéticos el precio de tu bróker puede diferir unos puntos.',
+    netErr:'No hay conexión con Deriv. Revisa tu internet y vuelve a intentarlo.',
+    dur:{m:'min', h:'h', d:'d'}
+  },
+  en:{
+    brandSig:'signals', kicker:'Ready-to-take harmonic signals',
+    lead:'Check every instrument in a group and keep only the formations that are turning or already confirmed without reaching 38.2%. Save the ones you send to a file and, whenever you like, upload it to compare how each one ended.',
+    bandSynth:'Synthetic indices', bandSynthSub:'Crash, Boom and Volatility', bandMkt:'Markets', bandMktSub:'Gold and metals, Forex, indices and crypto',
+    themeGroup:'Theme', themeSys:'System theme', themeLight:'Light theme', themeDark:'Dark theme', navLabel:'Sections',
+    nav1:'Live signals', nav2:'Compare results', nav3:'Near their zone',
+    intro3:'Alerts on each PRZ edge (near and far) of fitting patterns: price is about to touch it, touching it or slightly past it, and has not reacted yet. On sells the zone is above and on buys below. Boom only alerts buys and Crash only sells. Turn on watching and leave the page open: it will search by itself and alert you with a sound and a notification.',
+    nearA:'Alert within', nearB:'% of an edge (before or past)', reactA:'and with a bounce of no more than', reactB:'% of the CD leg',
+    edgeNear:'near edge', edgeFar:'far edge', bTouch:e => `Touching the ${e}`, bBefore:(p, e) => `${p} pts before the ${e}`, bPast:(p, e) => `${p} pts past the ${e}`,
+    ptsA:'Alert when price is within these points of an edge (before or past):', pts0:'pts if price is below 10,000;', pts1:'pts if below 100,000;', pts2:'pts if 100,000 or above.',
+    ptsNote:'Synthetic indices. One point is one price unit: 10 points on Boom 900 means from 9134 to 9144.', ptsTol:p => `±${p} pts window`,
+    edgesA:'Edges to watch:', edgesBoth:'both', edgesNear:'near edge only (the first one price touches)', edgesFar:'far edge only (lower on buys, upper on sells)',
+    przOf:p => `${p} PRZ`, przWidth:w => `width ${w}`, przLv:'Levels that form it', fitTxt:p => `${p}% fit`, edgeHere:'alert edge',
+    pctA:'Alert when price is within', pctB:'% of the way from C to the edge (before or past).', pctTol:(p, v) => `±${p}% window (${v})`,
+    bBeforeP:(p, e) => `${p}% before the ${e}`, bPastP:(p, e) => `${p}% past the ${e}`, gapP:p => `${p}% away`, gapPastP:p => `${p}% past`,
+    reactNow:(p, m) => `Bounce from the extreme: ${p}% of the CD leg (max ${m}%)`,
+    wLabel:'Watch automatically and alert me, searching every', wCfg:'Copy settings for phone alerts', wCfgOk:'Settings copied: paste them into ajustes.json of the phone alert.', zoneId:c => `Zone #${c}`, zoneC:d => `C formed on ${d}`, wMin:n => `${n} min`, wTest:'Test the alert',
+    wOff:'Watching is off.', wScanning:'Searching now…', wNext:h => `Next search at ${h}.`,
+    nOn:'Notifications on.', nAsk:'Allow browser notifications to get them while you are in another window.', nDenied:'The browser blocked notifications: it will only beep and change the tab title.', nNo:'This browser does not show notifications: it will only beep.',
+    notifMany:n => `${n} new PRZ edges`, logTitle:'Alerts this session', logClear:'Clear alerts', testTxt:'This is how each alert will sound and look.',
+    nearPastGap:pts => `${pts} pts past`, nearInGap:'price is in the zone', nearPath:'of the way from C to the zone', nearPrice:'of the price',
+    nearEmpty:'Press “Find signals” above: the same search also finds formations approaching their zone.',
+    nearNone:() => `No PRZ edge is within its window without having reacted. With watching on, you will be alerted when one appears.`,
+    fBuy:'Buys', fSell:'Sells',
+    nearLeft:p => `${p}% to go`, nearWatch:'Watch', zone:'Zone', zoneNear:'Near edge', zoneFar:'Far edge', priceNow:'Price now', slRef:'Reference SL',
+    nearGap:pts => `${pts} pts away`, nearCovered:p => `Way from C to the zone: ${p}%`,
+    nearMeta:(n, dur) => `C ${n} ${n === 1 ? 'candle' : 'candles'} ago (${dur})`,
+    nearProb:(r, h, n) => `reaches ${r}% and reacts ${h}% over ${n} ${n === 1 ? 'case' : 'cases'} in the history`,
+    intro1:'Candles are downloaded from each chart and run through the same detector as the scanner. You get the formations whose D has already turned: turning (not yet confirmed), confirmed and, at the end, those that have already moved too far. On Crash and Boom both buys and sells are searched.',
+    tfs:'Timeframes', hist:'Candles per chart', histN:n => `${n} candles`,
+    scan:'Find signals', scanning:'Searching…', rescan:'Search again',
+    instSum:(n, m, g) => `${g} instruments: ${n} of ${m}`, all:'All', none:'None',
+    instHintSynth:'Gold, metals, Forex, stock indices and crypto are in the “Markets” group.', instHintMkt:'Crash, Boom and Volatility are in the “Synthetic indices” group.', switchBand:'Switch group',
+    opts:'Search options', advA:'Mark as too advanced once price has covered', advB:'% of the way from D to TP1',
+    ageA:'Ignore turns older than', ageB:'candles', optWait:'Include those still turning (unconfirmed)',
+    prog:(d, t, cur) => `Checking ${d} of ${t}: ${cur}`, rate:'Deriv limits rapid downloads; resuming in 20 seconds.',
+    done:(n, g, time) => `${n} ${n === 1 ? 'signal' : 'signals'} across ${g} charts. Search at ${time}.`,
+    errs:n => `${n} ${n === 1 ? 'chart could not be read' : 'charts could not be read'}:`,
+    emptyScan:'Choose the group and timeframes, then press “Find signals”. Under instruments you can remove the ones you don’t trade.',
+    noSig:'No formation is turning or confirmed right now on these charts. Try another timeframe or search again later.',
+    fAll:'All', fWait:'Turning', fOk:'Confirmed', fAdv:'Too advanced',
+    stWait:'Turning', stOk:'Confirmed', stAdv:'Too advanced',
+    buy:'Buy', sell:'Sell', BUY:'BUY', SELL:'SELL',
+    entry:'Entry', entryNow:'current price', sl:'SL',
+    av:p => `Progress from D to TP1: ${p}%`,
+    age:(n, dur) => `D ${n} ${n === 1 ? 'candle' : 'candles'} ago (${dur})`,
+    hist2:(p, n) => `historical hold ${p}% over ${n} ${n === 1 ? 'case' : 'cases'}`,
+    histLow:'too few cases to estimate',
+    whereIn:'D inside the PRZ', whereBefore:x => `D turned ${x} before the PRZ`, wherePast:x => `D went ${x} past the edge without touching the SL`,
+    scale:{Mayor:'major scale', Media:'medium scale', Interna:'internal scale'},
+    also:'Also fits:', alsoTf:x => `also on ${x}`, include:'Include when saving', behind:'Price is already past TP1: cannot be sent',
+    copy:'Copy', copied:'Copied', image:'Image',
+    closed:t => `Market closed: last candle ${t}`,
+    saveBtn:n => `Save ${n} ${n === 1 ? 'signal' : 'signals'} (CSV)`, copyAll:'Copy selected',
+    saveNote:'Downloads a file with the time, the entry at the search price, the SL and the TPs. Upload it later in “Compare results”.',
+    saveOld:m => `The search is ${m} min old. The entry would be recorded at that price: search again before saving.`,
+    saved:n => `File downloaded with ${n} ${n === 1 ? 'signal' : 'signals'}.`, saveNone:'Tick at least one signal to save it.',
+    intro2:'Upload one or more saved signal files (for example, yesterday’s). Comparing reads 1-minute candles from each signal’s time until now. If price touches the SL before TP1 it is a loss; if the same candle touches both, the SL counts first.',
+    drop:'Drop the signal .csv files here or tap to choose them',
+    filesN:n => `${n} ${n === 1 ? 'signal loaded' : 'signals loaded'}`, remove:'Remove',
+    badFile:f => `“${f}” is not a HARMONIX signals file.`,
+    mode:'Trade management', mThirds:'1/3 at each TP, SL to entry after TP1', mTp1:'All at TP1', mTp2:'All at TP2, SL to entry after TP1',
+    cmp:'Compare now', cmpNone:'Load a signals file first.',
+    comparing:(d, t) => `Reading prices: ${d} of ${t} instruments…`, compared:t => `Compared at ${t}.`,
+    cInst:'Instrument', cSide:'Side', cPat:'Pattern', cTime:'Signal time', cEntry:'Entry', cSl:'SL', cTp:'Targets', cRes:'Result', cR:'R', cNow:'Price now', cFloat:'Floating',
+    cN:'Signals', cWin:'Won', cLoss:'Lost', cWr:'Win rate', hitCol:n => `${n} time`,
+    rOpen:'Open', rSl:'SL', rTp:n => `TP${n}`, rBe:'closed at entry', rRun:'still open', notEval:'not compared',
+    sN:'Signals', sWin:'Won', sLoss:'Lost', sOpen:'Open', sWr:'Win rate', sR:'Result', sTp:'Reached TP1 · TP2 · TP3',
+    pdf:'Download PDF', xlsx:'Download Excel', csv:'Download CSV', img:'Image for the channel', txt:'Copy text',
+    libErr:'Could not load the library to build the file. Check your connection.',
+    byPat:'By pattern', byTf:'By timeframe', noData:'No signals.',
+    repTitle:'Signal summary', repGen:t => `Generated on ${t}`, repPeriod:'Period', repGroup:'Group',
+    imgTitle:'Signal results', imgOf:(w, n) => `${w} of ${n} resolved`, imgMore:n => `and ${n} more`,
+    imgFoot1:'Entry at the price when the signal was sent. Win: TP1 before the SL.', imgFoot2:'Educational content, not financial advice.',
+    sigImgFoot:'Manage your risk. Educational content, not financial advice.',
+    sheetSum:'Summary', sheetSig:'Signals',
+    foot:'Prices from Deriv (public API). On markets other than synthetics your broker’s price may differ by a few points.',
+    netErr:'No connection to Deriv. Check your internet and try again.',
+    dur:{m:'min', h:'h', d:'d'}
+  }
+};
+const t = (k, ...a) => { const v = (k in L[LANG]) ? L[LANG][k] : L.es[k]; return typeof v === 'function' ? v(...a) : (v == null ? k : v); };
+const PAT_EN = {'Bat alterno':'Alternate Bat', 'Extensión 1.618':'1.618 Extension'};
+const patName = k => { const n = SIM[k] ? SIM[k].name : k; return LANG === 'en' ? (PAT_EN[n] || n) : n; };
+const locale = () => LANG === 'en' ? 'en-GB' : 'es-ES';
+const bandName = b => b === 'mkt' ? t('bandMkt') : t('bandSynth');
+
+/* ---------- instrumentos (los mismos del escáner) ---------- */
+const GROUPS = [
+  {band:'synth', name:['Crash','Crash'], list:[['CRASH1000','Crash 1000'],['CRASH900','Crash 900'],['CRASH600','Crash 600'],['CRASH500','Crash 500'],['CRASH300N','Crash 300'],['CRASH150N','Crash 150'],['CRASH50','Crash 50']]},
+  {band:'synth', name:['Boom','Boom'], list:[['BOOM1000','Boom 1000'],['BOOM900','Boom 900'],['BOOM600','Boom 600'],['BOOM500','Boom 500'],['BOOM300N','Boom 300'],['BOOM150N','Boom 150'],['BOOM50','Boom 50']]},
+  {band:'synth', name:['Volatility','Volatility'], list:[['R_10','Volatility 10'],['R_25','Volatility 25'],['R_50','Volatility 50'],['R_75','Volatility 75'],['R_100','Volatility 100'],['1HZ10V','Volatility 10 (1s)'],['1HZ25V','Volatility 25 (1s)'],['1HZ50V','Volatility 50 (1s)'],['1HZ75V','Volatility 75 (1s)'],['1HZ100V','Volatility 100 (1s)']]},
+  {band:'mkt', name:['Metales','Metals'], list:[['frxXAUUSD',['Oro (XAU/USD)','Gold (XAU/USD)']],['frxXAGUSD',['Plata (XAG/USD)','Silver (XAG/USD)']],['frxXPTUSD',['Platino','Platinum']],['frxXPDUSD',['Paladio','Palladium']]]},
+  {band:'mkt', name:['Forex','Forex'], list:[['frxEURUSD','EUR/USD'],['frxGBPUSD','GBP/USD'],['frxUSDJPY','USD/JPY'],['frxUSDCHF','USD/CHF'],['frxUSDCAD','USD/CAD'],['frxAUDUSD','AUD/USD'],['frxNZDUSD','NZD/USD'],['frxEURJPY','EUR/JPY'],['frxGBPJPY','GBP/JPY'],['frxEURGBP','EUR/GBP']]},
+  {band:'mkt', name:['Índices','Indices'], list:[['OTC_DJI','Wall Street 30'],['OTC_NDX','US Tech 100'],['OTC_SPC','US 500'],['OTC_GDAXI','Germany 40'],['OTC_FTSE','UK 100'],['OTC_N225','Japan 225']]},
+  {band:'mkt', name:['Cripto','Crypto'], list:[['cryBTCUSD','BTC/USD'],['cryETHUSD','ETH/USD']]}
+];
+const lname = v => Array.isArray(v) ? v[LANG === 'en' ? 1 : 0] : v;
+const SYMNAME = new Map(); GROUPS.forEach(g => g.list.forEach(([s, n]) => SYMNAME.set(s, n)));
+const symName = s => SYMNAME.has(s) ? lname(SYMNAME.get(s)) : s;
+const bandSyms = b => GROUPS.filter(g => g.band === b).flatMap(g => g.list.map(q => q[0]));
+const TFS = [[60,'M1'],[300,'M5'],[900,'M15'],[1800,'M30'],[3600,'H1'],[14400,'H4'],[86400,'D1']];
+const tfName = g => (TFS.find(q => q[0] === g) || [0, g / 60 + 'm'])[1];
+
+
+
+/* ---------- ajustes ---------- */
+const SKEY = 'harmonix-senales:ajustes-v3';
+// instrumentos que vienen desmarcados de inicio (se pueden volver a marcar en la lista)
+const OFF_DEFAULT = ['CRASH150N','CRASH50','BOOM150N','BOOM50','R_10','R_25','R_50','R_75','R_100','1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V',
+  'frxXPTUSD','frxXPDUSD','OTC_SPC','OTC_GDAXI','OTC_FTSE','OTC_N225','cryETHUSD'];
+const loadJ = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch(e) { return d; } };
+const saveJ = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } };
+const S = Object.assign({band:'synth', tfs:[300, 900, 3600], hist:1000, off:OFF_DEFAULT.slice(), adv:60, age:100, wait:true, mode:'thirds', filter:'all', pts:[20, 20, 50], ptsV:4, edges:'both', mktPct:3, nearSide:'all', nearReact:15, watch:false, watchMin:2}, loadJ(SKEY, {}));
+if(![1000, 2000, 3000].includes(+S.hist)) S.hist = 1000;
+S.watch = false;   // la vigilancia siempre empieza apagada: el navegador pide un clic para poder sonar
+if(!(+S.mktPct > 0)) S.mktPct = 3;
+if(!Array.isArray(S.pts) || S.pts.length !== 3 || !S.pts.every(v => isF(+v) && +v > 0)) S.pts = [10, 40, 50];
+if(!(+S.ptsV >= 2)){ if(+S.pts[1] === 200) S.pts[1] = 20; }   // de 10 000 a 100 000: 20 puntos (antes 200)
+if(!(+S.ptsV >= 3)){ if(+S.pts[2] === 1000) S.pts[2] = 50; }   // 100 000 o más: 50 puntos (antes 1000)
+if(!(+S.ptsV >= 4)){ if(+S.pts[1] === 20) S.pts[1] = 40; S.ptsV = 4; }   // de 10 000 a 100 000: 40 puntos (antes 20)
+if(!['both', 'near', 'far'].includes(S.edges)) S.edges = 'both';
+const saveS = () => saveJ(SKEY, S);
+// ajuste de trabajo (una sola vez, respeta los puntos y demás ajustes): M5, M15 y H1 en Boom y Crash 1000, 900, 600, 500 y 300
+const PRESET_ON = ['BOOM1000','BOOM900','BOOM600','BOOM500','BOOM300N','CRASH1000','CRASH900','CRASH600','CRASH500','CRASH300N'];
+if(!(+S.preV >= 1)){
+  const synthOff = ['CRASH150N','CRASH50','BOOM150N','BOOM50','R_10','R_25','R_50','R_75','R_100','1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V'];
+  S.tfs = [300, 900, 3600];
+  S.off = [...new Set([...(S.off || []).filter(x => !PRESET_ON.includes(x)), ...synthOff])];
+  S.preV = 1; saveS();
+}
+// sintéticos: 20 puntos por debajo de 10 000 y por debajo de 100 000 (una sola vez; luego se puede cambiar a mano)
+if(!(+S.preV >= 2)){ S.pts = [20, 20, +S.pts[2] > 0 ? +S.pts[2] : 50]; S.preV = 2; saveS(); }
+// en «Cerca de su zona» (y en el aviso del móvil): Boom solo compras, Crash solo ventas
+const sideAllowed = (sym, dir) => /^BOOM/i.test(sym) ? dir > 0 : /^CRASH/i.test(sym) ? dir < 0 : true;
+
+/* ---------- conexión con Deriv ---------- */
+const WS_URL = 'wss://api.derivws.com/trading/v1/options/ws/public';
+const API = {ws:null, rid:0, pend:new Map(), opening:null};
+function apiOpen(){
+  if(API.ws && API.ws.readyState === 1) return Promise.resolve();
+  if(API.opening) return API.opening;
+  API.opening = new Promise((res, rej) => {
+    let w; try { w = new WebSocket(WS_URL); } catch(e){ API.opening = null; rej(new Error('net')); return; }
+    const to = setTimeout(() => { try { w.close(); } catch(e){} }, 15000);
+    w.onopen = () => { clearTimeout(to); API.ws = w; API.opening = null; res(); };
+    w.onerror = () => {};
+    w.onclose = () => {
+      clearTimeout(to); if(API.opening){ API.opening = null; rej(new Error('net')); }
+      API.ws = null; API.pend.forEach(p => p.rej(Object.assign(new Error('closed'), {code:'closed'}))); API.pend.clear();
+    };
+    w.onmessage = e => {
+      let d; try { d = JSON.parse(e.data); } catch(x){ return; }
+      const p = API.pend.get(d.req_id); if(!p) return;
+      API.pend.delete(d.req_id); clearTimeout(p.to);
+      if(d.error) p.rej(Object.assign(new Error(d.error.message || 'API'), {code:d.error.code})); else p.res(d);
+    };
+  });
+  return API.opening;
+}
+async function api(req){
+  await apiOpen();
+  const id = ++API.rid;
+  return new Promise((res, rej) => {
+    const to = setTimeout(() => { if(API.pend.has(id)){ API.pend.delete(id); rej(Object.assign(new Error('timeout'), {code:'timeout'})); } }, 30000);
+    API.pend.set(id, {res, rej, to});
+    API.ws.send(JSON.stringify({...req, req_id:id}));
+  });
+}
+// petición con reintentos (límite de Deriv, conexión caída)
+async function apiRetry(req, onWait){
+  for(let a = 0; ; a++){
+    try { return await api(req); }
+    catch(e){
+      if(a >= 3) throw e;
+      if(e.code === 'RateLimit'){ if(onWait) onWait(true); await sleep(20000); if(onWait) onWait(false); continue; }
+      if(e.code === 'closed' || e.code === 'timeout' || e.message === 'net'){ await sleep(1500 * (a + 1)); continue; }
+      throw e;
+    }
+  }
+}
+const toRows = cs => (cs || []).map(k => ({t:+k.epoch, o:+k.open, h:+k.high, l:+k.low, c:+k.close})).filter(k => [k.t, k.o, k.h, k.l, k.c].every(isF));
+
+
+// historia de N velas: bloques de 1000 hacia atrás (como el escáner)
+async function getCandles(sym, gran, want, onWait){
+  const all = new Map(); let pip = null, end = 'latest', prevOldest = Infinity;
+  for(let p = 0; p < 4 && all.size < want; p++){
+    const d = await apiRetry({ticks_history:sym, end:String(end), count:Math.min(1000, want - all.size), style:'candles', granularity:gran, adjust_start_time:1}, onWait);
+    if(d.pip_size != null) pip = d.pip_size;
+    const rows = toRows(d.candles); if(!rows.length) break;
+    const oldest = rows[0].t; if(oldest >= prevOldest) break;
+    rows.forEach(k => all.set(k.t, k)); prevOldest = oldest; end = oldest - 1;
+    if(rows.length < 50) break;
+  }
+  return {rows:[...all.values()].sort((a, b) => a.t - b.t), pip};
+}
+
+/* ---------- detección de señales en un gráfico ---------- */
+const SCALE_RANK = {Mayor:3, Media:2, Interna:1};
+function detectSignals(sym, gran, rows, pip, band){
+  const last = rows[rows.length - 1];
+  const type = /^CRASH/i.test(sym) ? 'crash' : /^BOOM/i.test(sym) ? 'boom' : 'other';
+  const dp = Math.min(5, isF(pip) ? pip : 2);
+  state.asset.decimals = dp; state.asset.price = last.c; state.asset.type = type; state.asset.name = sym;
+  Object.assign(cv, {candles:rows, src:'live', bt:null, sym, tf:tfName(gran), file:'', sel:null, alt:true, prov:true, usePrice:true, side:'all'});
+  cv.thr = autoThr(rows, true);
+  cvBacktest();
+  cv.forms = buildForms();
+  const maxAge = Math.max(1, Math.min(TRK_MAX_AGE, Math.round(+S.age || 100)));
+  // compras y ventas en todos los instrumentos (también en Crash y Boom)
+  const T = (cv.tracked || []).filter(q => q.age <= maxAge && !q.tps[2].hit && (q.confirmed || q.age <= 30));
+  const byD = new Map();
+  T.forEach(q => { const key = q.dir + ':' + q.tm.D; if(!byD.has(key)) byD.set(key, []); byD.get(key).push(q); });
+  const out = [], tScan = nowS();
+  byD.forEach(G => {
+    G.sort((a, b) => a.off - b.off || (SCALE_RANK[b.scale] || 0) - (SCALE_RANK[a.scale] || 0) || b.fit - a.fit);
+    const q = G[0], d = q.dir, price = last.c, span = q.tps[0].v - q.Dv;
+    const pr = probOf(q.k, 1);
+    out.push({
+      id:[sym, gran, d, q.tm.D].join('|'), band, sym, gran, dir:d, k:q.k,
+      alts:[...new Set(G.slice(1).map(x => x.k))].filter(k => k !== q.k),
+      scale:Array.isArray(q.scale) ? q.scale[0] : q.scale, conf:!!q.confirmed, where:q.where, off:q.off, base:q.base,
+      coords:{X:q.coords.X, A:q.coords.A, B:q.coords.B, C:q.coords.C}, tm:q.tm, Dv:q.Dv, Dt:q.tm.D,
+      SL:q.SL, tps:q.tps.map(x => ({n:x.n, k:x.k, v:x.v, ref:x.ref, hit:!!x.hit})),
+      price, t0:tScan, lastT:last.t, age:q.age, dec:dp,
+      av:span ? (price - q.Dv) / span : 0, tp1Hit:!!q.tps[0].hit,
+      stale:tScan - last.t > Math.max(3 * gran, 900),
+      hold:pr ? {p:pr.hold, n:pr.reachCases, low:pr.low} : null,
+      pick:false
+    });
+  });
+  return out;
+}
+const canSend = s => s.dir * (s.tps[0].v - s.price) > 0;
+
+/* ---------- bordes de PRZ: el precio está por tocar, tocando o recién pasado, sin reaccionar ---------- */
+// Solo PRZ de patrones que encajan (con X; sin AB=CD sueltos ni capas de tolerancia). Cada borde (cercano y lejano) se vigila por separado.
+// En la búsqueda se guardan los datos en bruto; la ventana (±%), la reacción máxima y la agrupación se calculan al pintar,
+// así los ajustes cambian el resultado sin volver a buscar.
+// dP: avance actual del precio desde C hacia la PRZ · dExt: avance máximo desde C · dNear, dFar, dSL: distancia de C a cada nivel.
+function detectNear(sym, gran, rows, pip, band){
+  const last = rows[rows.length - 1], price = last.c, n = rows.length, dp = Math.min(5, isF(pip) ? pip : 2), tScan = nowS();
+  const idx = new Map(rows.map((r, i) => [r.t, i])), seen = new Set(), out = [];
+  [...(cv.forms || []), ...(cv.formsAux || [])].forEach(f => {
+    if(f.prov || !f.D) return;
+    const dir = f.g.dir, C = f.coords.C, dP = dir * (C - price), dExt = f.dExt;
+    f.D.rows.forEach(q => {
+      if(!(q.fit > 0) || !q.r || !q.r.ok || SIM[q.k].hidden || SIM[q.k].fam === 'abcd') return;
+      if(!(q.dNear > 0) || !(q.dFar >= q.dNear)) return;
+      if(dExt >= q.dSL || dP >= q.dSL) return;                                   // tocó el SL: patrón roto
+      const key = q.k + '|' + dir + '|' + fx(q.near, dp) + '|' + fx(q.far, dp); if(seen.has(key)) return; seen.add(key);
+      const tC = rows[f.pts[3].i].t, iC = idx.has(tC) ? idx.get(tC) : n - 1, pr = q.pr || null;
+      const lvls = q.r.proj.filter(x => x.inPrz && isF(x.v)).map(x => ({lab:x.label, v:x.v})).sort((a, b) => dir * (b.v - a.v));
+      const R = f.g.R, P = SIM[q.k], ratios = P.fam === 'cypher' ? [['B', R.bxa, 'XA'], ['C', R.cx, 'XA']] : [['B', R.bxa, 'XA'], ['C', R.cab, 'AB']];
+      out.push({sym, gran, band, dir, k:q.k, fit:q.fit, scale:f.scales && f.scales[0], near:q.near, far:q.far, SL:q.r.SL, price, lvls, ratios:ratios.filter(x => isF(x[1])),
+        dP, dExt, dNear:q.dNear, dFar:q.dFar, dSL:q.dSL,
+        coords:{X:f.coords.X, A:f.coords.A, B:f.coords.B, C:f.coords.C},
+        tm:{X:rows[f.pts[0].i].t, A:rows[f.pts[1].i].t, B:rows[f.pts[2].i].t, C:tC},
+        ageC:n - 1 - iC, dec:dp, lastT:last.t, t0:tScan, stale:tScan - last.t > Math.max(3 * gran, 900),
+        pr:pr ? {reach:pr.reach, hold:pr.hold, n:pr.reachCases, low:pr.low} : null});
+    });
+  });
+  return out;
+}
+// ventana en puntos (unidades de precio) según el nivel del precio: < 10 000, < 100 000 y 100 000 o más
+const ptsFor = price => { const a = Math.abs(price), P = S.pts; return +(a < 10000 ? P[0] : a < 100000 ? P[1] : P[2]); };
+const ptsTxt = (v, dec) => { const d = Math.min(dec, Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2); let x = (+v).toFixed(d); if(x.includes('.')) x = x.replace(/0+$/, '').replace(/\.$/, ''); return x.replace('.', LANG === 'en' ? '.' : ','); };
+// avisos de borde con los ajustes actuales: ventana ± puntos alrededor del borde, sin haberse pasado más de eso y sin rebote mayor que «reacción»
+function nearItems(){
+  const rMax = (+S.nearReact || 15) / 100, items = [];
+  (SCAN.near || []).forEach(r => {
+    if(!sideAllowed(r.sym, r.dir)) return;
+    [['near', r.dNear, r.near], ['far', r.dFar, r.far]].filter(([e]) => S.edges === 'both' || S.edges === e).forEach(([edge, dE, v]) => {
+      if(edge === 'far' && S.edges === 'both' && Math.abs(r.far - r.near) <= 1e-12) return;
+      const byPts = r.band === 'synth', tol = (byPts ? ptsFor(r.price) : (+S.mktPct || 3) / 100 * dE) + 1e-12, d = r.dP - dE;
+      if(Math.abs(d) > tol) return;                      // lejos del borde
+      if(r.dExt > dE + tol) return;                      // ya se había pasado más de la ventana
+      const react = r.dExt > 0 ? (r.dExt - r.dP) / r.dExt : 0;
+      if(react > rMax + 1e-12) return;                   // ya reaccionó
+      items.push({...r, code:zoneCode(r), edge, edgeV:v, d, tol, rem:Math.abs(d) / tol, byPts, pctE:Math.abs(d) / dE, react, alts:[], also:[],
+        key:[r.sym, r.gran, r.dir, edge, fx(v, r.dec)].join('|'), id:['near', r.sym, r.gran, r.dir, edge, fx(v, r.dec)].join('|')});
+    });
+  });
+  items.sort((a, b) => a.rem - b.rem || b.fit - a.fit);
+  // mismo gráfico, mismo lado y bordes a menos de la ventana: un solo aviso con los demás patrones como «también encaja»
+  const groups = [];
+  items.forEach(z => {
+    const g = groups.find(q => q.sym === z.sym && q.gran === z.gran && q.dir === z.dir && Math.abs(q.edgeV - z.edgeV) <= Math.max(q.tol, z.tol));
+    if(g){ if(z.k !== g.k && !g.alts.includes(z.k)) g.alts.push(z.k); return; }
+    groups.push(z);
+  });
+  // misma zona en varias temporalidades: se queda la mayor
+  const out = [];
+  groups.forEach(z => {
+    const i = out.findIndex(q => q.sym === z.sym && q.dir === z.dir && Math.abs(q.edgeV - z.edgeV) <= Math.max(q.tol, z.tol));
+    if(i < 0){ out.push(z); return; }
+    const o = out[i], hi = z.gran > o.gran ? z : o, lo = hi === z ? o : z;
+    hi.also = [...new Set([...hi.also, lo.gran, ...lo.also])].filter(g => g !== hi.gran).sort((a, b) => a - b);
+    out[i] = hi;
+  });
+  return out.sort((a, b) => a.rem - b.rem);
+}
+// Código de zona: sale de las velas de X, A, B y C. Mismo código = misma formación (la misma PRZ, aunque se avise su otro borde);
+// código distinto = otra formación con otra PRZ, aunque los precios se parezcan.
+function zoneCode(z){
+  const s = [z.sym, z.gran, z.dir, z.tm.X, z.tm.A, z.tm.B, z.tm.C].join('|'); let h = 2166136261;
+  for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36).toUpperCase().slice(-4).padStart(4, '0');
+}
+const edgeName = z => t(z.edge === 'near' ? 'edgeNear' : 'edgeFar');
+const nearBadge = z => z.rem < 0.05 ? t('bTouch', edgeName(z)) : z.byPts ? (z.d < 0 ? t('bBefore', ptsTxt(-z.d, z.dec), edgeName(z)) : t('bPast', ptsTxt(z.d, z.dec), edgeName(z)))
+  : (z.d < 0 ? t('bBeforeP', pctTxt(z.pctE), edgeName(z)) : t('bPastP', pctTxt(z.pctE), edgeName(z)));
+const sigStatus = s => (s.tp1Hit || s.av >= (+S.adv || 60) / 100) ? 'adv' : s.conf ? 'ok' : 'wait';
+const rrOf = (s, v) => Math.abs(v - s.price) / Math.abs(s.price - s.SL);
+const sideWord = (d, up) => t(d > 0 ? (up ? 'BUY' : 'buy') : (up ? 'SELL' : 'sell'));
+const sideHtml = d => `<span class="side ${d > 0 ? 't-bull' : 't-bear'}">${d > 0 ? '▲' : '▼'} ${esc(sideWord(d))}</span>`;
+function durTxt(sec){
+  const D = t('dur'), m = Math.round(sec / 60);
+  if(m < 60) return m + ' ' + D.m;
+  const h = Math.floor(m / 60), mm = m % 60;
+  if(h < 48) return h + ' ' + D.h + (mm && h < 10 ? ' ' + mm + ' ' + D.m : '');
+  return Math.round(h / 24) + ' ' + D.d;
+}
+const hhmm = sec => new Date(sec * 1000).toLocaleTimeString(locale(), {hour:'2-digit', minute:'2-digit'});
+const dmhm = sec => new Date(sec * 1000).toLocaleString(locale(), {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+const longDate = sec => new Date(sec * 1000).toLocaleDateString(locale(), {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+const whereTxt = s => s.where === 'dentro' ? t('whereIn') : s.where === 'antes' ? t('whereBefore', fr(s.off) + ' ' + s.base) : t('wherePast', fr(s.off) + ' ' + s.base);
+
+/* ---------- dibujo del patrón (SVG) ---------- */
+const PAL_UI = {bg:'none', ink:'var(--ink)', muted:'var(--muted)', line:'var(--line)', grid:'var(--grid)', bull:'var(--bull)', bear:'var(--bear)', acc:'var(--accent)', fib:'var(--fib)', tri:'var(--tri)'};
+const PAL_IMG = {bg:'#161F2B', page:'#0F151E', ink:'#E4EAF2', muted:'#98A5B6', line:'#2D3A4D', grid:'#243042', bull:'#4FC79C', bear:'#FF6F7C', acc:'#8F9CFF', fib:'#E2B44C', tri:'rgba(143,156,255,.14)', logo:'#6F8BFF'};
+const FONT = `Schibsted Grotesk, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`;
+// devuelve elementos SVG (sin la etiqueta <svg>) para un recuadro de w×h
+function chartEls(s, rows, w, h, P, fs){
+  fs = fs || 10;
+  const idx = new Map(rows.map((r, i) => [r.t, i]));
+  const iX = idx.has(s.tm.X) ? idx.get(s.tm.X) : Math.max(0, rows.length - 120);
+  const i0 = Math.max(0, iX - 6), data = rows.slice(i0);
+  const entLab = LANG === 'en' ? 'Entry' : 'Entrada';
+  const labLen = Math.max(...[['SL', s.SL], [entLab, s.price], ...s.tps.map(q => [q.n, q.v])].map(([a, v]) => (a + ' ' + fx(v, s.dec)).length));
+  const padL = 4, padR = Math.round((labLen * 0.58 + 0.9) * fs), padT = fs, padB = fs;
+  const maxBars = Math.max(30, Math.floor((w - padL - padR) / (fs * 0.42)));
+  const g = Math.max(1, Math.ceil(data.length / maxBars)), bars = [];
+  for(let j = 0; j < data.length; j += g){
+    const ch = data.slice(j, j + g);
+    bars.push({o:ch[0].o, c:ch[ch.length - 1].c, h:Math.max(...ch.map(k => k.h)), l:Math.min(...ch.map(k => k.l))});
+  }
+  const bi = tt => idx.has(tt) ? Math.floor((idx.get(tt) - i0) / g) : bars.length - 1;
+  const lvls = [s.SL, s.price, ...s.tps.map(q => q.v)];
+  let lo = Math.min(...bars.map(b => b.l), ...lvls), hi = Math.max(...bars.map(b => b.h), ...lvls);
+  const pad = (hi - lo) * 0.04 || Math.abs(hi) * 0.001 || 1; lo -= pad; hi += pad;
+  const bw = (w - padL - padR) / bars.length;
+  const X = b => padL + (b + 0.5) * bw, Y = v => padT + (hi - v) / (hi - lo) * (h - padT - padB);
+  const o = [];
+  o.push(`<rect x="0" y="0" width="${w}" height="${h}" fill="${P.bg}"/>`);
+  // velas
+  const body = Math.max(1, bw * 0.62);
+  bars.forEach((b, i) => {
+    const up = b.c >= b.o, col = up ? P.bull : P.bear, x = X(i);
+    o.push(`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${Y(b.h).toFixed(1)}" y2="${Y(b.l).toFixed(1)}" stroke="${col}" stroke-opacity=".55" stroke-width="${Math.max(0.8, bw * 0.12).toFixed(2)}"/>`);
+    const y1 = Y(Math.max(b.o, b.c)), y2 = Y(Math.min(b.o, b.c));
+    o.push(`<rect x="${(x - body / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${body.toFixed(1)}" height="${Math.max(0.8, y2 - y1).toFixed(1)}" fill="${col}" fill-opacity=".55"/>`);
+  });
+  // niveles: SL, entrada y objetivos
+  const xr = w - padR, dp = s.dec;
+  const lines = [
+    {v:s.SL, c:P.bear, lab:'SL', dash:'5 4'},
+    {v:s.price, c:P.acc, lab:entLab, dash:''},
+    ...s.tps.map(q => ({v:q.v, c:P.bull, lab:q.n, dash:'5 4'}))
+  ];
+  lines.forEach(l => o.push(`<line x1="${X(bi(s.Dt)).toFixed(1)}" x2="${xr}" y1="${Y(l.v).toFixed(1)}" y2="${Y(l.v).toFixed(1)}" stroke="${l.c}" stroke-width="${(fs / 9).toFixed(2)}" ${l.dash ? `stroke-dasharray="${l.dash}"` : ''}/>`));
+  // etiquetas sin solaparse
+  const labs = lines.map(l => ({...l, y:Y(l.v)})).sort((a, b) => a.y - b.y), gap = fs * 1.25;
+  for(let i = 1; i < labs.length; i++) if(labs[i].y - labs[i - 1].y < gap) labs[i].y = labs[i - 1].y + gap;
+  const over = labs.length ? labs[labs.length - 1].y - (h - fs * 0.4) : 0;
+  if(over > 0) labs.forEach(l => { l.y -= over; });
+  for(let i = labs.length - 2; i >= 0; i--) if(labs[i + 1].y - labs[i].y < gap) labs[i].y = labs[i + 1].y - gap;
+  labs.forEach(l => o.push(`<text x="${xr + fs * 0.4}" y="${(l.y + fs * 0.36).toFixed(1)}" font-size="${fs}" font-family="${FONT}" fill="${l.c}" font-weight="700">${esc(l.lab)} <tspan font-weight="400" fill="${P.muted}">${esc(fx(l.v, dp))}</tspan></text>`));
+  // estructura X-A-B-C-D
+  const pts = [['X', s.tm.X, s.coords.X], ['A', s.tm.A, s.coords.A], ['B', s.tm.B, s.coords.B], ['C', s.tm.C, s.coords.C], ['D', s.Dt, s.Dv]].map(([n, tt, v]) => ({n, x:X(bi(tt)), y:Y(v), v}));
+  const P_ = k => pts.find(p => p.n === k);
+  o.push(`<polygon points="${['X','A','B'].map(k => P_(k).x.toFixed(1) + ',' + P_(k).y.toFixed(1)).join(' ')}" fill="${P.tri}"/>`);
+  o.push(`<polygon points="${['B','C','D'].map(k => P_(k).x.toFixed(1) + ',' + P_(k).y.toFixed(1)).join(' ')}" fill="${P.tri}"/>`);
+  o.push(`<polyline points="${pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ')}" fill="none" stroke="${P.acc}" stroke-width="${(fs / 6.5).toFixed(2)}" stroke-linejoin="round"/>`);
+  pts.forEach((p, i) => {
+    const top = i === 0 ? p.v > pts[1].v : p.v > pts[i - 1].v;
+    const ty = top ? p.y - fs * 0.6 : p.y + fs * 1.3;
+    o.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(fs / 4).toFixed(1)}" fill="${p.n === 'D' ? P.fib : P.acc}"/>`);
+    o.push(`<text x="${p.x.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${fs * 1.05}" font-family="${FONT}" font-weight="700" fill="${p.n === 'D' ? P.fib : P.ink}">${p.n}</text>`);
+  });
+  // precio actual
+  o.push(`<circle cx="${X(bars.length - 1).toFixed(1)}" cy="${Y(s.price).toFixed(1)}" r="${(fs / 3).toFixed(1)}" fill="${P.acc}"/>`);
+  return o.join('');
+}
+function chartSvg(s, rows){
+  const w = 360, h = 190;
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(symName(s.sym) + ' ' + tfName(s.gran) + ' ' + patName(s.k))}">${chartEls(s, rows, w, h, PAL_UI, 9)}</svg>`;
+}
+
+/* ---------- textos para el canal ---------- */
+function sigText(s){
+  const d = s.dec, em = s.dir > 0 ? '🟢' : '🔴';
+  const lines = [
+    `${em} ${sideWord(s.dir, true)} · ${symName(s.sym)} · ${tfName(s.gran)}`,
+    `${LANG === 'en' ? 'Pattern' : 'Patrón'}: ${patName(s.k)}`,
+    `${t('entry')}: ${fx(s.price, d)}`,
+    `SL: ${fx(s.SL, d)}`,
+    ...s.tps.map(q => `${q.n}: ${fx(q.v, d)}`)
+  ];
+  return lines.join('\n');
+}
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); toast(t('copied')); }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast(t('copied')); } catch(x){} ta.remove();
+  }
+}
+
+/* ---------- imágenes para compartir ---------- */
+function svgText(x, y, txt, o){
+  o = o || {};
+  return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="${o.fs || 28}" font-weight="${o.fw || 400}" fill="${o.c || PAL_IMG.ink}"${o.anchor ? ` text-anchor="${o.anchor}"` : ''}${o.italic ? ' font-style="italic"' : ''}>${esc(txt)}</text>`;
+}
+const LOGO = (x, y, s) => `<g transform="translate(${x},${y}) scale(${s})"><polyline points="1.5,15.5 6.5,2.5 10.5,10.5 14.5,5.5 21.5,16.5" fill="none" stroke="${PAL_IMG.logo}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></g>`;
+function signalImage(s, rows){
+  const P = PAL_IMG, W = 1080, H = 1350, d = s.dec, col = s.dir > 0 ? P.bull : P.bear;
+  const o = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`, `<rect width="${W}" height="${H}" fill="${P.page}"/>`];
+  o.push(LOGO(60, 54, 2.2), svgText(124, 92, 'HARMONIX', {fs:34, fw:800, c:P.ink}), svgText(1020, 92, dmhm(s.t0), {fs:26, c:P.muted, anchor:'end'}));
+  o.push(`<rect x="60" y="140" width="${(sideWord(s.dir, true).length + 2) * 21 + 56}" height="64" rx="32" fill="${col}"/>`, svgText(88, 184, (s.dir > 0 ? '▲ ' : '▼ ') + sideWord(s.dir, true), {fs:32, fw:800, c:P.page}));
+  o.push(svgText(60, 270, symName(s.sym), {fs:60, fw:800}), svgText(60, 320, `${tfName(s.gran)}  ${patName(s.k)}`, {fs:32, c:P.fib, italic:true}));
+  o.push(`<g transform="translate(60,360)"><rect width="960" height="560" rx="18" fill="${P.bg}"/>${chartEls(s, rows, 960, 560, P, 20)}</g>`);
+  const rowsL = [[t('entry'), s.price, '', P.acc], ['SL', s.SL, '', P.bear], ...s.tps.map(q => [q.n, q.v, '1:' + rrOf(s, q.v).toFixed(1), P.bull])];
+  rowsL.forEach(([n, v, rr, c], i) => {
+    const y = 990 + i * 58;
+    o.push(svgText(60, y, n, {fs:34, fw:700, c}), svgText(560, y, fx(v, d), {fs:36, fw:700, anchor:'end'}));
+    if(rr) o.push(svgText(1020, y, 'R ' + rr, {fs:28, c:P.muted, anchor:'end'}));
+    if(i < rowsL.length - 1) o.push(`<line x1="60" x2="1020" y1="${y + 20}" y2="${y + 20}" stroke="${P.line}"/>`);
+  });
+  o.push(svgText(60, 1310, t('sigImgFoot'), {fs:22, c:P.muted}));
+  o.push('</svg>');
+  return {svg:o.join(''), w:W, h:H};
+}
+async function svgToPngBlob(svg, w, h){
+  const url = URL.createObjectURL(new Blob([svg], {type:'image/svg+xml;charset=utf-8'}));
+  try {
+    const img = new Image(); img.decoding = 'sync';
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    return await new Promise(res => c.toBlob(res, 'image/png'));
+  } finally { URL.revokeObjectURL(url); }
+}
+async function shareOrDownload(img, name){
+  const blob = await svgToPngBlob(img.svg, img.w, img.h); if(!blob) return;
+  const file = new File([blob], name, {type:'image/png'});
+  if(navigator.canShare && matchMedia('(pointer:coarse)').matches && navigator.canShare({files:[file]})){
+    try { await navigator.share({files:[file]}); return; } catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+function download(name, text, type){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+let toastT = null;
+function toast(msg){ const el = $('toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2600); }
+
+
+const EV0 = s => ({hit:[null, null, null], stopT:null, stopKind:null, U:Math.ceil(s.t0 / 60) * 60, last:s.entry, mfe:0, mae:0, done:false, upd:0});
+// recorre velas (en orden) a partir de e.U. Con duda dentro de una vela, cuenta primero el stop.
+function stepEv(e, s, candles){
+  const d = s.dir, E = s.entry, risk = Math.abs(E - s.SL), T = s.tps.map(q => q.v);
+  let lastT = null;
+  for(const k of candles){
+    if(k.t < e.U) continue;
+    lastT = k.t; e.last = k.c;
+    if(e.done) continue;
+    const fav = d > 0 ? k.h : k.l, adv = d > 0 ? k.l : k.h;
+    e.mfe = Math.max(e.mfe, d * (fav - E) / risk); e.mae = Math.max(e.mae, d * (E - adv) / risk);
+    const stop = e.hit[0] ? E : s.SL;
+    if(d * (adv - stop) <= 0){ e.stopT = k.t; e.stopKind = e.hit[0] ? 'be' : 'sl'; e.done = true; continue; }
+    T.forEach((v, i) => { if(!e.hit[i] && d * (fav - v) >= 0) e.hit[i] = k.t; });
+    if(e.hit[2]) e.done = true;
+  }
+  if(lastT != null) e.U = lastT;   // la última vela puede estar abierta: se vuelve a leer la próxima vez
+  e.upd = nowS();
+  return e;
+}
+function outcome(s, e, mode){
+  const rr = s.tps.map(q => Math.abs(q.v - s.entry) / Math.abs(s.entry - s.SL));
+  if(!e) return {code:'none', mx:0, win:false, loss:false, resolved:false, closed:false, r:0, rr};
+  const h = e.hit.map(Boolean), mx = h[2] ? 3 : h[1] ? 2 : h[0] ? 1 : 0, loss = e.stopKind === 'sl', win = h[0];
+  let r = 0, closed = false;
+  if(mode === 'tp1'){ r = win ? rr[0] : loss ? -1 : 0; closed = win || loss; }
+  else if(mode === 'tp2'){ r = h[1] ? rr[1] : loss ? -1 : 0; closed = h[1] || !!e.stopT; }
+  else { r = loss ? -1 : h.reduce((a, x, i) => a + (x ? rr[i] / 3 : 0), 0); closed = !!e.stopT || h[2]; }
+  return {code:loss ? 'sl' : mx ? 'tp' + mx : 'open', mx, win, loss, resolved:win || loss, closed, r, rr, be:e.stopKind === 'be'};
+}
+function resHtml(o){
+  if(o.code === 'none') return `<span class="res open">${esc(t('notEval'))}</span>`;
+  if(o.code === 'sl') return `<span class="res loss">${esc(t('rSl'))}</span>`;
+  if(o.code === 'open') return `<span class="res open">${esc(t('rOpen'))}</span>`;
+  return `<span class="res win">${esc(t('rTp', o.mx))}</span>${o.mx < 3 ? ` <span class="zsub">${esc(o.be ? t('rBe') : o.closed ? '' : t('rRun'))}</span>` : ''}`;
+}
+const rTxt = (o) => o.code === 'none' || (o.code === 'open') ? '–' : (o.r >= 0 ? '+' : '−') + Math.abs(o.r).toFixed(2) + 'R';
+async function fetchRange(sym, from, onPage){
+  const now = nowS(), span = now - from;
+  const gran = [60, 300, 900, 3600].find(g => span / g <= 10000) || 3600;
+  const out = new Map(); let s = from - (from % gran);
+  for(let p = 0; p < 12 && s <= now; p++){
+    const end = s + 999 * gran, last = end >= now - gran;
+    const d = await apiRetry({ticks_history:sym, start:s, end:last ? 'latest' : end, count:1000, style:'candles', granularity:gran});
+    toRows(d.candles).forEach(k => out.set(k.t, k));
+    if(onPage) onPage();
+    if(last) break; s = end + gran;
+  }
+  return [...out.values()].sort((a, b) => a.t - b.t);
+}
+
+/* =====================================================================
+   1 · Búsqueda de señales
+   ===================================================================== */
+let SCAN = {band:null, running:false, items:[], near:[], errors:[], total:0, done:0, cur:'', t:0, wait:false, charts:0};
+const ROWS = new Map();
+async function runScan(){
+  if(SCAN.running) return;
+  const syms = bandSyms(S.band).filter(s => !S.off.includes(s)), tfs = S.tfs.slice().sort((a, b) => a - b), want = +S.hist || 1000;
+  if(!syms.length || !tfs.length){ $('scanStatus').textContent = t('emptyScan'); return; }
+  const jobs = []; tfs.forEach(g => syms.forEach(sym => jobs.push({sym, g})));
+  SCAN = {band:S.band, running:true, items:[], near:[], errors:[], total:jobs.length, done:0, cur:'', t:nowS(), wait:false, charts:0};
+  ROWS.clear(); renderScanAll();
+  let i = 0, netFail = 0;
+  const worker = async () => {
+    while(i < jobs.length){
+      const j = jobs[i++]; SCAN.cur = symName(j.sym) + ' ' + tfName(j.g); renderProgress();
+      try {
+        const d = await getCandles(j.sym, j.g, want, w => { SCAN.wait = w; renderProgress(); });
+        const rows = d.rows;
+        if(rows.length >= 120){
+          SCAN.charts++;
+          const sigs = detectSignals(j.sym, j.g, rows, d.pip, SCAN.band);
+          if(sigs.length){ ROWS.set(j.sym + '|' + j.g, rows); sigs.forEach(s => { s.pick = sigStatus(s) !== 'adv' && canSend(s); mergeSig(s); }); }
+          const nz = detectNear(j.sym, j.g, rows, d.pip, SCAN.band);
+          if(nz.length){ ROWS.set(j.sym + '|' + j.g, rows); SCAN.near.push(...nz); }
+        }
+      } catch(e){ if(e.message === 'net') netFail++; SCAN.errors.push({sym:j.sym, g:j.g, msg:e.message || String(e)}); }
+      SCAN.done++; renderProgress(); scheduleCards();
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  SCAN.running = false; SCAN.t = nowS();
+  if(netFail && netFail === SCAN.done) SCAN.netFail = true;
+  renderScanAll();
+  afterScan();
+}
+// la misma formación vista en dos temporalidades (mismo D): se queda la mayor y se anota la otra
+function mergeSig(s){
+  const i = SCAN.items.findIndex(q => q.sym === s.sym && q.dir === s.dir && Math.abs(q.Dv - s.Dv) <= Math.abs(s.Dv) * 3e-4);
+  if(i < 0){ SCAN.items.push(s); return; }
+  const o = SCAN.items[i], hi = s.gran > o.gran ? s : o, lo = hi === s ? o : s;
+  hi.also = [...new Set([...(hi.also || []), lo.gran, ...(lo.also || [])])].filter(g => g !== hi.gran).sort((a, b) => a - b);
+  SCAN.items[i] = hi;
+}
+let cardsRaf = 0;
+const scheduleCards = () => { if(!cardsRaf) cardsRaf = requestAnimationFrame(() => { cardsRaf = 0; renderCards(); }); };
+function renderProgress(){
+  const p = $('prog'), st = $('scanStatus'), b = $('scanBtn');
+  b.textContent = SCAN.running ? t('scanning') : (SCAN.band === S.band && SCAN.done ? t('rescan') : t('scan')); b.disabled = SCAN.running;
+  p.hidden = !SCAN.running; p.firstElementChild.style.width = (SCAN.total ? 100 * SCAN.done / SCAN.total : 0) + '%';
+  if(SCAN.running) st.textContent = SCAN.wait ? t('rate') : t('prog', Math.min(SCAN.done + 1, SCAN.total), SCAN.total, SCAN.cur);
+  else if(SCAN.netFail) st.textContent = t('netErr');
+  else if(SCAN.band === S.band && SCAN.done) st.textContent = t('done', SCAN.items.length, SCAN.charts, hhmm(SCAN.t));
+  else st.textContent = '';
+}
+
+function cardHtml(s){
+  const st = sigStatus(s), rows = ROWS.get(s.sym + '|' + s.gran), d = s.dec, ok = canSend(s);
+  const avP = Math.max(0, Math.min(100, Math.round(s.av * 100))), thr = Math.max(0, Math.min(100, +S.adv || 60));
+  const hold = s.hold ? (s.hold.low ? t('histLow') : t('hist2', Math.round(s.hold.p * 100), s.hold.n)) : '';
+  const lv = [`<dt>${esc(t('entry'))}</dt><dd>${fx(s.price, d)}</dd><dd class="rr">${esc(t('entryNow'))}</dd>`, `<dt class="t-bear">SL</dt><dd>${fx(s.SL, d)}</dd><dd class="rr"></dd>`,
+    ...s.tps.map(q => `<dt class="t-bull">${q.n}</dt><dd${q.hit ? ' class="hit"' : ''}>${fx(q.v, d)}${q.hit ? ' ✓' : ''}</dd><dd class="rr">${fr(q.k)} ${q.ref} · R 1:${rrOf(s, q.v).toFixed(1)}</dd>`)].join('');
+  return `<article class="sig st-${st}" data-id="${esc(s.id)}">
+    <header>${sideHtml(s.dir)}<h4>${esc(symName(s.sym))}<span class="tf">${tfName(s.gran)}</span>${s.also && s.also.length ? `<span class="zsub"> ${esc(t('alsoTf', s.also.map(tfName).join(', ')))}</span>` : ''}</h4><span class="badge st-${st}">${esc(t(st === 'wait' ? 'stWait' : st === 'ok' ? 'stOk' : 'stAdv'))}</span></header>
+    <p class="pat"><b>${esc(patName(s.k))}</b>, ${esc(t('scale')[s.scale] || s.scale)}. ${esc(whereTxt(s))}.${s.alts.length ? ' ' + esc(t('also')) + ' ' + esc(s.alts.map(patName).join(', ')) + '.' : ''}</p>
+    ${rows ? chartSvg(s, rows) : ''}
+    <dl class="lv">${lv}</dl>
+    <div><div class="zsub">${esc(t('av', avP))}</div><div class="avbar" aria-hidden="true"><i style="width:${avP}%"></i><u style="left:${thr}%"></u></div></div>
+    <p class="meta">${esc(t('age', s.age, durTxt(s.age * s.gran)))}${hold ? '; ' + esc(hold) : ''}.${s.stale ? ' <span class="t-fib">' + esc(t('closed', dmhm(s.lastT))) + '</span>' : ''}</p>
+    <footer>${ok ? `<label><input type="checkbox" data-pick="${esc(s.id)}"${s.pick ? ' checked' : ''}> ${esc(t('include'))}</label>` : `<span class="no">${esc(t('behind'))}</span>`}
+      <button type="button" class="btn sm" data-copy="${esc(s.id)}">${esc(t('copy'))}</button>
+      ${rows ? `<button type="button" class="btn sm" data-img="${esc(s.id)}">${esc(t('image'))}</button>` : ''}</footer>
+  </article>`;
+}
+const ST_ORDER = {ok:0, wait:1, adv:2};
+function renderCards(){
+  const out = $('scanOut'), fl = $('scanFilters');
+  if(SCAN.band !== S.band || (!SCAN.running && !SCAN.done)){ fl.innerHTML = ''; out.innerHTML = `<div class="empty">${esc(t('emptyScan'))}</div>`; $('saveBar').hidden = true; return; }
+  let items = SCAN.items.filter(s => S.wait || sigStatus(s) !== 'wait');
+  const cnt = k => items.filter(s => k === 'all' || sigStatus(s) === k).length;
+  fl.innerHTML = [['all', 'fAll'], ['wait', 'fWait'], ['ok', 'fOk'], ['adv', 'fAdv']].filter(([k]) => k !== 'wait' || S.wait)
+    .map(([k, lab]) => `<button type="button" class="chip${S.filter === k ? ' on' : ''}${cnt(k) ? '' : ' no'}" data-filter="${k}">${esc(t(lab))} (${cnt(k)})</button>`).join('');
+  if(S.filter !== 'all') items = items.filter(s => sigStatus(s) === S.filter);
+  items.sort((a, b) => ST_ORDER[sigStatus(a)] - ST_ORDER[sigStatus(b)] || a.age * a.gran - b.age * b.gran);
+  let html = '';
+  if(!items.length && !SCAN.running) html = `<div class="empty">${esc(t('noSig'))}</div>`;
+  else html = `<div class="sigs">${items.map(cardHtml).join('')}</div>`;
+  if(!SCAN.running && SCAN.errors.length) html += `<p class="zsub">${esc(t('errs', SCAN.errors.length))} ${SCAN.errors.map(e => esc(symName(e.sym) + ' ' + tfName(e.g) + ' (' + e.msg + ')')).join(', ')}</p>`;
+  out.innerHTML = html;
+  renderSaveBar();
+  renderNear();
+}
+
+/* ---------- 2 · Cerca de su zona ---------- */
+function nearChartEls(z, rows, w, h, P, fs){
+  const idx = new Map(rows.map((r, i) => [r.t, i]));
+  const iX = idx.has(z.tm.X) ? idx.get(z.tm.X) : Math.max(0, rows.length - 120);
+  const i0 = Math.max(0, iX - 6), data = rows.slice(i0);
+  const eC = z.dir > 0 ? P.bull : P.bear;
+  const lines = [{v:z.near, c:z.edge === 'near' ? eC : P.fib, lab:z.edge === 'near' ? '◀' : '', dash:z.edge === 'near' ? '' : '3 3'}, {v:z.far, c:z.edge === 'far' ? eC : P.fib, lab:z.edge === 'far' ? '◀' : '', dash:z.edge === 'far' ? '' : '3 3'}, {v:z.SL, c:P.bear, lab:'SL', dash:'5 4'}, {v:z.price, c:P.acc, lab:LANG === 'en' ? 'Price' : 'Precio', dash:''}];
+  const labLen = Math.max(...lines.map(l => ((l.lab ? l.lab + ' ' : '') + fx(l.v, z.dec)).length));
+  const padL = 4, padR = Math.round((labLen * 0.58 + 0.9) * fs), padT = fs, padB = fs;
+  const maxBars = Math.max(30, Math.floor((w - padL - padR) / (fs * 0.42)));
+  const g = Math.max(1, Math.ceil(data.length / maxBars)), bars = [];
+  for(let j = 0; j < data.length; j += g){ const ch = data.slice(j, j + g); bars.push({o:ch[0].o, c:ch[ch.length - 1].c, h:Math.max(...ch.map(k => k.h)), l:Math.min(...ch.map(k => k.l))}); }
+  const bi = tt => idx.has(tt) ? Math.floor((idx.get(tt) - i0) / g) : bars.length - 1;
+  const lv = lines.map(l => l.v);
+  let lo = Math.min(...bars.map(b => b.l), ...lv), hi = Math.max(...bars.map(b => b.h), ...lv);
+  const pad = (hi - lo) * 0.04 || Math.abs(hi) * 0.001 || 1; lo -= pad; hi += pad;
+  const bw = (w - padL - padR) / bars.length, xr = w - padR;
+  const X = b => padL + (b + 0.5) * bw, Y = v => padT + (hi - v) / (hi - lo) * (h - padT - padB);
+  const o = [`<rect x="0" y="0" width="${w}" height="${h}" fill="${P.bg}"/>`];
+  // zona (PRZ) desde C hasta el borde derecho
+  const xC = X(bi(z.tm.C)), yA = Y(Math.max(z.near, z.far)), yB = Y(Math.min(z.near, z.far));
+  o.push(`<rect x="${xC.toFixed(1)}" y="${yA.toFixed(1)}" width="${(xr - xC).toFixed(1)}" height="${Math.max(1.5, yB - yA).toFixed(1)}" fill="${P.fib}" fill-opacity=".2"/>`);
+  const body = Math.max(1, bw * 0.62);
+  bars.forEach((b, i) => {
+    const col = b.c >= b.o ? P.bull : P.bear, x = X(i);
+    o.push(`<line x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${Y(b.h).toFixed(1)}" y2="${Y(b.l).toFixed(1)}" stroke="${col}" stroke-opacity=".55" stroke-width="${Math.max(0.8, bw * 0.12).toFixed(2)}"/>`);
+    const y1 = Y(Math.max(b.o, b.c)), y2 = Y(Math.min(b.o, b.c));
+    o.push(`<rect x="${(x - body / 2).toFixed(1)}" y="${y1.toFixed(1)}" width="${body.toFixed(1)}" height="${Math.max(0.8, y2 - y1).toFixed(1)}" fill="${col}" fill-opacity=".55"/>`);
+  });
+  lines.forEach(l => o.push(`<line x1="${xC.toFixed(1)}" x2="${xr}" y1="${Y(l.v).toFixed(1)}" y2="${Y(l.v).toFixed(1)}" stroke="${l.c}" stroke-width="${(fs / 9).toFixed(2)}" ${l.dash ? `stroke-dasharray="${l.dash}"` : ''}/>`));
+  const labs = lines.map(l => ({...l, y:Y(l.v)})).sort((a, b) => a.y - b.y), gap = fs * 1.25;
+  for(let i = 1; i < labs.length; i++) if(labs[i].y - labs[i - 1].y < gap) labs[i].y = labs[i - 1].y + gap;
+  const over = labs.length ? labs[labs.length - 1].y - (h - fs * 0.4) : 0;
+  if(over > 0) labs.forEach(l => { l.y -= over; });
+  for(let i = labs.length - 2; i >= 0; i--) if(labs[i + 1].y - labs[i].y < gap) labs[i].y = labs[i + 1].y - gap;
+  labs.forEach(l => o.push(`<text x="${xr + fs * 0.4}" y="${(l.y + fs * 0.36).toFixed(1)}" font-size="${fs}" font-family="${FONT}" fill="${l.c}" font-weight="700">${l.lab ? esc(l.lab) + ' ' : ''}<tspan font-weight="400" fill="${P.muted}">${esc(fx(l.v, z.dec))}</tspan></text>`));
+  // estructura X-A-B-C y el tramo CD en curso hasta el precio actual
+  const pts = [['X', z.tm.X, z.coords.X], ['A', z.tm.A, z.coords.A], ['B', z.tm.B, z.coords.B], ['C', z.tm.C, z.coords.C]].map(([n, tt, v]) => ({n, x:X(bi(tt)), y:Y(v), v}));
+  o.push(`<polygon points="${pts.slice(0, 3).map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ')}" fill="${P.tri}"/>`);
+  o.push(`<polyline points="${pts.map(p => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ')}" fill="none" stroke="${P.acc}" stroke-width="${(fs / 6.5).toFixed(2)}" stroke-linejoin="round"/>`);
+  const xP = X(bars.length - 1), yP = Y(z.price), pC = pts[3];
+  o.push(`<line x1="${pC.x.toFixed(1)}" y1="${pC.y.toFixed(1)}" x2="${xP.toFixed(1)}" y2="${yP.toFixed(1)}" stroke="${P.acc}" stroke-width="${(fs / 9).toFixed(2)}" stroke-dasharray="4 3"/>`);
+  pts.forEach((p, i) => {
+    const top = i === 0 ? p.v > pts[1].v : p.v > pts[i - 1].v, ty = top ? p.y - fs * 0.6 : p.y + fs * 1.3;
+    o.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(fs / 4).toFixed(1)}" fill="${P.acc}"/>`);
+    o.push(`<text x="${p.x.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" font-size="${fs * 1.05}" font-family="${FONT}" font-weight="700" fill="${P.ink}">${p.n}</text>`);
+  });
+  o.push(`<circle cx="${xP.toFixed(1)}" cy="${yP.toFixed(1)}" r="${(fs / 3).toFixed(1)}" fill="${P.acc}"/>`);
+  return o.join('');
+}
+const pctTxt = v => { const p = v * 100; return p < 1 ? p.toFixed(2).replace('.', LANG === 'en' ? '.' : ',') : p < 10 ? p.toFixed(1).replace('.', LANG === 'en' ? '.' : ',') : String(Math.round(p)); };
+function nearText(z){
+  const d = z.dec, em = z.dir > 0 ? '🟢' : '🔴';
+  return [
+    `${em} ${t('nearWatch')} ${sideWord(z.dir, true)} · ${symName(z.sym)} · ${tfName(z.gran)}`,
+    `${t('zoneId', z.code)} · ${t('zoneC', dmhm(z.tm.C))}`,
+    `${LANG === 'en' ? 'Pattern' : 'Patrón'}: ${patName(z.k)}${z.alts.length ? ' (+ ' + z.alts.map(patName).join(', ') + ')' : ''}`,
+    `${edgeName(z)}: ${fx(z.edgeV, d)}`,
+    `${t('przOf', patName(z.k))}: ${fx(Math.min(z.near, z.far), d)} – ${fx(Math.max(z.near, z.far), d)}` + ((z.lvls || []).length ? ' (' + z.lvls.map(l => l.lab + ' ' + fx(l.v, d)).join('; ') + ')' : ''),
+    `${t('priceNow')}: ${fx(z.price, d)} (${nearBadge(z)})`,
+    `${t('slRef')}: ${fx(z.SL, d)}`
+  ].join('\n');
+}
+const nearCls = z => z.rem < 0.05 ? 'st-in' : z.d < 0 ? 'st-near' : 'st-past';
+function przBox(z){
+  const d = z.dec, side = z.dir > 0 ? 'hl-buy' : 'hl-sell', eps = Math.max(1e-9, Math.abs(z.edgeV) * 1e-9);
+  const w = Math.abs(z.far - z.near), wTxt = z.byPts ? ptsTxt(w, d) + ' pts' : fx(w, d);
+  const rat = (z.ratios || []).map(([n, v, b]) => `${n} ${fr(v)} ${b}`).join(' · ');
+  return `<div class="przbox ${side}">
+    <p class="pzh"><b>${esc(t('przOf', patName(z.k)))}</b><span class="num">${fx(Math.min(z.near, z.far), d)} – ${fx(Math.max(z.near, z.far), d)}</span><span class="zsub">${esc(t('przWidth', wTxt))}${isF(z.fit) ? ' · ' + esc(t('fitTxt', Math.round(z.fit * 100))) : ''}</span></p>
+    ${rat ? `<div class="zsub">${esc(rat)}</div>` : ''}
+    ${(z.lvls || []).length ? `<ul aria-label="${esc(t('przLv'))}">${z.lvls.map(l => `<li${Math.abs(l.v - z.edgeV) <= eps ? ` class="on" title="${esc(t('edgeHere'))}"` : ''}><span>${esc(l.lab)}</span><span>${fx(l.v, d)}</span></li>`).join('')}</ul>` : ''}
+  </div>`;
+}
+function nearCardHtml(z){
+  const rows = ROWS.get(z.sym + '|' + z.gran), d = z.dec, cls = nearCls(z), isN = z.edge === 'near';
+  const pr = z.pr ? (z.pr.low ? t('histLow') : t('nearProb', Math.round(z.pr.reach * 100), Math.round(z.pr.hold * 100), z.pr.n)) : '';
+  const gapTxt = z.byPts ? (z.d < 0 ? t('nearGap', ptsTxt(-z.d, d)) : t('nearPastGap', ptsTxt(z.d, d))) + ' · ' + t('ptsTol', ptsTxt(ptsFor(z.price), d))
+    : (z.d < 0 ? t('gapP', pctTxt(z.pctE)) : t('gapPastP', pctTxt(z.pctE))) + ' (' + fx(Math.abs(z.d), d) + ') · ' + t('pctTol', S.mktPct, fx(z.tol, d));
+  const lv = [
+    `<dt>${esc(t('priceNow'))}</dt><dd>${fx(z.price, d)}</dd><dd class="rr"></dd>`,
+    ...[[true, 'zoneNear', z.near], [false, 'zoneFar', z.far]].map(([nearRow, lab, v]) => {
+      const on = nearRow === isN, h = on ? ` hl ${z.dir > 0 ? 'hl-buy' : 'hl-sell'}` : '';
+      return `<dt class="${on ? '' : 't-fib'}${h}">${esc(t(lab))}</dt><dd class="${h}">${fx(v, d)}</dd><dd class="rr${h}">${on ? esc(gapTxt) : ''}</dd>`;
+    }),
+    `<dt class="t-bear">${esc(t('slRef'))}</dt><dd>${fx(z.SL, d)}</dd><dd class="rr"></dd>`
+  ].join('');
+  const rP = Math.round(z.react * 100), rM = Math.max(1, +S.nearReact || 15), bar = Math.min(100, 100 * rP / rM);
+  return `<article class="sig ${cls}" data-id="${esc(z.id)}">
+    <header>${sideHtml(z.dir)}<h4>${esc(symName(z.sym))}<span class="tf">${tfName(z.gran)}</span>${z.also.length ? `<span class="zsub"> ${esc(t('alsoTf', z.also.map(tfName).join(', ')))}</span>` : ''}</h4><span class="badge ${cls}">${esc(nearBadge(z))}</span></header>
+    <p class="pat"><span class="zcode">${esc(t('zoneId', z.code))}</span> <b>${esc(patName(z.k))}</b>${z.scale ? ', ' + esc(t('scale')[z.scale] || z.scale) : ''}.${z.alts.length ? ' ' + esc(t('also')) + ' ' + esc(z.alts.map(patName).join(', ')) + '.' : ''}</p>
+    ${rows ? `<svg class="chart" viewBox="0 0 360 190" role="img" aria-label="${esc(symName(z.sym) + ' ' + tfName(z.gran) + ' ' + patName(z.k))}">${nearChartEls(z, rows, 360, 190, PAL_UI, 9)}</svg>` : ''}
+    <dl class="lv">${lv}</dl>
+    ${przBox(z)}
+    <div><div class="zsub">${esc(t('reactNow', rP, rM))}</div><div class="avbar" aria-hidden="true"><i style="width:${bar}%"></i></div></div>
+    <p class="meta">${esc(t('zoneC', dmhm(z.tm.C)))} · ${esc(t('nearMeta', z.ageC, durTxt(z.ageC * z.gran)))}${pr ? '; ' + esc(pr) : ''}.${z.stale ? ' <span class="t-fib">' + esc(t('closed', dmhm(z.lastT))) + '</span>' : ''}</p>
+    <footer><span class="no"></span><button type="button" class="btn sm" data-ncopy="${esc(z.id)}">${esc(t('copy'))}</button></footer>
+  </article>`;
+}
+let NEAR_CUR = [];
+function renderNear(){
+  const out = $('nearOut'), fl = $('nearFilters');
+  renderWatch();
+  if(SCAN.band !== S.band || (!SCAN.running && !SCAN.done)){ fl.innerHTML = ''; out.innerHTML = `<div class="empty">${esc(t('nearEmpty'))}</div>`; NEAR_CUR = []; return; }
+  NEAR_CUR = nearItems();
+  let items = NEAR_CUR;
+  const cnt = k => items.filter(z => k === 'all' || (k === 'buy') === (z.dir > 0)).length;
+  fl.innerHTML = [['all', 'fAll'], ['buy', 'fBuy'], ['sell', 'fSell']].map(([k, lab]) => `<button type="button" class="chip${S.nearSide === k ? ' on' : ''}${cnt(k) ? '' : ' no'}" data-nside="${k}">${esc(t(lab))} (${cnt(k)})</button>`).join('');
+  if(S.nearSide !== 'all') items = items.filter(z => (S.nearSide === 'buy') === (z.dir > 0));
+  out.innerHTML = !items.length && !SCAN.running ? `<div class="empty">${esc(t('nearNone'))}</div>` : `<div class="sigs">${items.map(nearCardHtml).join('')}</div>`;
+}
+
+/* ---------- vigilancia automática y avisos en la PC ---------- */
+// Repite la búsqueda cada N minutos mientras la página esté abierta. Avisa (sonido, notificación del navegador y título de la pestaña)
+// cuando un borde entra en la lista por primera vez. Un mismo borde no vuelve a avisar hasta que lleve 30 min fuera de la lista.
+const ALERT = {seen:new Map(), log:[], timer:0, next:0, ctx:null, unread:0, baseTitle:''};
+const ALERT_FORGET = 30 * 60 * 1000;
+function audioInit(){ try { if(!ALERT.ctx) ALERT.ctx = new (window.AudioContext || window.webkitAudioContext)(); if(ALERT.ctx.state === 'suspended') ALERT.ctx.resume(); } catch(e){} }
+function beep(){
+  const c = ALERT.ctx; if(!c) return;
+  try { if(c.state === 'suspended') c.resume();
+    [[880, 0], [1175, 0.18], [880, 0.36]].forEach(([f, t0]) => {
+      const o = c.createOscillator(), g = c.createGain(), st = c.currentTime + t0;
+      o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(0.25, st + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, st + 0.16);
+      o.connect(g); g.connect(c.destination); o.start(st); o.stop(st + 0.18);
+    });
+  } catch(e){}
+}
+const notifOK = () => 'Notification' in window && Notification.permission === 'granted';
+function notify(title, body, tag){ if(!notifOK()) return; try { const n = new Notification(title, {body, tag, renotify:true}); n.onclick = () => { window.focus(); location.hash = '#cerca'; n.close(); }; } catch(e){} }
+function alertLine(z){ return `${symName(z.sym)} ${tfName(z.gran)} · #${z.code} · ${sideWord(z.dir)} · ${patName(z.k)}: ${nearBadge(z)} (${fx(z.edgeV, z.dec)})`; }
+function afterScan(){
+  if(S.watch){
+    const now = Date.now(), items = nearItems(), fresh = [];
+    items.forEach(z => { if(!ALERT.seen.has(z.key)) fresh.push(z); ALERT.seen.set(z.key, now); });
+    ALERT.seen.forEach((tm, k) => { if(now - tm > ALERT_FORGET) ALERT.seen.delete(k); });
+    if(fresh.length){
+      fresh.forEach(z => ALERT.log.unshift({t:nowS(), txt:alertLine(z), dir:z.dir}));
+      ALERT.log = ALERT.log.slice(0, 40);
+      beep();
+      if(fresh.length <= 3) fresh.forEach(z => notify(`HARMONIX · ${symName(z.sym)} ${tfName(z.gran)}`, `${sideWord(z.dir, true)} · ${patName(z.k)}\n${nearBadge(z)} (${fx(z.edgeV, z.dec)})`, z.key));
+      else notify('HARMONIX', t('notifMany', fresh.length) + '\n' + fresh.slice(0, 4).map(alertLine).join('\n'), 'harmonix-many');
+      if(document.hidden){ ALERT.unread += fresh.length; document.title = `(${ALERT.unread}) ` + ALERT.baseTitle; }
+    }
+    clearTimeout(ALERT.timer);
+    const ms = Math.max(1, +S.watchMin || 2) * 60000; ALERT.next = Date.now() + ms;
+    ALERT.timer = setTimeout(() => { if(S.watch) runScan(); }, ms);
+  }
+  renderWatch();
+}
+// Para el aviso en el móvil: aviso.js abre esta página en un navegador sin ventana y llama a esta función.
+window.HX_AVISO = async cfg => {
+  if(cfg) Object.assign(S, cfg);
+  S.watch = false;
+  await runScan();
+  const items = nearItems().filter(z => S.nearSide === 'all' || (S.nearSide === 'buy') === (z.dir > 0));
+  return {charts:SCAN.charts, total:SCAN.total, errors:SCAN.errors.map(e => e.sym + ' ' + tfName(e.g) + ': ' + e.msg),
+    items:items.map(z => ({key:z.key, code:z.code, dir:z.dir, band:z.band, stale:!!z.stale, text:nearText(z)}))};
+};
+function setWatch(on){
+  S.watch = !!on; saveS(); clearTimeout(ALERT.timer); ALERT.next = 0;
+  if(S.watch){
+    audioInit();
+    if('Notification' in window && Notification.permission === 'default'){ try { Notification.requestPermission().then(() => renderWatch()); } catch(e){} }
+    if(!SCAN.running) runScan();
+  }
+  renderWatch();
+}
+function renderWatch(){
+  const st = $('watchStatus'); if(!st) return;
+  $('optWatch').checked = !!S.watch;
+  let txt = '';
+  if(S.watch) txt = SCAN.running ? t('wScanning') : ALERT.next ? t('wNext', hhmm(Math.floor(ALERT.next / 1000))) : '';
+  else txt = t('wOff');
+  const perm = !('Notification' in window) ? t('nNo') : Notification.permission === 'granted' ? t('nOn') : Notification.permission === 'denied' ? t('nDenied') : t('nAsk');
+  st.textContent = txt + ' ' + perm;
+  $('alertLog').innerHTML = ALERT.log.length ? `<h3>${esc(t('logTitle'))}</h3><ul class="alog">${ALERT.log.map(a => `<li><span class="num">${esc(hhmm(a.t))}</span> <span class="${a.dir > 0 ? 't-bull' : 't-bear'}">${a.dir > 0 ? '▲' : '▼'}</span> ${esc(a.txt)}</li>`).join('')}</ul><button type="button" class="btn sm" id="logClear">${esc(t('logClear'))}</button>` : '';
+}
+document.addEventListener('visibilitychange', () => { if(!document.hidden && ALERT.unread){ ALERT.unread = 0; document.title = ALERT.baseTitle; } });
+
+const pickedList = () => SCAN.items.filter(s => s.pick && canSend(s) && (S.wait || sigStatus(s) !== 'wait'));
+function renderSaveBar(){
+  const bar = $('saveBar'), picked = pickedList();
+  bar.hidden = SCAN.running || SCAN.band !== S.band || !SCAN.items.length;
+  const ageM = Math.floor((nowS() - SCAN.t) / 60);
+  bar.classList.toggle('old', ageM >= 10);
+  $('saveNote').innerHTML = ageM >= 10 ? `<span class="t-bear">${esc(t('saveOld', ageM))}</span>` : esc(t('saveNote'));
+  $('saveBtn').textContent = t('saveBtn', picked.length); $('saveBtn').disabled = !picked.length;
+  $('copyAllBtn').textContent = t('copyAll'); $('copyAllBtn').disabled = !picked.length;
+}
+function renderScanAll(){ renderProgress(); renderCards(); }
+
+/* ---------- archivo de señales (CSV) ---------- */
+// columnas fijas (no dependen del idioma) para poder volver a leerlo
+const SIG_COLS = ['id','fecha_utc','epoch','grupo','simbolo','instrumento','tf','granularidad','lado','patron','patron_nombre','escala','estado','decimales','entrada','sl','tp1','tp2','tp3','tp1_ratio','tp2_ratio','tp3_ratio','tramo','d','d_epoch'];
+const csvQ = v => { const s = v == null ? '' : String(v); return /[",;\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function saveSignals(){
+  const picked = pickedList();
+  if(!picked.length){ toast(t('saveNone')); return; }
+  const rows = picked.map(s => [s.id, new Date(s.t0 * 1000).toISOString(), s.t0, s.band, s.sym, symName(s.sym), tfName(s.gran), s.gran, s.dir > 0 ? 'buy' : 'sell', s.k, patName(s.k), s.scale, sigStatus(s), s.dec,
+    fx(s.price, s.dec), fx(s.SL, s.dec), ...s.tps.map(q => fx(q.v, s.dec)), ...s.tps.map(q => q.k), s.tps[0].ref, fx(s.Dv, s.dec), s.Dt]);
+  const txt = [SIG_COLS, ...rows].map(r => r.map(csvQ).join(',')).join('\n');
+  const d = new Date(SCAN.t * 1000), z = n => String(n).padStart(2, '0');
+  const name = `harmonix-senales_${S.band === 'mkt' ? 'mercados' : 'sinteticos'}_${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}.csv`;
+  download(name, '\ufeff' + txt + '\n', 'text/csv;charset=utf-8');
+  toast(t('saved', picked.length));
+}
+function parseCsv(text){
+  const out = []; let row = [], cur = '', q = false;
+  text = text.replace(/^\ufeff/, '');
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(q){ if(c === '"'){ if(text[i + 1] === '"'){ cur += '"'; i++; } else q = false; } else cur += c; continue; }
+    if(c === '"') q = true; else if(c === ',' || c === ';') { row.push(cur); cur = ''; }
+    else if(c === '\n' || c === '\r'){ if(c === '\r' && text[i + 1] === '\n') i++; row.push(cur); out.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if(cur !== '' || row.length){ row.push(cur); out.push(row); }
+  return out.filter(r => r.some(x => x.trim() !== ''));
+}
+function readSignalFile(text){
+  const rows = parseCsv(text); if(rows.length < 2) return null;
+  const head = rows[0].map(h => h.trim().toLowerCase()), col = n => head.indexOf(n);
+  if(['simbolo','granularidad','lado','entrada','sl','tp1','epoch'].some(n => col(n) < 0)) return null;
+  const out = [];
+  rows.slice(1).forEach(r => {
+    const g = n => (r[col(n)] || '').trim(), nm = n => num(g(n));
+    const s = {id:g('id'), t0:Math.round(nm('epoch')), band:g('grupo') === 'mkt' ? 'mkt' : 'synth', sym:g('simbolo'), gran:Math.round(nm('granularidad')), dir:g('lado') === 'sell' ? -1 : 1,
+      k:SIM[g('patron')] ? g('patron') : g('patron'), kName:g('patron_nombre'), scale:g('escala'), st:g('estado'), dec:isF(nm('decimales')) ? Math.round(nm('decimales')) : 2,
+      entry:nm('entrada'), SL:nm('sl'), tps:[1, 2, 3].map(i => ({n:'TP' + i, v:nm('tp' + i), k:nm('tp' + i + '_ratio'), ref:g('tramo')})), Dv:nm('d'), Dt:nm('d_epoch')};
+    if(!s.sym || !isF(s.t0) || !isF(s.entry) || !isF(s.SL) || !s.tps.every(q => isF(q.v))) return;
+    if(!s.id) s.id = [s.sym, s.gran, s.dir, s.t0].join('|');
+    out.push(s);
+  });
+  return out.length ? out : null;
+}
+
+/* =====================================================================
+   2 · Comparar: cómo terminó cada señal guardada
+   ===================================================================== */
+let FILES = [];           // [{name, sigs}]
+let CMP = {running:false, at:0, ev:new Map(), list:null};
+const loadedSigs = () => { const seen = new Set(), out = []; FILES.forEach(f => f.sigs.forEach(s => { if(!seen.has(s.id)){ seen.add(s.id); out.push(s); } })); return out.sort((a, b) => a.t0 - b.t0); };
+async function addFiles(fileList){
+  for(const f of [...fileList]){
+    const txt = await f.text(), sigs = readSignalFile(txt);
+    if(!sigs){ toast(t('badFile', f.name)); continue; }
+    FILES = FILES.filter(x => x.name !== f.name); FILES.push({name:f.name, sigs});
+  }
+  CMP.list = null; renderCompare();
+}
+async function runCompare(){
+  if(CMP.running) return;
+  const sigs = loadedSigs(); if(!sigs.length){ $('cmpStatus').textContent = t('cmpNone'); return; }
+  const bySym = new Map(); sigs.forEach(s => { if(!bySym.has(s.sym)) bySym.set(s.sym, []); bySym.get(s.sym).push(s); });
+  CMP.running = true; $('cmpBtn').disabled = true; CMP.ev = new Map();
+  let i = 0, fails = 0;
+  for(const [sym, L2] of bySym){
+    $('cmpStatus').textContent = t('comparing', ++i, bySym.size);
+    try {
+      const candles = await fetchRange(sym, Math.min(...L2.map(s => Math.ceil(s.t0 / 60) * 60)));
+      L2.forEach(s => CMP.ev.set(s.id, stepEv(EV0(s), s, candles)));
+    } catch(e){ fails++; }
+  }
+  CMP.running = false; CMP.at = nowS(); CMP.list = sigs; $('cmpBtn').disabled = false;
+  $('cmpStatus').textContent = fails === bySym.size ? t('netErr') : t('compared', hhmm(CMP.at));
+  renderCompare();
+}
+const floatR = (s, e) => e ? s.dir * (e.last - s.entry) / Math.abs(s.entry - s.SL) : null;
+const sName = s => s.kName && !SIM[s.k] ? s.kName : patName(s.k);
+function reportData(){
+  const list = (CMP.list || []).map(s => { const e = CMP.ev.get(s.id) || null; return {s, e, o:outcome(s, e, S.mode)}; });
+  const win = list.filter(x => x.o.win).length, loss = list.filter(x => x.o.loss).length, res = win + loss;
+  const agg = keyF => { const m = new Map(); list.forEach(x => { const k = keyF(x); if(!m.has(k)) m.set(k, {k, n:0, w:0, l:0, r:0}); const q = m.get(k); q.n++; q.w += x.o.win ? 1 : 0; q.l += x.o.loss ? 1 : 0; q.r += x.o.r; }); return [...m.values()].sort((p, q) => q.n - p.n); };
+  const ts = list.map(x => x.s.t0), bands = [...new Set(list.map(x => x.s.band))];
+  return {list, n:list.length, win, loss, open:list.length - res, wr:res ? win / res : null, r:list.reduce((s, x) => s + x.o.r, 0),
+    tp:[1, 2, 3].map(i => list.filter(x => x.o.mx >= i).length), byPat:agg(x => x.s.k), byTf:agg(x => x.s.gran),
+    from:ts.length ? Math.min(...ts) : 0, to:ts.length ? Math.max(...ts) : 0, group:bands.map(bandName).join(' + ')};
+}
+const wrTxt = v => v == null ? '–' : Math.round(v * 100) + '%';
+const rSum = r => (r >= 0 ? '+' : '−') + Math.abs(r).toFixed(2) + 'R';
+const rAscii = r => (r >= 0 ? '+' : '-') + Math.abs(r).toFixed(2) + 'R';
+function periodLabel(R){
+  if(!R.n) return '';
+  const a = new Date(R.from * 1000).toLocaleDateString(locale()), b = new Date(R.to * 1000).toLocaleDateString(locale());
+  return a === b ? longDate(R.from) : `${a} – ${b}`;
+}
+const resWord = o => o.code === 'sl' ? 'SL' : o.mx ? 'TP' + o.mx + (o.mx < 3 ? (o.be ? ' (' + t('rBe') + ')' : o.closed ? '' : ' (' + t('rRun') + ')') : '') : o.code === 'none' ? t('notEval') : t('rOpen');
+function renderCompare(){
+  const fl = $('fileList'), sigs = loadedSigs();
+  fl.innerHTML = FILES.map((f, i) => `<span class="filetag">${esc(f.name)} <span class="zsub">(${f.sigs.length})</span><button type="button" data-rmfile="${i}" aria-label="${esc(t('remove'))}">✕</button></span>`).join('') +
+    (sigs.length ? `<span class="zsub" style="align-self:center">${esc(t('filesN', sigs.length))}</span>` : '');
+  $('cmpBtn').disabled = CMP.running || !sigs.length;
+  const out = $('cmpOut'); out.hidden = !CMP.list;
+  if(!CMP.list) return;
+  const R = reportData();
+  $('repStats').innerHTML = `<div class="stats"><div class="big"><b>${wrTxt(R.wr)}</b>${esc(t('sWr'))}</div><div><b>${R.n}</b>${esc(t('sN'))}</div><div><b class="t-bull">${R.win}</b>${esc(t('sWin'))}</div><div><b class="t-bear">${R.loss}</b>${esc(t('sLoss'))}</div><div><b>${R.open}</b>${esc(t('sOpen'))}</div><div><b>${rSum(R.r)}</b>${esc(t('sR'))}</div><div><b>${R.tp.join(' · ')}</b>${esc(t('sTp'))}</div></div>
+    <p class="zsub">${esc(R.group)}, ${esc(periodLabel(R))}. ${esc(t('mode'))}: ${esc(t(S.mode === 'tp1' ? 'mTp1' : S.mode === 'tp2' ? 'mTp2' : 'mThirds'))}.</p>`;
+  const head = `<tr><th>${esc(t('cInst'))}</th><th>${esc(t('cSide'))}</th><th>${esc(t('cPat'))}</th><th>${esc(t('cTime'))}</th><th>${esc(t('cEntry'))}</th><th>SL</th><th>${esc(t('cTp'))}</th><th>${esc(t('cRes'))}</th><th>R</th><th>${esc(t('cNow'))}</th></tr>`;
+  $('cmpTable').innerHTML = head + R.list.map(({s, e, o}) => {
+    const d = s.dec, fl2 = floatR(s, e);
+    const tps = s.tps.map((q, i) => `<span class="${e && e.hit[i] ? 'hit' : ''}">${q.n} ${fx(q.v, d)}${e && e.hit[i] ? ' ✓' : ''}</span>`).join('');
+    return `<tr><td>${esc(symName(s.sym))} <span class="zsub">${tfName(s.gran)}</span></td><td>${sideHtml(s.dir)}</td><td>${esc(sName(s))}</td><td class="n">${dmhm(s.t0)}</td>
+      <td class="n">${fx(s.entry, d)}</td><td class="n${e && e.stopKind === 'sl' ? ' t-bear' : ''}">${fx(s.SL, d)}</td><td class="tps">${tps}</td><td>${resHtml(o)}</td><td class="n">${rTxt(o)}</td>
+      <td class="n">${e ? fx(e.last, d) : '–'}${fl2 != null && !e.done ? ` <span class="zsub">(${rSum(fl2)})</span>` : ''}</td></tr>`;
+  }).join('');
+  const tbl = (rows, nameF) => rows.length ? `<tr><th></th><th>${esc(t('cN'))}</th><th>${esc(t('cWin'))}</th><th>${esc(t('cLoss'))}</th><th>${esc(t('cWr'))}</th><th>R</th></tr>` + rows.map(q => `<tr><td>${esc(nameF(q.k))}</td><td>${q.n}</td><td class="t-bull">${q.w}</td><td class="t-bear">${q.l}</td><td>${wrTxt(q.w + q.l ? q.w / (q.w + q.l) : null)}</td><td class="n">${rSum(q.r)}</td></tr>`).join('') : `<tr><td class="zsub">${esc(t('noData'))}</td></tr>`;
+  $('patTable').innerHTML = tbl(R.byPat, k => SIM[k] ? patName(k) : k);
+  $('tfTable').innerHTML = tbl(R.byTf, tfName);
+}
+
+/* ---------- exportar: CSV, Excel, PDF, imagen y texto ---------- */
+const fileBase = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return `harmonix-resumen_${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`; };
+const iso = s => s ? new Date(s * 1000).toLocaleString(locale(), {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+function sigTableRows(R, asText){
+  const head = [t('cTime'), t('cInst'), 'TF', t('cSide'), t('cPat'), t('cEntry'), 'SL', 'TP1', 'TP2', 'TP3', t('cRes'), 'R', t('hitCol', 'TP1'), t('hitCol', 'TP2'), t('hitCol', 'TP3'), t('hitCol', 'SL/BE'), t('cNow'), t('cFloat')];
+  const rows = R.list.map(({s, e, o}) => {
+    const fl2 = floatR(s, e), rd = v => isF(v) ? (asText ? fx(v, s.dec) : +(+v).toFixed(s.dec)) : '';
+    return [iso(s.t0), symName(s.sym), tfName(s.gran), sideWord(s.dir), sName(s), rd(s.entry), rd(s.SL), ...s.tps.map(q => rd(q.v)), resWord(o),
+      o.code === 'open' || o.code === 'none' ? '' : asText ? rAscii(o.r) : +o.r.toFixed(2), ...(e ? e.hit.map(iso) : ['', '', '']), e ? iso(e.stopT) : '', e ? rd(e.last) : '', fl2 != null && e && !e.done ? +fl2.toFixed(2) : ''];
+  });
+  return {head, rows};
+}
+function summaryRows(R){
+  const modeTxt = t(S.mode === 'tp1' ? 'mTp1' : S.mode === 'tp2' ? 'mTp2' : 'mThirds');
+  return [[t('repTitle')], [t('repGroup'), R.group], [t('repPeriod'), periodLabel(R)], [t('mode'), modeTxt], [t('repGen', iso(CMP.at))], [],
+    [t('sN'), R.n], [t('sWin'), R.win], [t('sLoss'), R.loss], [t('sOpen'), R.open], [t('sWr'), R.wr == null ? '' : +(R.wr * 100).toFixed(1) + '%'], [t('sR'), +R.r.toFixed(2)],
+    ['TP1', R.tp[0]], ['TP2', R.tp[1]], ['TP3', R.tp[2]]];
+}
+const aggRows = (rows, nameF) => rows.map(q => [nameF(q.k), q.n, q.w, q.l, q.w + q.l ? Math.round(100 * q.w / (q.w + q.l)) + '%' : '', +q.r.toFixed(2)]);
+const aggHead = first => [first, t('cN'), t('cWin'), t('cLoss'), t('cWr'), 'R'];
+function exportCsv(){
+  const R = reportData(), T = sigTableRows(R);
+  const lines = [...summaryRows(R), [], aggHead(t('cPat')), ...aggRows(R.byPat, k => SIM[k] ? patName(k) : k), [], aggHead('TF'), ...aggRows(R.byTf, tfName), [], T.head, ...T.rows];
+  download(fileBase() + '.csv', '\ufeff' + lines.map(r => r.map(csvQ).join(',')).join('\n') + '\n', 'text/csv;charset=utf-8');
+}
+const LIBS = {xlsx:'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', jspdf:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', autotable:'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'};
+const libP = {};
+const loadLib = k => libP[k] || (libP[k] = new Promise((res, rej) => { const s = document.createElement('script'); s.src = LIBS[k]; s.onload = res; s.onerror = () => { delete libP[k]; rej(new Error('lib')); }; document.head.appendChild(s); }));
+async function exportXlsx(){
+  try { await loadLib('xlsx'); } catch(e){ toast(t('libErr')); return; }
+  const X = window.XLSX, R = reportData(), T = sigTableRows(R), wb = X.utils.book_new();
+  const sum = [...summaryRows(R), [], aggHead(t('cPat')), ...aggRows(R.byPat, k => SIM[k] ? patName(k) : k), [], aggHead('TF'), ...aggRows(R.byTf, tfName)];
+  const ws1 = X.utils.aoa_to_sheet(sum); ws1['!cols'] = [{wch:34}, {wch:14}, {wch:10}, {wch:10}, {wch:10}, {wch:10}];
+  const ws2 = X.utils.aoa_to_sheet([T.head, ...T.rows]); ws2['!cols'] = T.head.map((h, i) => ({wch:i === 0 || i >= 12 && i <= 15 ? 17 : i === 10 ? 24 : 13}));
+  X.utils.book_append_sheet(wb, ws1, t('sheetSum')); X.utils.book_append_sheet(wb, ws2, t('sheetSig'));
+  X.writeFile(wb, fileBase() + '.xlsx');
+}
+// jsPDF con su fuente base solo admite Latin-1: se cambian los símbolos que no entran
+const pdfTxt = v => String(v == null ? '' : v).replace(/[−–—]/g, '-').replace(/[“”«»]/g, '"').replace(/’/g, "'").replace(/✓/g, '').replace(/[^\x00-\xFF]/g, '');
+async function exportPdf(){
+  try { await loadLib('jspdf'); await loadLib('autotable'); } catch(e){ toast(t('libErr')); return; }
+  const {jsPDF} = window.jspdf, doc = new jsPDF({orientation:'landscape', unit:'pt', format:'a4'}), R = reportData(), T = sigTableRows(R, true);
+  const W = doc.internal.pageSize.getWidth(), ink = [22, 35, 58], muted = [90, 102, 120], bull = [21, 116, 85], bear = [179, 48, 61], acc = [52, 70, 196];
+  doc.setDrawColor(74, 108, 240); doc.setLineWidth(2.2); doc.setLineJoin('round');
+  doc.lines([[5, -13], [4, 8], [4, -5], [7, 11]], 40, 52);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(...ink); doc.text('HARMONIX', 68, 50);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...muted); doc.text(pdfTxt(t('repGen', iso(CMP.at))), W - 40, 50, {align:'right'});
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor(...ink); doc.text(pdfTxt(t('repTitle')), 40, 86);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(...muted);
+  doc.text(pdfTxt(`${R.group}  |  ${periodLabel(R)}  |  ${t('mode')}: ${t(S.mode === 'tp1' ? 'mTp1' : S.mode === 'tp2' ? 'mTp2' : 'mThirds')}`), 40, 104);
+  // cifras
+  const st = [[t('sWr'), wrTxt(R.wr), R.wr == null ? muted : R.wr >= 0.5 ? bull : bear], [t('sN'), String(R.n), ink], [t('sWin'), String(R.win), bull], [t('sLoss'), String(R.loss), bear], [t('sOpen'), String(R.open), muted], [t('sR'), rAscii(R.r), R.r >= 0 ? bull : bear], ['TP1 / TP2 / TP3', R.tp.join(' / '), ink]];
+  let x = 40;
+  st.forEach(([lab, v, c], i) => {
+    doc.setFontSize(8.5); doc.setTextColor(...muted); doc.text(pdfTxt(lab), x, 128);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(i ? 16 : 22); doc.setTextColor(...c); doc.text(pdfTxt(v), x, i ? 148 : 152); doc.setFont('helvetica', 'normal');
+    x += i ? 102 : 92;
+  });
+  const sty = {font:'helvetica', fontSize:7.6, cellPadding:3, textColor:ink, lineColor:[204, 212, 222], lineWidth:0.4};
+  const head = T.head.slice(0, 12).map(pdfTxt), body = T.rows.map(r => r.slice(0, 12).map(v => pdfTxt(v === '' ? '' : v)));
+  const resCol = 10;
+  doc.autoTable({head:[head], body, startY:168, styles:sty, headStyles:{fillColor:[236, 239, 250], textColor:muted, fontStyle:'bold'}, margin:{left:40, right:40},
+    didParseCell:h => { if(h.section !== 'body') return; if(h.column.index === resCol || h.column.index === 11){ const v = String(h.cell.raw); h.cell.styles.textColor = /^SL/.test(R.list[h.row.index] && resWord(R.list[h.row.index].o)) ? bear : /^TP/.test(resWord(R.list[h.row.index].o)) ? bull : muted; h.cell.styles.fontStyle = 'bold'; if(!v) h.cell.text = ['-']; } }});
+  let y = doc.lastAutoTable.finalY + 22;
+  if(y > doc.internal.pageSize.getHeight() - 140){ doc.addPage(); y = 50; }
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...ink); doc.text(pdfTxt(t('byPat')), 40, y);
+  doc.autoTable({head:[aggHead(t('cPat')).map(pdfTxt)], body:aggRows(R.byPat, k => SIM[k] ? patName(k) : k).map(r => r.map(pdfTxt)), startY:y + 6, styles:sty, headStyles:{fillColor:[236, 239, 250], textColor:muted}, margin:{left:40}, tableWidth:360});
+  doc.text(pdfTxt(t('byTf')), 440, y);
+  doc.autoTable({head:[aggHead('TF').map(pdfTxt)], body:aggRows(R.byTf, tfName).map(r => r.map(pdfTxt)), startY:y + 6, styles:sty, headStyles:{fillColor:[236, 239, 250], textColor:muted}, margin:{left:440}, tableWidth:300});
+  const pages = doc.getNumberOfPages();
+  for(let p = 1; p <= pages; p++){ doc.setPage(p); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...muted); doc.text(pdfTxt(t('imgFoot1') + ' ' + t('imgFoot2')), 40, doc.internal.pageSize.getHeight() - 24); doc.text(p + ' / ' + pages, W - 40, doc.internal.pageSize.getHeight() - 24, {align:'right'}); }
+  doc.save(fileBase() + '.pdf');
+}
+function reportImage(R){
+  const P = PAL_IMG, W = 1080, maxRows = 14, rows = R.list.slice(0, maxRows), rowH = 62, top = 600;
+  const H = top + Math.max(1, rows.length) * rowH + (R.list.length > maxRows ? 60 : 0) + 170;
+  const o = [`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`, `<rect width="${W}" height="${H}" fill="${P.page}"/>`];
+  o.push(LOGO(60, 54, 2.2), svgText(124, 92, 'HARMONIX', {fs:34, fw:800}), svgText(1020, 92, R.group, {fs:26, c:P.muted, anchor:'end'}));
+  o.push(svgText(60, 180, t('imgTitle'), {fs:54, fw:800}), svgText(60, 226, periodLabel(R), {fs:30, c:P.fib, italic:true}));
+  o.push(`<rect x="60" y="262" width="960" height="262" rx="20" fill="${P.bg}"/>`);
+  o.push(svgText(100, 322, t('sWr'), {fs:28, c:P.muted}), svgText(100, 428, wrTxt(R.wr), {fs:110, fw:800, c:R.wr == null ? P.muted : R.wr >= 0.5 ? P.bull : P.bear}));
+  o.push(svgText(100, 476, t('imgOf', R.win, R.win + R.loss), {fs:24, c:P.muted}));
+  const st = [[t('sN'), String(R.n), P.ink], [t('sWin'), String(R.win), P.bull], [t('sLoss'), String(R.loss), P.bear], [t('sOpen'), String(R.open), P.muted], [t('sR'), rSum(R.r), R.r >= 0 ? P.bull : P.bear], ['TP1 · TP2 · TP3', R.tp.join(' · '), P.ink]];
+  st.forEach(([lab, v, c], i) => { const x = 540 + (i % 2) * 240, y = 318 + Math.floor(i / 2) * 70; o.push(svgText(x, y, lab, {fs:22, c:P.muted}), svgText(x, y + 34, v, {fs:34, fw:800, c})); });
+  o.push(svgText(60, top - 18, t('cInst'), {fs:22, c:P.muted}), svgText(480, top - 18, t('cPat'), {fs:22, c:P.muted}), svgText(690, top - 18, t('cRes'), {fs:22, c:P.muted}), svgText(1020, top - 18, 'R', {fs:22, c:P.muted, anchor:'end'}));
+  rows.forEach((x, i) => {
+    const y = top + i * rowH + 40, s = x.s, oc = x.o, col = s.dir > 0 ? P.bull : P.bear;
+    o.push(`<line x1="60" x2="1020" y1="${y - 40}" y2="${y - 40}" stroke="${P.line}"/>`);
+    o.push(svgText(60, y, (s.dir > 0 ? '▲ ' : '▼ '), {fs:26, c:col, fw:700}), svgText(92, y, `${symName(s.sym)} ${tfName(s.gran)}`, {fs:28, fw:700}), svgText(480, y, sName(s), {fs:24, c:P.muted}));
+    const lab = oc.code === 'sl' ? 'SL' : oc.code === 'open' || oc.code === 'none' ? t('rOpen') : 'TP' + oc.mx + (oc.mx === 3 ? ' ✓' : oc.be ? ' · BE' : '');
+    const c = oc.code === 'sl' ? P.bear : oc.mx ? P.bull : P.muted;
+    o.push(svgText(690, y, lab, {fs:28, fw:800, c}), svgText(1020, y, oc.code === 'open' || oc.code === 'none' ? '–' : rSum(oc.r), {fs:28, fw:700, c, anchor:'end'}));
+  });
+  let y = top + Math.max(1, rows.length) * rowH;
+  if(!rows.length) o.push(svgText(60, top + 40, t('noData'), {fs:28, c:P.muted}));
+  if(R.list.length > maxRows){ o.push(svgText(60, y + 30, t('imgMore', R.list.length - maxRows), {fs:24, c:P.muted})); y += 60; }
+  o.push(`<line x1="60" x2="1020" y1="${y + 10}" y2="${y + 10}" stroke="${P.line}"/>`);
+  o.push(svgText(60, y + 56, t('imgFoot1'), {fs:21, c:P.muted}));
+  o.push(svgText(60, y + 88, t('mode') + ': ' + t(S.mode === 'tp1' ? 'mTp1' : S.mode === 'tp2' ? 'mTp2' : 'mThirds') + '.', {fs:21, c:P.muted}));
+  o.push(svgText(60, y + 120, t('imgFoot2'), {fs:21, c:P.muted}));
+  o.push('</svg>');
+  return {svg:o.join(''), w:W, h:H};
+}
+function reportText(R){
+  const head = `📊 ${t('imgTitle')} · ${R.group}\n${periodLabel(R)}`;
+  const sum = `${t('sN')}: ${R.n} · ${t('sWin')}: ${R.win} · ${t('sLoss')}: ${R.loss} · ${t('sOpen')}: ${R.open}\n${t('sWr')}: ${wrTxt(R.wr)} (${t('imgOf', R.win, R.win + R.loss)}) · ${t('sR')}: ${rSum(R.r)}`;
+  const lines = R.list.map(({s, o}) => {
+    const em = o.code === 'sl' ? '❌' : o.mx ? '✅' : '⏳';
+    const res = o.code === 'sl' ? 'SL' : o.mx ? 'TP' + o.mx + (o.be ? ' (BE)' : '') : t('rOpen');
+    return `${em} ${symName(s.sym)} ${tfName(s.gran)} ${sideWord(s.dir)} ${sName(s)} → ${res}${o.code === 'open' || o.code === 'none' ? '' : ' (' + rSum(o.r) + ')'}`;
+  });
+  return [head, '', sum, '', ...lines].join('\n');
+}
+
+/* =====================================================================
+   Pintado de controles, idioma y eventos
+   ===================================================================== */
+function renderStatic(){
+  document.documentElement.lang = LANG;
+  document.title = 'HARMONIX · ' + (LANG === 'en' ? 'Signals' : 'Señales');
+  document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+  document.querySelectorAll('[data-ta]').forEach(el => { const v = t(el.dataset.ta); el.setAttribute('aria-label', v); if(el.tagName === 'BUTTON') el.title = v; });
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
+  $('bandSeg').setAttribute('aria-label', LANG === 'en' ? 'Group' : 'Grupo');
+  $('bandSeg').innerHTML = [['synth', 'bandSynth', 'bandSynthSub'], ['mkt', 'bandMkt', 'bandMktSub']].map(([k, a, b]) => `<button type="button" data-band="${k}" aria-pressed="${S.band === k}"><b>${esc(t(a))}</b><small>${esc(t(b))}</small></button>`).join('');
+  $('tfChips').innerHTML = TFS.map(([g, n]) => `<button type="button" class="chip" data-tf="${g}" aria-pressed="${S.tfs.includes(g)}">${n}</button>`).join('');
+  $('histSel').innerHTML = [1000, 2000, 3000].map(n => `<option value="${n}"${+S.hist === n ? ' selected' : ''}>${esc(t('histN', n))}</option>`).join('');
+  renderInstSum();
+  $('instHint').innerHTML = `${esc(t(S.band === 'synth' ? 'instHintSynth' : 'instHintMkt'))} <button type="button" class="btn sm" data-band="${S.band === 'synth' ? 'mkt' : 'synth'}">${esc(t('switchBand'))}</button>`;
+  $('instGrid').innerHTML = GROUPS.filter(g => g.band === S.band).map((g, gi) => `<fieldset><legend>${esc(lname(g.name))}<button type="button" class="btn sm" data-gall="${gi}">${esc(t('all'))}</button><button type="button" class="btn sm" data-gnone="${gi}">${esc(t('none'))}</button></legend>
+    ${g.list.map(([s, n]) => `<label><input type="checkbox" data-sym="${s}"${S.off.includes(s) ? '' : ' checked'}> ${esc(lname(n))}</label>`).join('')}</fieldset>`).join('');
+  S.pts.forEach((v, i) => { $('pts' + i).value = v; }); $('mktPct').value = S.mktPct;
+  $('edgesSel').innerHTML = [['both', 'edgesBoth'], ['near', 'edgesNear'], ['far', 'edgesFar']].map(([k, lab]) => `<option value="${k}"${S.edges === k ? ' selected' : ''}>${esc(t(lab))}</option>`).join('');
+  document.querySelectorAll('.synthOnly').forEach(el => { el.hidden = S.band !== 'synth'; }); document.querySelectorAll('.mktOnly').forEach(el => { el.hidden = S.band === 'synth'; }); $('optReact').value = S.nearReact;
+  $('watchMin').innerHTML = [1, 2, 3, 5, 10, 15].map(n => `<option value="${n}"${+S.watchMin === n ? ' selected' : ''}>${esc(t('wMin', n))}</option>`).join('');
+  ALERT.baseTitle = document.title;
+  $('optAdv').value = S.adv; $('optAge').value = S.age; $('optWait').checked = S.wait;
+  $('modeSel').innerHTML = [['thirds', 'mThirds'], ['tp1', 'mTp1'], ['tp2', 'mTp2']].map(([k, lab]) => `<option value="${k}"${S.mode === k ? ' selected' : ''}>${esc(t(lab))}</option>`).join('');
+  $('cmpBtn').textContent = t('cmp');
+  [['xPdf', 'pdf'], ['xXlsx', 'xlsx'], ['xCsv', 'csv'], ['xImg', 'img'], ['xTxt', 'txt']].forEach(([id, k]) => { $(id).textContent = t(k); });
+}
+function renderInstSum(){ const syms = bandSyms(S.band); $('instSum').textContent = t('instSum', syms.filter(s => !S.off.includes(s)).length, syms.length, bandName(S.band)); }
+function renderAll(){ renderStatic(); renderScanAll(); renderCompare(); }
+const bandGroupsVisible = () => GROUPS.filter(g => g.band === S.band);
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  const ds = b.dataset;
+  if(ds.lang){ LANG = ds.lang; try { localStorage.setItem('grafico-armonico:idioma', LANG); } catch(x){} renderAll(); return; }
+  if(ds.themeBtn){ applyTheme(ds.themeBtn); return; }
+  if(ds.band){ if(S.band !== ds.band){ const keep = $('instBox').open; S.band = ds.band; S.filter = 'all'; saveS(); renderAll(); $('instBox').open = keep; } return; }
+  if(ds.tf){ const g = +ds.tf; S.tfs = S.tfs.includes(g) ? S.tfs.filter(x => x !== g) : [...S.tfs, g]; saveS(); b.setAttribute('aria-pressed', String(S.tfs.includes(g))); return; }
+  if(ds.gall || ds.gnone){ const g = bandGroupsVisible()[+(ds.gall || ds.gnone)], on = !!ds.gall; g.list.forEach(([s]) => { S.off = S.off.filter(x => x !== s); if(!on) S.off.push(s); }); saveS(); renderStatic(); $('instBox').open = true; return; }
+  if(ds.filter){ S.filter = ds.filter; saveS(); renderCards(); return; }
+  if(ds.nside){ S.nearSide = ds.nside; saveS(); renderNear(); return; }
+  if(ds.ncopy){ const z = NEAR_CUR.find(q => q.id === ds.ncopy); if(z) copyText(nearText(z)); return; }
+  if(b.id === 'testAlert'){ audioInit(); const go = () => { beep(); notify('HARMONIX', t('testTxt'), 'harmonix-test'); toast(t('testTxt')); renderWatch(); };
+    if('Notification' in window && Notification.permission === 'default'){ try { Notification.requestPermission().then(go); } catch(e){ go(); } } else go(); return; }
+  if(b.id === 'copyCfg'){ const {watch, watchMin, ...cfg} = S; copyText(JSON.stringify(cfg, null, 2)).then(() => toast(t('wCfgOk'))); return; }
+  if(b.id === 'logClear'){ ALERT.log = []; renderWatch(); return; }
+  if(ds.copy){ const s = SCAN.items.find(q => q.id === ds.copy); if(s) copyText(sigText(s)); return; }
+  if(ds.img){ const s = SCAN.items.find(q => q.id === ds.img), rows = s && ROWS.get(s.sym + '|' + s.gran); if(s && rows) shareOrDownload(signalImage(s, rows), `senal-${s.sym}-${tfName(s.gran)}.png`); return; }
+  if(ds.rmfile){ FILES.splice(+ds.rmfile, 1); CMP.list = null; renderCompare(); return; }
+  switch(b.id){
+    case 'scanBtn': runScan(); break;
+    case 'saveBtn': saveSignals(); break;
+    case 'copyAllBtn': copyText(pickedList().map(sigText).join('\n\n')); break;
+    case 'cmpBtn': runCompare(); break;
+    case 'xPdf': exportPdf(); break;
+    case 'xXlsx': exportXlsx(); break;
+    case 'xCsv': exportCsv(); break;
+    case 'xImg': shareOrDownload(reportImage(reportData()), fileBase() + '.png'); break;
+    case 'xTxt': copyText(reportText(reportData())); break;
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if(el.dataset.pick){ const s = SCAN.items.find(q => q.id === el.dataset.pick); if(s){ s.pick = el.checked; renderSaveBar(); } return; }
+  if(el.dataset.sym){ const s = el.dataset.sym; S.off = S.off.filter(x => x !== s); if(!el.checked) S.off.push(s); saveS(); renderInstSum(); return; }
+  if(el.id === 'histSel'){ S.hist = +el.value; saveS(); return; }
+  if(el.id === 'optAdv'){ const v = num(el.value); if(isF(v) && v > 0 && v <= 100){ S.adv = v; saveS(); SCAN.items.forEach(s => { s.pick = s.pick && sigStatus(s) !== 'adv'; }); renderCards(); } else el.value = S.adv; return; }
+  if(el.id === 'optAge'){ const v = Math.round(num(el.value)); if(isF(v) && v >= 1){ S.age = Math.min(TRK_MAX_AGE, v); saveS(); el.value = S.age; } else el.value = S.age; return; }
+  if(el.id === 'edgesSel'){ S.edges = el.value; saveS(); renderNear(); return; }
+  if(el.id === 'mktPct'){ const v = num(el.value); if(isF(v) && v > 0 && v <= 50){ S.mktPct = v; saveS(); renderNear(); } else el.value = S.mktPct; return; }
+  if(/^pts[012]$/.test(el.id)){ const i = +el.id[3], v = num(el.value); if(isF(v) && v > 0){ S.pts[i] = v; saveS(); renderNear(); } else el.value = S.pts[i]; return; }
+  if(el.id === 'optWatch'){ setWatch(el.checked); return; }
+  if(el.id === 'watchMin'){ S.watchMin = +el.value || 2; saveS(); if(S.watch && !SCAN.running){ clearTimeout(ALERT.timer); const ms = S.watchMin * 60000; ALERT.next = Date.now() + ms; ALERT.timer = setTimeout(() => { if(S.watch) runScan(); }, ms); } renderWatch(); return; }
+  if(el.id === 'optReact'){ const v = num(el.value); if(isF(v) && v > 0 && v <= 100){ S.nearReact = v; saveS(); renderNear(); } else el.value = S.nearReact; return; }
+  if(el.id === 'optWait'){ S.wait = el.checked; saveS(); renderCards(); return; }
+  if(el.id === 'modeSel'){ S.mode = el.value; saveS(); renderCompare(); return; }
+  if(el.id === 'cmpFile' && el.files && el.files.length){ addFiles(el.files); el.value = ''; }
+});
+// arrastrar y soltar archivos en la zona de carga
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { if(e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+/* tema (el mismo ajuste que el escáner) */
+const THEMES = ['system', 'light', 'dark'];
+function applyTheme(th){
+  if(!THEMES.includes(th)) th = 'system';
+  if(th === 'system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = th;
+  document.querySelectorAll('[data-theme-btn]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeBtn === th)));
+  try { localStorage.setItem('grafico-armonico:tema', th); } catch(e) {}
+}
+let theme0 = 'system'; try { theme0 = localStorage.getItem('grafico-armonico:tema') || 'system'; } catch(e) {}
+
+applyTheme(theme0);
+renderAll();
+setInterval(() => { if(!SCAN.running && SCAN.items.length) renderSaveBar(); }, 30000);
+
+})();
+</script>
+</body>
+</html>

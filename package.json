@@ -1,0 +1,8 @@
+{
+  "name": "harmonix-aviso",
+  "private": true,
+  "description": "Avisos de HARMONIX · Cerca de su zona en Telegram",
+  "dependencies": {
+    "puppeteer-core": "25.16.0"
+  }
+}
